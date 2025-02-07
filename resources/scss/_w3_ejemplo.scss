@@ -1,0 +1,81 @@
+@use 'w3';
+#w3css{
+    header{
+        @extend .w3-display-container;
+        @extend .w3-content;
+        @extend .w3-indigo;
+        @extend .w3-center;
+        img{
+            width: 100%;
+            height: 250px;
+        }
+    }
+    nav{
+        @extend .w3-content;
+        @extend .w3-bar;
+        @extend .w3-black;
+        ul{
+            li{
+                a{
+                    @extend .w3-bar-item;
+                    @extend .w3-button;
+                }
+            }
+        }
+    }
+    main{
+        @extend .w3-content;
+        main{
+            @extend .w3-col;
+            width: 80%;
+            section{
+                article{
+                    form{
+                        @extend .w3-container;
+                        @extend .w3-card-4;
+                        @extend .w3-light-grey;
+                        @extend .w3-text-blue;
+                        @extend .w3-margin;
+                        input{
+                            @extend .w3-input;
+                            @extend .w3-border;
+                        }
+                        button{
+                            @extend .w3-button;
+                            @extend .w3-block;
+                            @extend .w3-section;
+                            @extend .w3-blue;
+                            @extend .w3-ripple;
+                            @extend .w3-padding;
+                        }
+                    }
+                    table{
+                        @extend .w3-table-all;
+                        @extend .w3-hoverable;
+                        @extend .w3-card-4;
+                        @extend .w3-margin;
+                        @extend .w3-container;
+                        thead{
+                            tr{
+                                @extend .w3-blue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        aside{
+            @extend .w3-col;
+            width: 20%;
+            background-color: lightgreen;
+        }
+    }
+    footer{
+        @extend .w3-content;
+        @extend .w3-center;
+        @extend .w3-light-grey;
+        @extend .w3-xlarge;
+        @extend .w3-padding-64;
+        @extend .w3-row;
+    }
+}
