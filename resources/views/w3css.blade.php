@@ -28,6 +28,10 @@
                     </p>
                 </article>
                 <article>
+                    <p>Tadeo 2
+                    </p>
+                </article>
+                <article>
                     <h3>Ejemplo Formulario</h3>
                     <form action="">
                         <h2 class="w3-center">Contact Us</h2>
