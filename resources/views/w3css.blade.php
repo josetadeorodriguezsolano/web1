@@ -26,6 +26,8 @@
                     <p>Esta pagina es un ejemplo de como utilizar
                         w3css, para crear hojas de estilo.
                     </p>
+                    <p>Javier
+                    </p>
                 </article>
                 <article>
                     <h3>Ejemplo Formulario</h3>
