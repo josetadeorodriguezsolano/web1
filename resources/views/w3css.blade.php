@@ -23,8 +23,7 @@
         <main>
             <section>
                 <article>
-                    <p>Esta pagina es un ejemplo de como utilizar
-                        w3css, para crear hojas de estilo.
+                    <p>Diego
                     </p>
                 </article>
                 <article>
