@@ -25,6 +25,7 @@
                 <article>
                     <p>Esta pagina es un ejemplo de como utilizar
                         w3css, para crear hojas de estilo.
+                        Cambio de david Isaac Acosta Molina
                     </p>
                 </article>
                 <article>
