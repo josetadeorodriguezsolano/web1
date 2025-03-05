@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('grupos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('materia_id')->constrained();
+            $table->foreignId('maestro_id')->constrained();
+            $table->integer('generacion');
+            $table->
             $table->timestamps();
         });
     }
