@@ -7623,6 +7623,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< HEAD
             "version": "11.5.7",
             "source": {
                 "type": "git",
@@ -7633,6 +7634,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e1cb706f019e2547039ca2c839898cd5f557ee5d",
                 "reference": "e1cb706f019e2547039ca2c839898cd5f557ee5d",
+=======
+            "version": "11.5.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "3946ac38410be7440186c6e74584f31b15107fc7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3946ac38410be7440186c6e74584f31b15107fc7",
+                "reference": "3946ac38410be7440186c6e74584f31b15107fc7",
+>>>>>>> origin/David-Acosta
                 "shasum": ""
             },
             "require": {
@@ -7704,7 +7717,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.7"
+=======
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.11"
+>>>>>>> origin/David-Acosta
             },
             "funding": [
                 {
@@ -7720,7 +7737,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2025-02-06T16:10:05+00:00"
+=======
+            "time": "2025-03-05T07:36:02+00:00"
+>>>>>>> origin/David-Acosta
         },
         {
             "name": "sebastian/cli-parser",
