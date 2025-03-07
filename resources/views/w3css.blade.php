@@ -23,8 +23,22 @@
         <main>
             <section>
                 <article>
+                    <p>Diego
+                    </p>
+                </article>
+                <article>
+                    <p>Iker Meza
+                    </p>
+                </article>
+                <article>
+                    <p>Isaac Schcolnik Iriarte
                     <p>Esta pagina es un ejemplo de como utilizar
                         w3css, para crear hojas de estilo.
+                        Cambio de david Isaac Acosta Molina
+                    </p>
+                </article>
+                <article>
+                    <p>Tadeo 2
                     </p>
                     <p>Javier
                     </p>
