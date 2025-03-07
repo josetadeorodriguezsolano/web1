@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->string('nombre');
             $table->string('clave')->unique();
             $table->integer('creditos');
+            $table->enum('grado',['1','2','3'])->default('1');
             $table->timestamps();
         });
     }

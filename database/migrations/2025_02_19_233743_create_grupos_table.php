@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inscritos', function (Blueprint $table) {
+        Schema::create('grupos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('grado_id');
-            $table->foreign('grado_id')->references('id')->on('grados');
-            $table->foreignId('maestro_id');
-            $table->foreign('alumno_id');
+            $table->enum('grado',['1','2','3'])->default('1');
+            $table->char('letra',1)->default('A');
             $table->integer('generacion');
-            $table->date('fecha_inscripcion');
-
-            
             $table->timestamps();
+            $table->unique(['grado','letra','generacion']);
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inscritos');
+        Schema::dropIfExists('grados');
     }
 };

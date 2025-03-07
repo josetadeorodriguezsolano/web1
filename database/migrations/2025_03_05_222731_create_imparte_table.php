@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('materia_id')->constrained();
             $table->foreignId('maestro_id')->constrained();
-            $table->foreignId('grado_id')->constrained();
-            $table->integer('generacion');
+            $table->foreignId('grupo_id')->constrained();
             $table->timestamps();
+
+            $table->unique(['grupo_id','materia_id']);
         });
     }
 
