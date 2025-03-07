@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('inscritos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('grado_id')->constrained();
+            $table->foreignId('grupo_id')->constrained();
             $table->foreignId('alumno_id')->constrained();
-            $table->integer('generacion');
             $table->timestamps();
         });
     }

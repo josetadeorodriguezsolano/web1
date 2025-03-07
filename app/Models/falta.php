@@ -2,26 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; 
 
-class falta extends Model
+class Falta extends Model
 {
-    use HasFactory; 
+    use HasFactory;
+    public $table="faltas";
+    public $timestamps=true;
+    protected $fillable = ['alumno_id', 'fecha', 'justificada'];
 
-    protected $table = "faltas"; 
-    public $timestamps = true; 
-
-    protected $primaryKey = "id";
-
-    
-    protected $fillable = [
-        'grado_id',
-        'maestro_id',
-        'fecha',
-        'hora',
-        'justificacion'
-
-    ];
-    
+    // Relación con Alumnos
+    public function alumno()
+    {
+        return $this->belongsTo(Alumno::class);
+    }
 }

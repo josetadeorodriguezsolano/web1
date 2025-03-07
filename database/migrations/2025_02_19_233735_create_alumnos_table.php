@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('curp', 18);
             $table->string('contacto', 20);
             $table->string('tutor');            //TUTOR
-            $table->unique('curp');//no permitir repetidos
-            $table->index('apellidos');
-
             $table->timestamps();
+
+            $table->index('apellidos');
+            $table->unique('curp');//no permitir repetidos
        });
     }
 
