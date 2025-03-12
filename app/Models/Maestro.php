@@ -63,4 +63,9 @@ class Maestro extends Authenticatable
         ];
     }
 
+    public function gruposImpartidos($año){
+        return Grupo::join('imparte','grupo_id','=','grupos.id')
+                    ->where([['generacion',$año],['maestro_id',$this->id]])
+                    ->get();
+    }
 }

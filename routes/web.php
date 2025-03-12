@@ -11,8 +11,8 @@ Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
     ->group(function () {
     Route::get('','mostrar');
     Route::get('{$grupo_id}','selectGrupo');
-    Route::get('inasistencia/vino/{$alumno_id}','vino');
-    Route::get('inasistencia/falto/{$alumno_id}','falto');
+    Route::get('inasistencia/vino/{alumno_id}','vino');
+    Route::get('inasistencia/falto/{alumno_id}','falto');
     Route::get('listar/{$numero_de_lista}','listar');
     Route::get('listar/{$numero_de_lista}/vino','listarVino');
     Route::get('listar/{$numero_de_lista}/falto','listarFalto');

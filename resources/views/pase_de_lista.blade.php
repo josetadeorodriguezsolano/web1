@@ -5,13 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $.fn.hasAttr = function(name) {
+            return this.attr(name) !== undefined;
+        };
+
+        $(document).ready(function(){
+            $("input[type='checkbox']").click(function() {
+                let x = $(this).hasAttr('checked');
+                let id = $(this).attr('alumno_id');
+                if (x){
+                    $.get("pase_de_lista/inasistencia/vino/"+id, function(data, status){
+                      alert("Data: " + data + "\nStatus: " + status);
+                    });
+                }
+                else {
+                    $.get("pase_de_lista/inasistencia/falto/"+id, function(data, status){
+                      alert("Data: " + data + "\nStatus: " + status);
+                    });
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     Seleccione el grupo:
         <select name="selectGrupo">
-            <option value='1000'>1A Matericas</option>
-            <option value='1001'>1B Matericas</option>
-            <option value='1002'>2C Fisica</option>
+            @foreach ($gruposImpartidos as $gpo)
+                <option value='{{$gpo->id}}'>{{$gpo->materia->grado}}{{$gpo->letra}} {{$gpo->materia->nombre}}</option>
+            @endforeach
         </select>
     Lista de Asistencia:
     <table>
@@ -27,7 +50,11 @@
             <tr>
                 <td>{{$key+1}}</td>
                 <td>{{$alumno->apellidos}} {{$alumno->nombres}}</td>
-                <td><input type="checkbox" name='alumno1' checked></td>
+                <td><input type="checkbox" name='alumno1' alumno_id='{{$alumno->id}}'
+                @if($alumno->falto(date('Y-m-d'))!=null)
+                    checked
+                @endif
+                ></td>
             </tr>
             @endforeach
         </tbody>

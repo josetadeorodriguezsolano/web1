@@ -17,4 +17,22 @@ class Falta extends Model
     {
         return $this->belongsTo(Alumno::class);
     }
+
+    public static function insertar($grupo_id,$alumno_id){
+        $data = [
+            'alumno_id' => $alumno_id,
+            'fecha' => now()->format('Y-m-d')
+        ];
+        /*$validator = Validator::make($data);
+        if ($validator->fails()) {
+            return $validator->errors();
+        }*/
+        self::create($data);
+        return true;
+    }
+
+    public static function eliminar($grupo_id,$alumno_id){
+        self::where([['alumno_id',$alumno_id],
+                     ['fecha',date('Y-m-d')]])->delete();
+    }
 }
