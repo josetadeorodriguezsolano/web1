@@ -15,17 +15,15 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($grupo->alumnos as $key => $alumno)
+            @foreach ($grupo['alumnos'] as $key => $alumno)
             <tr>
                 <td>{{$key+1}}</td>
-                <td>{{$alumno->apellidos}} {{$alumno->nombres}}</td>
-                <td><input type="checkbox" name='alumno1' alumno_id='{{$alumno->id}}'
-                @if($alumno->falto(date('Y-m-d'))!=null)
-                    checked
-                @endif
-                ></td>
+                <td>{{$alumno['apellidos']}} {{$alumno['nombres']}}</td>
+                <td>{{$grupo['alumnos'][$key]['falto']}}
+                    <input wire:click='faltas({{$key}})' wire:model="grupo->alumnos->{{$key}}->falto" type="checkbox"></td>
             </tr>
             @endforeach
         </tbody>
     </table>
+
 </div>

@@ -18,7 +18,7 @@ class Falta extends Model
         return $this->belongsTo(Alumno::class);
     }
 
-    public static function insertar($grupo_id,$alumno_id){
+    public static function insertar($alumno_id){
         $data = [
             'alumno_id' => $alumno_id,
             'fecha' => now()->format('Y-m-d')
@@ -31,7 +31,7 @@ class Falta extends Model
         return true;
     }
 
-    public static function eliminar($grupo_id,$alumno_id){
+    public static function eliminar($alumno_id){
         self::where([['alumno_id',$alumno_id],
                      ['fecha',date('Y-m-d')]])->delete();
     }

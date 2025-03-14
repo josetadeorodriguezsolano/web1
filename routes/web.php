@@ -8,27 +8,27 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('pase_lista',PaseDeLista::class);
-
-Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
-    ->group(function () {
-    Route::get('','mostrar');
-    Route::get('{$grupo_id}','selectGrupo');
-    Route::get('inasistencia/vino/{alumno_id}','vino');
-    Route::get('inasistencia/falto/{alumno_id}','falto');
-    Route::get('listar/{$numero_de_lista}','listar');
-    Route::get('listar/{$numero_de_lista}/vino','listarVino');
-    Route::get('listar/{$numero_de_lista}/falto','listarFalto');
-});
-
 Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
+    'auth:sanctum',//token autentificacion
+    config('jetstream.auth_session'),//autentificacion
+    'verified',//verificacion de correo electronico
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
+    ->group(function () {
+        Route::get('','mostrar');
+        Route::get('{$grupo_id}','selectGrupo');
+        Route::get('inasistencia/vino/{alumno_id}','vino');
+        Route::get('inasistencia/falto/{alumno_id}','falto');
+        Route::get('listar/{$numero_de_lista}','listar');
+        Route::get('listar/{$numero_de_lista}/vino','listarVino');
+        Route::get('listar/{$numero_de_lista}/falto','listarFalto');
+    });
+
+    Route::get('pase_lista',PaseDeLista::class);
 });
 
 Route::get("w3css",function(){

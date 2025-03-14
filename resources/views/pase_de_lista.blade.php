@@ -34,7 +34,7 @@
     Seleccione el grupo:
         <select name="selectGrupo">
             @foreach ($gruposImpartidos as $gpo)
-                <option value='{{$gpo->id}}'>{{$gpo->materia->grado}}{{$gpo->letra}} {{$gpo->materia->nombre}}</option>
+                <option value='{{$gpo->grupo->id}}'>{{$gpo->materia->grado}}{{$gpo->grupo->letra}} {{$gpo->materia->nombre}}</option>
             @endforeach
         </select>
     Lista de Asistencia:
