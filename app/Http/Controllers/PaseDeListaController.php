@@ -18,10 +18,11 @@ class PaseDeListaController extends Controller
 
     public function mostrar(){
         $maestro = Auth::user();
-        $gruposImpartidos = $maestro->gruposImpartidos(2024);
+        $generacion = date('Y')-1;
+        $gruposImpartidos = $maestro->gruposImpartidos($generacion);
         $grupo = Grupo::find(1);
         return view('pase_de_lista',['gruposImpartidos'=>$gruposImpartidos,
-                    'grupo'=>$grupo]);
+                    'grupo'=>$grupo,'generacion'=>$generacion]);
     }
 
     public function selectGrupo($grupo_id){

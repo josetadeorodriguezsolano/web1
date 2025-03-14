@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\PaseDeListaController;
+use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('pase_lista',PaseDeLista::class);
 
 Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
     ->group(function () {

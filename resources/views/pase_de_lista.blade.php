@@ -17,12 +17,12 @@
                 let id = $(this).attr('alumno_id');
                 if (x){
                     $.get("pase_de_lista/inasistencia/vino/"+id, function(data, status){
-                      alert("Data: " + data + "\nStatus: " + status);
+                      //alert("Data: " + data + "\nStatus: " + status);
                     });
                 }
                 else {
                     $.get("pase_de_lista/inasistencia/falto/"+id, function(data, status){
-                      alert("Data: " + data + "\nStatus: " + status);
+                      //alert("Data: " + data + "\nStatus: " + status);
                     });
                 }
             });
@@ -30,6 +30,7 @@
     </script>
 </head>
 <body>
+    Generacion: {{$generacion}}<br>
     Seleccione el grupo:
         <select name="selectGrupo">
             @foreach ($gruposImpartidos as $gpo)
