@@ -5,6 +5,7 @@
                 <option value='{{$gpo->id}}'>{{$gpo->materia->grado}}{{$gpo->letra}} {{$gpo->materia->nombre}}</option>
             @endforeach
         </select>
+    <br><button wire:click='cambiarVista(false)'>Pasar Lista</button><br>
     Lista de Asistencia:
     <table>
         <thead>
