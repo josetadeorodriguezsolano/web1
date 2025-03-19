@@ -16,6 +16,8 @@ class PaseDeLista extends Component
     public $gruposImpartidos;
     public $grupo; //id = 1
     public $selectGrupo;
+    public $buscar;
+    public $palabras = [];
 
     public function mount(){
         $impartidos = Auth::user()->gruposImpartidos($this->año);
@@ -55,5 +57,9 @@ class PaseDeLista extends Component
     public function updatedSelectGrupo(){
         //dd($this->selectGrupo);
         $this->cambiarGrupo();
+    }
+
+    public function updatedBuscar(){
+        $this->palabras[]= $this->buscar;
     }
 }

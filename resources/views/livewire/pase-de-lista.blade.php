@@ -1,12 +1,18 @@
 <div>
+    <input style="color:black" type="text" wire:model.live.debounce.1000ms="buscar" placeholder="Buscar Alumno">
+    <br>
+    @foreach ($palabras as $palabra)
+        {{$palabra}}<br>
+    @endforeach
     Seleccione el grupo:
-        <select wire:model.live="selectGrupo" style="color:black">
-            @foreach ($gruposImpartidos as $imparte)
-                <option value='{{$imparte['grupo']['id']}}'>
-                    {{$imparte['materia']['grado']}}{{$imparte['grupo']['letra']}} {{$imparte['materia']['nombre']}}
-                </option>
-            @endforeach
-        </select>
+    <select wire:model.live="selectGrupo" style="color:black">
+        @foreach ($gruposImpartidos as $imparte)
+            <option value='{{$imparte['grupo']['id']}}'>
+                {{$imparte['materia']['grado']}}{{$imparte['grupo']['letra']}} {{$imparte['materia']['nombre']}}
+            </option>
+        @endforeach
+    </select>
+    <hr>
     Lista de Asistencia:
     <table>
         <thead>
