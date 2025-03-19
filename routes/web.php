@@ -3,6 +3,7 @@
 use App\Http\Controllers\PaseDeListaController;
 use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\LogPeticion;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,7 +29,7 @@ Route::middleware([
         Route::get('listar/{$numero_de_lista}/falto','listarFalto');
     });
 
-    Route::get('pase_lista',PaseDeLista::class);
+    Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
 });
 
 Route::get("w3css",function(){
