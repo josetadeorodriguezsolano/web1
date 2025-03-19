@@ -1,8 +1,10 @@
 <div>
     Seleccione el grupo:
-        <select name="selectGrupo">
-            @foreach ($gruposImpartidos as $gpo)
-                <option value='{{$gpo->id}}'>{{$gpo->materia->grado}}{{$gpo->letra}} {{$gpo->materia->nombre}}</option>
+        <select wire:model.live="selectGrupo" style="color:black">
+            @foreach ($gruposImpartidos as $imparte)
+                <option value='{{$imparte['grupo']['id']}}'>
+                    {{$imparte['materia']['grado']}}{{$imparte['grupo']['letra']}} {{$imparte['materia']['nombre']}}
+                </option>
             @endforeach
         </select>
     Lista de Asistencia:
@@ -19,8 +21,10 @@
             <tr>
                 <td>{{$key+1}}</td>
                 <td>{{$alumno['apellidos']}} {{$alumno['nombres']}}</td>
-                <td>{{$grupo['alumnos'][$key]['falto']}}
-                    <input wire:click='faltas({{$key}})' wire:model="grupo->alumnos->{{$key}}->falto" type="checkbox"></td>
+                <td><input wire:click='faltas({{$key}})'
+                        wire:model="grupo.alumnos.{{$key}}.falto"
+                        type="checkbox">
+                </td>
             </tr>
             @endforeach
         </tbody>
