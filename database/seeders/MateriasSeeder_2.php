@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Materia;
 
-class MateriaSeeder extends Seeder {
+class MateriaSeeder_2 extends Seeder {
     public function run(): void {
         $materias = [
             ['nombre' => 'Matemáticas', 'clave' => 'MAT101', 'creditos' => 5],

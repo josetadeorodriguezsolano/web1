@@ -12,7 +12,7 @@ class Materia extends Model {
 
     protected $fillable = ['nombre', 'clave', 'creditos'];
 
-    public function porGrado($grado){
+    public static function porGrado($grado){
         return Materia::where('grado',$grado)->get();
     }
 
