@@ -20,7 +20,9 @@ class PaseDeListaController extends Controller
         $maestro = Auth::user();
         $generacion = date('Y')-1;
         $gruposImpartidos = $maestro->gruposImpartidos($generacion);
-        $grupo = Grupo::find(1);
+        $imparte = $gruposImpartidos->first();
+        $grupo = $imparte->grupo;
+        Session::put(PaseDeListaController::PASAR_LISTA_GRUPO_ID,$grupo->id);
         return view('pase_de_lista',['gruposImpartidos'=>$gruposImpartidos,
                     'grupo'=>$grupo,'generacion'=>$generacion]);
     }
