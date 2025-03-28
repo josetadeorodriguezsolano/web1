@@ -28,7 +28,16 @@ class PaseDeListaController extends Controller
     }
 
     public function selectGrupo($grupo_id){
-
+        $maestro = Auth::user();
+        $generacion = date('Y')-1;
+        $gruposImpartidos = $maestro->gruposImpartidos($generacion);
+        $imparte = $gruposImpartidos->first(function ($imparte) use ($grupo_id) {
+            return $imparte->grupo->id == $grupo_id;
+        });
+        $grupo = $imparte->grupo;
+        Session::put(PaseDeListaController::PASAR_LISTA_GRUPO_ID,$grupo->id);
+        return view('pase_de_lista',['gruposImpartidos'=>$gruposImpartidos,
+                    'grupo'=>$grupo,'generacion'=>$generacion]);
     }
 
     public function falto($alumno_id) {

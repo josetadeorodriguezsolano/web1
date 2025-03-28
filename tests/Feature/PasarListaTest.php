@@ -32,6 +32,5 @@ class PasarListaTest extends TestCase
             ->get('pase_de_lista/inasistencia/falto/'.$alumno->id);
         $response->assertStatus(200);
         $response->assertContent("false");
-
     }
 }
