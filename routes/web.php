@@ -4,6 +4,7 @@ use App\Http\Controllers\PaseDeListaController;
 use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
+use App\Livewire\CatalogoMaestros;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,6 +31,8 @@ Route::middleware([
     });
 
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
+    Route::get('catalogo/maestros',CatalogoMaestros::class);
+
 });
 
 Route::get("w3css",function(){

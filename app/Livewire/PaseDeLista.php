@@ -37,7 +37,7 @@ class PaseDeLista extends Component
         return view('livewire.pase-de-lista');//,['gruposImpartidos' => $this->gruposImpartidos]);
     }
 
-    public function cambiarGrupo(){
+    private function cambiarGrupo(){
         $grupo = Grupo::with('alumnos')->find($this->selectGrupo);
         $alumnos = $grupo->alumnos->map(function($alumno){
             $alumno->falto = ($alumno->falto(date('Y-m-d'))==null);
@@ -49,9 +49,9 @@ class PaseDeLista extends Component
 
     public function faltas($key){
         if ($this->grupo['alumnos'][$key]['falto'])
-            Falta::eliminar($this->grupo['alumnos'][$key]['id']);
-        else
             Falta::insertar($this->grupo['alumnos'][$key]['id']);
+        else
+            Falta::eliminar($this->grupo['alumnos'][$key]['id']);
     }
 
     public function updatedSelectGrupo(){
