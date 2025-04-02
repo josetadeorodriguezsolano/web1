@@ -11,9 +11,7 @@ class Alumno extends Model
     //public $table= "alumnos";
     public $timestamps=true;
 
-    public function clases(){
-
+    public function falto($fecha){
+        return Falta::where([['alumno_id',$this->id],['fecha',$fecha]])->first();
     }
-
-    public function
 }

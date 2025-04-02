@@ -13,15 +13,21 @@ return new class extends Migration
     {
         Schema::create('maestros', function (Blueprint $table) {
             $table->id();
-            $table->string('nombres');
+            $table->string('name');
             $table->string('apellidos');
             $table->string('telefono',10);
             $table->string('curp',18);
             $table->string('direccion',500);
-            $table->string('correo');
-            $table->string('password',128);
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->foreignId('current_team_id')->nullable();
+            $table->string('profile_photo_path', 2048)->nullable();
+            $table->softDeletes();
             $table->timestamps();
-            $table->index('nombres');
+
+            $table->index('name');
             $table->index('apellidos');
             $table->unique('curp');
         });
