@@ -114,8 +114,6 @@ class CatalogoMaestros extends Component
     }
 
     public function cancelar(){
-        Session::flash('error','prueba 2');
-        return;
         $this->mostrarFormulario = false;
     }
 
