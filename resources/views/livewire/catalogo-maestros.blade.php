@@ -8,22 +8,20 @@
     <hr>
     @if ($mostrarFormulario)
     <div>
-        <form  >
-            <label>Nombres</label><br>
-            <input type="text" wire:model='maestro.name'><br>
-            <label>Apellidos</label><br>
-            <input type="text" wire:model='maestro.apellidos'><br>
-            <label>Correo</label><br>
-            <input type="email" wire:model='maestro.email'><br>
-            <label>CURP</label><br>
-            <input type="text" wire:model='maestro.curp'><br>
-            <label>Direccion</label><br>
-            <input type="text" wire:model='maestro.direccion'><br>
-            <label>Telefono</label><br>
-            <input type="number" wire:model='maestro.telefono'><br>
-            <button wire:click='cancelar'>Cancelar</button>
-            <button wire:click='guardar'>Guardar</button>
-        </form>
+        <label>Nombres</label><br>
+        <input type="text" wire:model='maestro.name'><br>
+        <label>Apellidos</label><br>
+        <input type="text" wire:model='maestro.apellidos'><br>
+        <label>Correo</label><br>
+        <input type="email" wire:model='maestro.email'><br>
+        <label>CURP</label><br>
+        <input type="text" wire:model='maestro.curp'><br>
+        <label>Direccion</label><br>
+        <input type="text" wire:model='maestro.direccion'><br>
+        <label>Telefono</label><br>
+        <input type="number" wire:model='maestro.telefono'><br>
+        <button wire:click='cancelar'>Cancelar</button>
+        <button wire:click='guardar'>Guardar</button>
     </div>
     @endif
     <table>
@@ -50,5 +48,5 @@
             @endforeach
         </tbody>
     </table>
-
+    @include('livewire.errores')
 </div>

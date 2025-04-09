@@ -5,8 +5,14 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Maestro;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
+
+
 
 class CatalogoMaestros extends Component
 {
@@ -16,8 +22,15 @@ class CatalogoMaestros extends Component
     public $seleccionado;
 
     protected function rules(){
-        return ['maestro.curp'=>'requited|min:18|max:18',
+        return ['maestro.curp'=>'required|min:18|max:18',
                 'maestro.name' => 'required'];
+    }
+
+    protected function messages(){
+        return ['maestro.curp.required' => 'El campo CURP es requerido',
+                'maestro.curp.min' => 'El campo CURP debe tener 18 caracteres',
+                'maestro.curp.max' => 'El campo CURP no puede tener mas de 18 caracteres',
+                'maestro.name.required' => 'El campo nombre es requerido'];
     }
 
     public function mount(){
@@ -60,8 +73,17 @@ class CatalogoMaestros extends Component
 
     public function guardar(){
         if (isset($this->maestro['id'])){
-            if (!$this->validate())
+            try{
+                $this->validate();
+            }
+            catch (ValidationException  $e) {
+                Session::flash('error',$e->validator->errors()->first());
                 return;
+            }
+            catch (Exception $e){
+                Session::flash('error', 'Error al actualizar un maestro '.$e->getMessage());
+                return;
+            }
             $maestro = Maestro::find($this->maestro['id']);
             $maestro->name = $this->maestro['name'];
             $maestro->apellidos = $this->maestro['apellidos'];
@@ -69,6 +91,12 @@ class CatalogoMaestros extends Component
             $maestro->direccion = $this->maestro['direccion'];
             $maestro->telefono = $this->maestro['telefono'];
             $maestro->curp = $this->maestro['curp'];
+            try{
+                Gate::authorize('update',$maestro);
+            }catch (AuthorizationException $e) {
+                Session::flash('error', 'No tiene autorizacion');
+                return;
+            }
             $maestro->save();
         }
         else{
@@ -76,14 +104,18 @@ class CatalogoMaestros extends Component
             try{
                 Maestro::create($this->maestro);
             }catch (Exception $e){
-                Log::error('Error al insertar un maestro '.$e->getMessage());
+                Session::flash('error', 'Error al insertar un maestro '.$e->getMessage());
+                return;
             }
         }
         $this->maestros = Maestro::all()->toArray();
         $this->maestro = [];
+        $this->mostrarFormulario = false;
     }
 
     public function cancelar(){
+        Session::flash('error','prueba 2');
+        return;
         $this->mostrarFormulario = false;
     }
 

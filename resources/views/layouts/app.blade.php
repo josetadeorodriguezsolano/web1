@@ -10,7 +10,7 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+        <script src='/js/jquery-3.7.1.js'></script>
         <!-- Scripts -->
         @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 
@@ -19,10 +19,8 @@
     </head>
     <body class="font-sans antialiased">
         <x-banner />
-
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @livewire('navigation-menu')
-
             <!-- Page Heading -->
             @if (isset($header))
                 <header class="bg-white dark:bg-gray-800 shadow">
@@ -37,9 +35,6 @@
                 {{ $slot }}
             </main>
         </div>
-
-        @stack('modals')
-
-        @livewireScripts
+        @yield('errores')
     </body>
 </html>

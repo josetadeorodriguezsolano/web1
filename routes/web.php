@@ -18,7 +18,6 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
     Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
     ->group(function () {
         Route::get('','mostrar');
@@ -29,10 +28,8 @@ Route::middleware([
         Route::get('listar/{$numero_de_lista}/vino','listarVino');
         Route::get('listar/{$numero_de_lista}/falto','listarFalto');
     });
-
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
-
 });
 
 Route::get("w3css",function(){
