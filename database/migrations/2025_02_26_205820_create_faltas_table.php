@@ -17,6 +17,8 @@ return new class extends Migration
             $table->date('fecha');
             $table->boolean('justificada')->default(false);
             $table->timestamps();
+
+            $table->unique(['alumno_id','fecha']);
         });
     }
 

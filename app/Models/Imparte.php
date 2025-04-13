@@ -18,4 +18,8 @@ class Imparte extends Model
     public function materia(){
         return $this->belongsTo(Materia::class);
     }
+
+    public function maestro(){
+        return $this->belongsTo(Maestro::class);
+    }
 }
