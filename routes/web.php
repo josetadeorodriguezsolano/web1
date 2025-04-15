@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\PaseDeListaController;
 use App\Http\Controllers\PdfController;
 use App\Livewire\PaseDeLista;
@@ -32,6 +34,7 @@ Route::middleware([
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
+    Route::resource('alumnos', AlumnoController::class); //placeholder para acceder a las funciones CRUD de Alumno
 });
 
 Route::get("w3css",function(){
