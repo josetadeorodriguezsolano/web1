@@ -23,7 +23,7 @@
     <!-- Menú -->
     <nav class="mt-36 space-y-1">
         <a href="/dashboard" class="flex items-center py-3 px-6 hover:bg-gray-300">
-            <i data-lucide="home" class="w-5 h-5 mr-3"></i> Dashboard
+            <i data-lucide="home" class="w-5 h-5 mr-3"></i> Inicio
         </a>
         <a href="/pase_de_lista" class="flex items-center py-3 px-6 hover:bg-gray-300">
             <i data-lucide="list" class="w-5 h-5 mr-3"></i> Pase de Lista
@@ -38,14 +38,6 @@
             <i data-lucide="award" class="w-5 h-5 mr-3"></i> Calificaciones
         </a>
     </nav>
-</div>
-
-
-    <!-- Contenido -->
-    <div class="flex-1 p-8">
-        <h1 class="text-4xl font-bold mb-4">Bienvenido a Mi Secundaria🎉</h1> </h1>
-        <p class="text-lg text-gray-700">El sistema que facilitará la gestión de tu secundaria</p>
-    </div>
 </div>
 
 <script>

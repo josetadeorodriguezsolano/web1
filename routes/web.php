@@ -12,14 +12,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
 Route::middleware([
     'auth:sanctum',//token autentificacion
     config('jetstream.auth_session'),//autentificacion
     'verified',//verificacion de correo electronico
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+
 
     Route::get('/admin/index', [InscripcionesController::class, 'index'])->name('admin.inscripciones');
 
