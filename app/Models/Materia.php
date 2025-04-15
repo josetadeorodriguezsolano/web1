@@ -15,5 +15,8 @@ class Materia extends Model {
     public static function porGrado($grado){
         return Materia::where('grado',$grado)->get();
     }
+    public function grupos() {
+        return $this->hasMany(Grupo::class);
+      }
 
 }

@@ -21,4 +21,7 @@ class Grupo extends Model
     public function materia(){
         return $this->belongsTo(Materia::class);
     }
+    public function imparte() {
+        return $this->hasMany(Imparte::class);
+      }
 }
