@@ -40,7 +40,6 @@
                 <article>
                     <p>Tadeo 2
                     </p>
-                    <p>Nancy :D</p>
                 </article>
                 <article>
                     <h3>Ejemplo Formulario</h3>

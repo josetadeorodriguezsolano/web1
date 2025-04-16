@@ -5,19 +5,26 @@ use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
+use App\Http\Controllers\InscripcionesController;
+
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
 Route::middleware([
     'auth:sanctum',//token autentificacion
     config('jetstream.auth_session'),//autentificacion
     'verified',//verificacion de correo electronico
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+
+
+    Route::get('/admin/index', [InscripcionesController::class, 'index'])->name('admin.inscripciones');
+
 
     Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
     ->group(function () {
@@ -34,6 +41,11 @@ Route::middleware([
     Route::get('catalogo/maestros',CatalogoMaestros::class);
 
 });
+
+Route::get('/menu', function () {
+    return view('menu');
+})->name('menu');
+
 
 Route::get("w3css",function(){
     return view("w3css");
