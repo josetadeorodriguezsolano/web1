@@ -9,14 +9,37 @@ class Inscrito extends Model
 {
     use HasFactory;
 
-    public function grupo(){
-        return $this->belongsTo(Grupo::class);//,'id','grupo_id');
-        //return $this->hasOne();// 1 a 1
-        //return $this->hasMany();// 1 a muchos
-        //return $this->belongsTo();// inverso de hasOne y hasMany
+   protected $fillable = [
+        'alumno_id',
+        'grupo_id',
+        'estatus',
+    ];
+
+    // Relaciones
+    public function alumno()
+    {
+        return $this->belongsTo(Alumno::class);
     }
 
-    public function alumno(){
-        return $this->belongsTo(Alumno::class);//,'id','alumno_id');
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class);
     }
+
+    // Accesores para datos del grupo
+    public function getGradoAttribute()
+    {
+        return $this->grupo->grado ?? null;
+    }
+
+    public function getGeneracionAttribute()
+    {
+        return $this->grupo->generacion ?? null;
+    }
+
+    public function getSalonAttribute()
+    {
+        return $this->grupo->letra ?? null;
+    }
+
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * ACTUALIZAR ESTA MIGRACION EN BASE A LO USADO EN EL MODELO: CALIFICACION
      */
     public function up(): void
     {
