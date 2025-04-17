@@ -3,14 +3,17 @@
 use App\Http\Controllers\PaseDeListaController;
 use App\Http\Controllers\PdfController;
 use App\Livewire\PaseDeLista;
+use App\Livewire\view;
+
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
 
-Route::get('/', function () {
-    return view('welcome');
+//welcome
+Route::get('reportes', function (){
+    return view('reportes');
 });
-
 Route::middleware([
     'auth:sanctum',//token autentificacion
     config('jetstream.auth_session'),//autentificacion
