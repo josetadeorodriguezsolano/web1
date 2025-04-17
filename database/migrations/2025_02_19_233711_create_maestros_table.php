@@ -9,6 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    //cambio esme
     public function up(): void
     {
         Schema::create('maestros', function (Blueprint $table) {
