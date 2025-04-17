@@ -14,4 +14,10 @@ class Alumno extends Model
     public function falto($fecha){
         return Falta::where([['alumno_id',$this->id],['fecha',$fecha]])->first();
     }
+
+    public function inscritos(){
+
+        return $this->hasMany(Inscrito::class);
+    }
+
 }
