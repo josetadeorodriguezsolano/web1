@@ -18,5 +18,8 @@ class Materia extends Model {
     public function grupos() {
         return $this->hasMany(Grupo::class);
       }
-
+      public function maestros()
+      {
+          return $this->belongsToMany(Maestro::class, 'imparte', 'materia_id', 'maestro_id');
+      }
 }

@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Grupo;
 use App\Models\Alumno;
 use App\Models\Materia;
+use App\Models\Maestro;
 
 
 class ReportesGrupo extends Component
@@ -20,109 +21,42 @@ class ReportesGrupo extends Component
     public $resultados = []; //De esta forma debe de quedar al momento en que funcione correctamente alumnosInscritos
     public $letra = null;
     public $grado = null;
+// Agrega esta propiedad al inicio de tu componente
+public $tabActivo = 'maestros';
 
-    public function mount()
+// Agrega este método para materias con maestro
+public function materiasConMaestro()
 {
-    // Datos simulados
-
-    $this->resultados = [
-        (object)[
-            'id' => 1,
-            'name' => 'Matt Gottlieb',
-            'apellidos' => 'Lang',
-            'telefono' => '7167928925',
-            'curp' => 'VEZQZX7ZNXJT46HB60',
-            'direccion' => '63864 Blick Rapid, Olsonstad, WY 83059',
-            'email_verified_at' => '2025-04-15 21:08:30',
-        ],
-        (object)[
-            'id' => 2,
-            'name' => 'Marley Hagenes',
-            'apellidos' => 'Medhurst',
-            'telefono' => '7271620148',
-            'curp' => 'RAGXKN7Z28ATGCXWD2',
-            'direccion' => '765 Mante Valley Suite 020, Klockburgh, FL 31652-3454',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 3,
-            'name' => 'Dr. Stephania Keeling I',
-            'apellidos' => 'Hoeger',
-            'telefono' => '5273039822',
-            'curp' => 'K6957GQTCSDYJ6R4QN',
-            'direccion' => '81548 Zboncak Mills, New Gideon, LA 83826-3008',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 4,
-            'name' => 'David Collins I',
-            'apellidos' => 'Rosenbaum',
-            'telefono' => '4110748944',
-            'curp' => 'I8NMAK1P8RL7MET7LX',
-            'direccion' => '56787 Schamberger Turnpike, New Staceytown, DC 59827',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 5,
-            'name' => 'Prof. Shyann Douglas III',
-            'apellidos' => 'Schroeder',
-            'telefono' => '0701663821',
-            'curp' => 'WM03HM79HBO6JKYVF',
-            'direccion' => '3914 Janice Inlet Suite 109, Port Chester, WY 83800-2520',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 6,
-            'name' => 'Laron Marks',
-            'apellidos' => 'Casper',
-            'telefono' => '4692690404',
-            'curp' => 'U04NYPPU670PMT948',
-            'direccion' => '426 Schumm Land, East Caden, DC 43775-0797',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 7,
-            'name' => 'Ms. Felicity Carroll',
-            'apellidos' => 'Nader',
-            'telefono' => '6793984746',
-            'curp' => 'B0ZTMRNY83X0E8Q0QR',
-            'direccion' => '68405 Beth Estate Apt. 613, West Ruth, NV 07869',
-            'email_verified_at' => '2025-04-15 21:08:31',
-        ],
-        (object)[
-            'id' => 8,
-            'name' => 'Prof. Dortha Stokes IV',
-            'apellidos' => 'King',
-            'telefono' => '45046640256',
-            'curp' => 'UI0SRXGULPVXJD9DIX',
-            'direccion' => '4052 Rempel Crossing, Edenfort, TX 80736',
-            'email_verified_at' => '2025-04-15 21:08:32',
-        ],
-    ];
-
+    return Materia::whereHas('grupos.imparte')
+        ->when($this->grado, fn($q) => $q->where('grado', $this->grado))
+        ->with(['grupos.imparte.maestro'])
+        ->get();
 }
+
 
      //Obtiene todos los grupos con número de alumnos
      //Lo puedes filtrar por generación
 
-
      public function controlEscolar()
      {
-        logger("La letra seleccionada es: $this->letra");
-        logger("El grado seleccionado es: $this->grado");
-        logger("La generacion seleccionada es: $this->generacion");
+         logger("Filtros aplicados:", [
+             'grado' => $this->grado,
+             'letra' => $this->letra,
+             'generacion' => $this->generacion
+         ]);
 
-        //$this->resultados = $this-> gruposConAlumnos();
+         $this->resultados = Alumno::with(['inscritos.grupo'])
+             ->whereHas('inscritos.grupo', function($q) {
+                 $q->when($this->grado, fn($q) => $q->where('grado', $this->grado))
+                   ->when($this->letra, fn($q) => $q->where('letra', $this->letra))
+                   ->when($this->generacion, fn($q) => $q->where('generacion', $this->generacion));
+             })
+             ->orderBy('apellidos')
+             ->orderBy('nombres')
+             ->get();
 
-        $this->grupo_id = 1;
-        $this->resultados = $this->alumnosInscritos();
-        //logger("El grupo_id es: $this->grupo_id");
-        //$this->resultados = $this->filtrarGrupos('2024', '1', 'grado');
-        //$this->buqueda = 1;
-        //$this->resultados = $this->maestrosPorMateria();
-        //logger("El contenido de resultados es: $this->resultados");
+
      }
-
 
     public function gruposConAlumnos()
     {
@@ -134,9 +68,9 @@ class ReportesGrupo extends Component
             ->get();
     }
 
-    public function cambiarResutados()
+    /*public function cambiarResutados()
     {
-        /*
+
         //Cambiar el arreglo resultados de alumno
         $this->resultados  = [
             (object)[
@@ -170,7 +104,7 @@ class ReportesGrupo extends Component
                 'tutor' => 'Susanna Daniel DDS',
             ],
         ];
-        */
+
         //Cambiar el arreglo resultados para los grupos
         $this->resultados = [
             (object) [
@@ -211,18 +145,41 @@ class ReportesGrupo extends Component
             ],
         ];
     }
+        */
+        public function getTotalAlumnosProperty()
+        {
+            return Alumno::count();
+        }
+
+        public function getTotalMaestrosProperty()
+        {
+            return Maestro::count();
+        }
+
+        public function getMateriasSinMaestroCountProperty()
+        {
+            return Materia::whereDoesntHave('maestros')->count();
+        }
+
+        public function getGruposSinMaestroCountProperty()
+        {
+            return Grupo::whereDoesntHave('imparte')->count();
+        }
+
     // Obtiene alumnos inscritos en un grupo específico (nombres)
      // Requiere que $grupo_id no sea null
 
-    public function alumnosInscritos()
-    {
-        if(!$this->grupo_id) return collect();
-
-        return Alumno::whereHas('inscritos', fn($q) => $q->where('grupo_id', $this->grupo_id))
-            ->orderBy('apellidos')
-            ->orderBy('nombres')
-            ->get();
-    }
+     public function alumnosInscritos()
+     {
+         return Alumno::whereHas('inscritos.grupo', function($q) {
+                 $q->when($this->grado, fn($q) => $q->where('grado', $this->grado))
+                   ->when($this->letra, fn($q) => $q->where('letra', $this->letra))
+                   ->when($this->generacion, fn($q) => $q->where('generacion', $this->generacion));
+             })
+             ->orderBy('apellidos')
+             ->orderBy('nombres')
+             ->paginate(15);
+     }
 
 
      //Obtiene las generaciones disponibles
@@ -237,18 +194,6 @@ class ReportesGrupo extends Component
     }
 
 
-     //Método principal para usar en el blase
-
-    public function render()
-    {
-        return view('livewire.reportes-grupo', [
-            'grupos' => $this->gruposConAlumnos(),
-            'resultados' => $this->resultados,
-            'generaciones' => $this->generacionesDisponibles(),
-            'letra' => $this->letra,
-            'grado' => $this->grado
-        ]);
-    }
 
 
     /**
@@ -294,6 +239,23 @@ class ReportesGrupo extends Component
         }])->findOrFail($this->buqueda);
     }
 
+    //Método principal para usar en el blase
+
+    public function render()
+    {
+        return view('livewire.reportes-grupo', [
+            'totalAlumnos' => $this->totalAlumnos,
+            'totalMaestros' => $this->totalMaestros,
+            'materiasSinMaestroCount' => $this->materiasSinMaestroCount,
+            'gruposSinMaestroCount' => $this->gruposSinMaestroCount,
+            'grupos' => $this->gruposConAlumnos(),
+            'resultados' => $this->resultados,
+            'generaciones' => $this->generacionesDisponibles(),
+            'letra' => $this->letra,
+            'grado' => $this->grado
+
+        ]);
+    }
 
 }
 ?>
