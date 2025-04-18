@@ -7,19 +7,21 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * ACTUALIZAR ESTA MIGRACION EN BASE A LO USADO EN EL MODELO: CALIFICACION
      */
     public function up(): void
     {
         Schema::create('calificaciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('alumno_id')->constrained('alumnos');
-            $table->foreignId('imparte_id')->constrained('imparte');
-            $table->string('unidad'); // Campo para la unidad
-            $table->float('calificacion', 3, 1)->check('calificacion >= 1.0 AND calificacion <= 10.0');
-            $table->timestamps();
+            
+            $table->foreignId('alumno_id')->constrained();
+            $table->foreignId('materia_id')->constrained();
+            $table->foreignId('grupo_id')->constrained();
+            $table->foreignId('imparte_id')->constrained('imparte'); // Ajusta si es otra tabla
+            $table->unsignedTinyInteger('unidad');
+            $table->decimal('calificacion', 5, 2);
 
-            $table->unique(['alumno_id', 'imparte_id', 'unidad']);
+            $table->timestamps();
         });
     }
 
@@ -31,3 +33,4 @@ return new class extends Migration
         Schema::dropIfExists('calificaciones');
     }
 };
+
