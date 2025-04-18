@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Validation\ValidationException;
+
 
 
 class Calificacion extends Model
@@ -14,8 +16,6 @@ class Calificacion extends Model
 
     protected $fillable = [
         'alumno_id',
-        'materia_id',
-        'grupo_id',
         'imparte_id',
         'unidad',
         'calificacion',
@@ -27,19 +27,32 @@ class Calificacion extends Model
         return $this->belongsTo(Alumno::class);
     }
 
+    public function imparte()
+    {
+        return $this->belongsTo(Imparte::class);
+    }
     public function materia()
     {
-        return $this->belongsTo(Materia::class);
+        return $this->imparte->materia();
     }
 
     public function grupo()
     {
-        return $this->belongsTo(Grupo::class);
+        return $this->imparte->grupo();
     }
 
-    public function imparte()
+    public static function boot()
     {
-        return $this->belongsTo(Imparte::class);
+        parent::boot();
+
+        static::saving(function ($calificacion) {
+            // Validar si la calificación está dentro del rango
+            if ($calificacion->calificacion < 1.0 || $calificacion->calificacion > 10.0) {
+                throw ValidationException::withMessages([
+                    'calificacion' => ['La calificación debe estar entre 1.0 y 10.0'],
+                ]);
+            }
+        });
     }
 }
 

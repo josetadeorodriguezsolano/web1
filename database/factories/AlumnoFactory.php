@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
+use Faker\Generator as FakerGenerator;
 use Illuminate\Database\Eloquent\Factories\Factory;
-USE App\Models\alumno;
-use Illuminate\Support\Testing\Fakes\Fake;
+use App\Models\Alumno;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
 class AlumnoFactory extends Factory
 {
-    protected $model = alumno::class;
+    protected $model = Alumno::class;
 
     /**
      * Define the model's default state.
@@ -21,13 +21,24 @@ class AlumnoFactory extends Factory
     public function definition(): array
     {
         return [
-            'matricula' => $this->faker->regexify('[A-Z0-9]{10}'),
-            'nombres'   => $this->faker->firstName,
-            'apellidos' => $this->faker->lastName,
-            'estatus'   => $this->faker->randomElement(['vigente', 'egresado', 'baja']),
-            'curp'      => strtoupper($this->faker->unique()->regexify('[A-Z0-9]{18}')),
+            'matricula' => strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 4)) . $this->faker->randomNumber(4, true),
+            'nombres' => 'Juan Gustavo',
+            'apellidos' => 'Corrales Cerveza',
+           // 'estatus'   => $this->faker->randomElement(['vigente', 'egresado', 'baja']),
+            'curp'      => strtoupper(
+                substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 3) .
+                $this->faker->numerify('######') .
+                'H' .
+                substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6) .
+                $this->faker->numerify('##')
+            ),
             'contacto'  => $this->faker->numerify('##########'),
-            'tutor'     => $this->faker->name,
+            'tutor'     => 'Berenice Talamantes',
         ];
     }
+    public function withFaker(): FakerGenerator
+    {
+        return \Faker\Factory::create('es_MX'); // o 'es_ES', o 'en_US'
+    }
+
 }

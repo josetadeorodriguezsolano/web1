@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Falta;
+use App\Models\Grupo;
 use App\Models\Alumno;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GrupoFactory extends Factory
 {
-    protected $model = Falta::class;
+    protected $model = Grupo::class;
 
     public function definition(): array
     {

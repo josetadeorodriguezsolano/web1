@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('grupo_id')->constrained();
             $table->foreignId('alumno_id')->constrained();
+            $table->enum('estatus', ['vigente', 'baja', 'egresado'])->default('vigente'); // Columna 'estatus' con valores restringidos
             $table->timestamps();
         });
     }
