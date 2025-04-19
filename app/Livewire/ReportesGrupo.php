@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Grupo;
 use App\Models\Alumno;
+use App\Models\Materia;
 
 class ReportesGrupo extends Component
 {
@@ -13,7 +14,8 @@ class ReportesGrupo extends Component
     public $generacion = null;
     public $alumnos =[];
 
-
+    public $maestros = [];
+    public $materia_id = null;
      //Obtiene todos los grupos con número de alumnos
      //Lo puedes filtrar por generación
 
@@ -21,8 +23,33 @@ class ReportesGrupo extends Component
     public function controlEscolar()
     {
         logger('Ejecutando controlEscolar');
-        $this->alumnos = $this->alumnosInscritos();
-        dd($this->alumnos);
+
+        if($this->grupo_id!=0) //Este if es para busquedas de alumnos
+        {
+            //dd("Estoy entrando en el if de alumnos");
+            $this->alumnos = $this->alumnosInscritos();
+            //dd($this->alumnos);
+        }
+        else //Este else es para las operaciones de maestros buscados por materia
+        {
+            //dd("Estoy entrando en el else de maestros");
+            /*
+            $this->maestros = [
+                (object)[
+                    'id' => 1,
+                    'name' => 'Matt Gottlieb',
+                    'apellidos' => 'Lang',
+                    'telefono' => '7167928925',
+                    'curp' => 'VEZQZX7ZNXJT46HB60',
+                    'direccion' => '63864 Blick Rapid, Olsonstad, WY 83059',
+                    'email' => 'elena93@example.org',
+                ]
+
+           ];
+           */
+           $this->maestros = $this->maestrosPorMateria(1);
+        }
+
     }
 
 
@@ -72,7 +99,10 @@ class ReportesGrupo extends Component
         return view('livewire.reportes-grupo', [
             'grupos' => $this->gruposConAlumnos(),
             'alumnos' => $this->alumnosInscritos(),
-            'generaciones' => $this->generacionesDisponibles()
+            'maestros' => $this->maestros,
+            'generaciones' => $this->generacionesDisponibles(),
+            'materia_id' => $this->materia_id,
+            'grupo_id' => $this->grupo_id
         ]);
     }
 
@@ -112,4 +142,11 @@ class ReportesGrupo extends Component
         ->orderBy('letra')
         ->get();
 }
+
+public function maestrosPorMateria($materia_id)
+    {
+        return Materia::with(['grupos.imparte.maestro' => function($q) {
+            $q->distinct()->select('maestros.id', 'name', 'apellidos');
+        }])->findOrFail($materia_id);
+    }
 }
