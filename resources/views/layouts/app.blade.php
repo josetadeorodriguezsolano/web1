@@ -8,10 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
     </style>
 </head>
-
 
 <body class="bg-gray-100">
 
@@ -37,7 +44,7 @@
             <div class="w-10 h-10 flex items-center justify-center bg-white text-[#1E3A8A] rounded-full border-2 border-white">
                 <i data-lucide="user" class="w-6 h-6"></i>
             </div>
-                    </div>
+        </div>
     </header>
 
     <!-- Sidebar -->
@@ -45,33 +52,13 @@
         @include('menu')
     </aside>
 
-
     <!-- Contenido Principal -->
-    <main class="pt-20 pb-24 px-6 transition-all duration-300" id="mainContent">
+    <main class="pt-20 px-6 transition-all duration-300" id="mainContent">
         @yield('content')
     </main>
 
-
-
-    <script>
-        lucide.createIcons()
-
-        const sidebar = document.getElementById('sidebar')
-        const toggleBtn = document.getElementById('toggleSidebar')
-        const closeBtn = document.getElementById('closeSidebar')
-        const mainContent = document.getElementById('mainContent')
-
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full')
-        })
-
-        closeBtn.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full')
-        })
-    </script>
-
-    <!-- Footer -->
-    <footer class="flex items-center px-6 py-2 bg-[#1E3A8A] text-white fixed bottom-0 w-full z-50">
+    <!-- Footer - Modifique aquí para que ya no quede fijo, y aparezca al final de la página -->
+    <footer class="flex items-center px-6 py-2 bg-[#1E3A8A] text-white w-full z-40">
         <!-- Imagen grande -->
         <div class="flex-shrink-0 mr-4">
             <img src="{{ asset('img/SecundariaBlancos.png') }}" alt="Logo" class="h-60 object-contain">
@@ -86,7 +73,16 @@
         </div>
     </footer>
 
+    <script>
+        lucide.createIcons()
 
+        const sidebar = document.getElementById('sidebar')
+        const toggleBtn = document.getElementById('toggleSidebar')
+        const mainContent = document.getElementById('mainContent')
 
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full')
+        })
+    </script>
 </body>
 </html>

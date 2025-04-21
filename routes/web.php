@@ -9,12 +9,16 @@ use App\Http\Controllers\InscripcionesController;
 
 
 Route::get('/', function () {
-    return view('menu');
+    return view('dashboard');
 });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/calificaciones', function () {
+    return view('calificaciones');
+})->name('calificaciones');
 
 Route::middleware([
     'auth:sanctum',//token autentificacion
