@@ -4,19 +4,19 @@
     <div class="grid grid-cols-4 gap-4">
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Total Alumnos</h2>
-            <p class="text-2xl font-bold">200</p> {{-- Reemplazar con variable Livewire --}}
+            <p class="text-2xl font-bold">{{ $totalAlumnos }}</p>
         </div>
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Total Maestros</h2>
-            <p class="text-2xl font-bold">18</p> {{-- Reemplazar con variable Livewire --}}
+            <p class="text-2xl font-bold">{{ $totalMaestros }}</p>
         </div>
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Materias sin Maestro</h2>
-            <p class="text-2xl font-bold">3</p> {{-- Reemplazar con variable Livewire --}}
+            <p class="text-2xl font-bold">{{ }}</p>
         </div>
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
-            <p class="text-2xl font-bold">2</p> {{-- Reemplazar con variable Livewire --}}
+            <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
         </div>
     </div>
 

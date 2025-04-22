@@ -18,5 +18,8 @@ class Materia extends Model {
     public function grupos() {
         return $this->hasMany(Grupo::class);
       }
-
+      public function imparte()
+      {
+          return $this->hasMany(Imparte::class);
+      }
 }
