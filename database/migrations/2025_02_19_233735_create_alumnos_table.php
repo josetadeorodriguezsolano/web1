@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('alumnos', function (Blueprint $table) {
             $table->id();
-            $table->string('matricula',10);
+            $table->string('matricula', 10)->unique();
             $table->string('nombres'); //por default no se permite NULL
             $table->string('apellidos');
             $table->enum('estatus', ['vigente', 'egresado', 'baja'])->default('vigente');

@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\maestro;
-use App\Models\materia;
+use App\Models\Imparte;
+use App\Models\Materia;
+use App\Models\Maestro;
+use App\Models\Grupo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,17 +13,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ImparteFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Imparte::class;
+
     public function definition(): array
     {
         return [
-            "materia_id" => materia::pluck('id')->random(),
-            "maestro_id" => maestro::pluck('id')->random(),
-            "grupo_id" => maestro::pluck('id')->random(),
+            'materia_id' => Materia::factory(),
+            'maestro_id' => Maestro::factory(),
+            'grupo_id'   => Grupo::factory(),
         ];
     }
 }
