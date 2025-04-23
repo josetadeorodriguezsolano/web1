@@ -6,60 +6,103 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Grupo;
 use App\Models\Falta;
+use App\Models\Materia;
 use App\Models\Maestro;
 use Livewire\Attributes\Locked;
 
 class PaseDeLista extends Component
 {
     private $año = 2024;
-    #[locked]
+
+    #[Locked]
     public $gruposImpartidos;
-    public $grupo; //id = 1
+
+    public $grupo; // id = 1
     public $selectGrupo;
     public $buscar;
     public $palabras = [];
 
-    public function mount(){
+    // Nuevas propiedades para manejar materias ()
+
+    public $materias;
+    public $materiaSeleccionada;
+
+    public function mount()
+    {
+        // Obtener todas las materias del maestro
+        $this->materias = Materia::materiasPorMaestro(Auth::id(), $this->año);
+        $this->materiaSeleccionada = $this->materias->first()->id ?? null;
+
+        // Obtener grupos impartidos
         $impartidos = Auth::user()->gruposImpartidos($this->año);
-        $this->gruposImpartidos = $impartidos->map(function($imparte){
-            $imparte->grupo = $imparte->grupo->only(['id','letra']);
-            $imparte->materia = $imparte->materia->only(['id','grado','nombre']);
-            return  $imparte->only(['grupo','materia']);
+        $this->gruposImpartidos = $impartidos->map(function($imparte) {
+            $imparte->grupo = $imparte->grupo->only(['id', 'letra']);
+            $imparte->materia = $imparte->materia->only(['id', 'grado', 'nombre']);
+            return $imparte->only(['grupo', 'materia']);
         })->values();
-        //dd($this->gruposImpartidos);
-        $this->selectGrupo = $this->gruposImpartidos[0]['grupo']['id'];
+
+        $this->selectGrupo = $this->gruposImpartidos[0]['grupo']['id'] ?? null;
         $this->cambiarGrupo();
     }
 
     public function render()
     {
-        //$this->gruposImpartidos = Auth::user()->gruposImpartidos($this->año);
-        return view('livewire.pase-de-lista');//,['gruposImpartidos' => $this->gruposImpartidos]);
+        return view('livewire.pase-de-lista');
     }
 
-    private function cambiarGrupo(){
+    private function cambiarGrupo()
+    {
+        if (!$this->selectGrupo) return;
+
         $grupo = Grupo::with('alumnos')->find($this->selectGrupo);
-        $alumnos = $grupo->alumnos->map(function($alumno){
-            $alumno->falto = ($alumno->falto(date('Y-m-d'))==null);
-            return  $alumno->only(['id','nombres','apellidos','falto']);
+        $alumnos = $grupo->alumnos->map(function($alumno) {
+            $alumno->falto = ($alumno->falto(date('Y-m-d')) == null;
+            return $alumno->only(['id', 'nombres', 'apellidos', 'falto']);
         });
-        $grupo->alumnos = $alumnos;
-        $this->grupo = $grupo->only(['id','alumnos']);
+
+        $this->grupo = $grupo->only(['id', 'alumnos']);
     }
 
-    public function faltas($key){
-        if ($this->grupo['alumnos'][$key]['falto'])
+    // Método para filtrar grupos por materia seleccionada (JUAN)
+    public function updatedMateriaSeleccionada()
+    {
+        $this->gruposImpartidos = Auth::user()
+            ->gruposImpartidos($this->año)
+            ->filter(function($imparte) {
+                return $imparte->materia_id == $this->materiaSeleccionada;
+            })
+            ->map(function($imparte) {
+                return [
+                    'grupo' => $imparte->grupo->only(['id', 'letra']),
+                    'materia' => $imparte->materia->only(['id', 'grado', 'nombre'])
+                ];
+            })->values();
+
+        if ($this->gruposImpartidos->isNotEmpty()) {
+            $this->selectGrupo = $this->gruposImpartidos->first()['grupo']['id'];
+            $this->cambiarGrupo();
+        } else {
+            $this->grupo = null;
+        }
+    }
+
+    // Métodos originales
+    public function faltas($key)
+    {
+        if ($this->grupo['alumnos'][$key]['falto']) {
             Falta::insertar($this->grupo['alumnos'][$key]['id']);
-        else
+        } else {
             Falta::eliminar($this->grupo['alumnos'][$key]['id']);
+        }
     }
 
-    public function updatedSelectGrupo(){
-        //dd($this->selectGrupo);
+    public function updatedSelectGrupo()
+    {
         $this->cambiarGrupo();
     }
 
-    public function updatedBuscar(){
-        $this->palabras[]= $this->buscar;
+    public function updatedBuscar()
+    {
+        $this->palabras[] = $this->buscar;
     }
 }
