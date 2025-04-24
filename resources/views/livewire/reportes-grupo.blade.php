@@ -85,7 +85,7 @@
             @else
             <div>
                 <label class="block mb-1">Materia</label>
-                <select wire:model="materia_id" class="w-full border rounded p-2">
+                <select wire:model.defer="materia_id" wire:change="actualizarMateriaId" class="w-full border rounded p-2">
                     <option value="">Todos</option>
                     @foreach ($materias as $materia)
                         <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
@@ -104,7 +104,13 @@
         </div>
 
         <div class="text-right">
-            <button wire:click="controlEscolar" class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+            <button
+            @if ($modo)
+                wire:click="controlEscolar"
+            @else
+               wire:click="controlEscolarMaestros"
+            @endif
+            class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>

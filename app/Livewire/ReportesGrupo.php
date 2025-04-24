@@ -38,6 +38,13 @@ class ReportesGrupo extends Component
         $this->cargarDatosIniciales();
     }
 
+    public function actualizarMateriaId(){
+        //dd("Se actualizó a: ", $value);
+        $this->materia_id = $this->materia_id !== '' ? (int) $this->materia_id : null;
+        //dd("Materia se actualizo a: ", $this->materia_id);
+    }
+
+
     public function calcularEstadisticas()
     {
         $this->totalAlumnos = Alumno::count();
@@ -64,17 +71,64 @@ class ReportesGrupo extends Component
         $this->resultados = $this->alumnosInscritos()->take(5);
     }
 
+    /*Tanto este metodo como el contolEscolarMaestros deberian ser el mismo
+        pero por algun motivo el if en control escolar del modo no funciona
+        como deberia, asi se creo un metodo particualar para cada caso, un if en
+        la visa que cambia el metodo que debe de tomar el boton, hay que pensar
+        en como optimizar este problema en futuras iteraciones
+    */
     public function controlEscolar()
     {
+
+
+
+
         $this->validate([
             'grado' => 'nullable|integer|between:1,3',
             'letra' => 'nullable|string|max:1',
             'generacion' => 'nullable|integer|min:2000|max:' . (date('Y') + 1)
         ]);
 
-        $this->resultados = $this->filtrarResultados();
-        $this->calcularEstadisticas();
+        if($this->modo===true)
+        {
+
+            //dd("Estoy en el if");
+            $this->resultados = $this->filtrarResultados();
+            $this->calcularEstadisticas();
+        }
+        if($this->modo===false)
+        {
+
+            dd("Estoy en el else");
+            //$this->resultados = $this->obtenerMaestrosPorMateria();
+            //dd($this->resultados);
+            //$this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
+            //$this->calcularEstadisticas();
+            //dd($this->resultados);
+            /*
+            $this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
+            dd($this->resultados);
+            //dd("estoy en el else y mi valor de materia es: ");
+            //dd("estoy en el else y mi valor de materia es: ", $this->materia_id);
+            $this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
+            dd($this->resultados);
+            //$this->calcularEstadisticas();
+             dd([
+            'materia_id' => $this->materia_id,
+            'tipo' => gettype($this->materia_id)
+        ]);
+            */
+        }
     }
+
+    public function controlEscolarMaestros()
+    {
+        //dd("Estoy en el else");
+        $this->resultados = $this->obtenerMaestrosPorMateria();
+        dd($this->resultados);
+    }
+
+
   /**
      * Método solicitado para DAVIGOD
  * Filtra grupos por generación y un parámetro adicional (ID, letra o grado).
@@ -192,11 +246,16 @@ public function obtenerMaestrosCompleto()
                  ->toArray();
 }
 
-public function obtenerMaestrosPorMateria($materia_id)
+public function obtenerMaestrosPorMateria()
 {
-    return Materia::with(['grupos.imparte.maestro' => function($q) {
-        $q->distinct()->select('maestros.id', 'name', 'apellidos');
-    }])->findOrFail($materia_id);
+    //$materia_id = $materia_id !== '' ? (int) $materia_id : null;
+
+    $materia_id = $this->materia_id;
+    return Maestro::whereHas('materias', function ($query) use ($materia_id) {
+        if ($materia_id) {
+            $query->where('materias.id', $materia_id);
+        }
+    })->get();
 }
 
 public function obtenerMaestrosSinMaterias($search = '')
@@ -233,11 +292,13 @@ public function obtenerMaestrosSinMaterias($search = '')
             'maestros_basico' => $this->obtenerMaestrosBasico(),
             'maestros_completo' => $this->obtenerMaestrosCompleto(),
             'maestros_sin_materias' => $this->obtenerMaestrosSinMaterias($this->searchMaestro ?? ''),
+
             'resultados' => $this->resultados,
             'totalAlumnos' => $this->totalAlumnos,
             'totalMaestros' => $this->totalMaestros,
             'materiasSinMaestro' => $this->materiasSinMaestro,
-            'gruposSinMaestro' => $this->gruposSinMaestro
+            'gruposSinMaestro' => $this->gruposSinMaestro,
+            'materia_id' => $this->materia_id
         ]);
     }
 }
