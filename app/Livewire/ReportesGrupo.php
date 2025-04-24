@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Livewire;
+namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Grupo;
@@ -128,29 +128,6 @@ class ReportesGrupo extends Component
             ->pluck('generacion');
     }
 
-    /*
-     public function controlEscolar()
-     {
-         logger("Filtros aplicados:", [
-             'grado' => $this->grado,
-             'letra' => $this->letra,
-             'generacion' => $this->generacion
-         ]);
-
-         $this->resultados = Alumno::with(['inscritos.grupo'])
-             ->whereHas('inscritos.grupo', function($q) {
-                 $q->when($this->grado, fn($q) => $q->where('grado', $this->grado))
-                   ->when($this->letra, fn($q) => $q->where('letra', $this->letra))
-                   ->when($this->generacion, fn($q) => $q->where('generacion', $this->generacion));
-             })
-             ->orderBy('apellidos')
-             ->orderBy('nombres')
-             ->get();
-
-
-     }
-    */
-
     public function gruposConAlumnos()
     {
         return Grupo::query()
@@ -234,10 +211,6 @@ public function obtenerMaestrosSinMaterias($search = '')
     public function render()
     {
         return view('livewire.reportes-grupo', [
-            'totalAlumnos' => $this->totalAlumnos,
-            'totalMaestros' => $this->totalMaestros,
-            'materiasSinMaestroCount' => $this->materiasSinMaestroCount,
-            'gruposSinMaestroCount' => $this->gruposSinMaestroCount,
             'grupos' => $this->gruposConAlumnos(),
             'generaciones' => $this->generacionesDisponibles(),
             'materias' => $this->obtenerMaterias(),
@@ -252,6 +225,4 @@ public function obtenerMaestrosSinMaterias($search = '')
             'gruposSinMaestro' => $this->gruposSinMaestro
         ]);
     }
-
 }
-?>
