@@ -20,21 +20,22 @@
         </div>
     </div>
     <div>
-        <label class="block mb-1">Materia</label>
-        <select wire:model="materia_id" class="w-full border rounded p-2">
-            <option value="">Todos</option>
-            @foreach ($materias as $materia)
-                <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
-            @endforeach
-        </select>
+       <!-- Aqui debe de haber un selector para los resportes entre maestros y alumnos -->
+       <button wire:click="cambioModo" class="px-4 py-2 bg-orange-700 text-black rounded">
+        Cambiar reporte
+        </button>
+       <label class="block mb-1">Modo de reporte:
+        @if ($modo)
+            Alumnos
+        @else
+            Maestros
+
+        @endif
+        </label>
     </div>
 
 <!-- Select básico -->
-<select wire:model="maestro_id">
-    @foreach($maestros_basico as $maestro)
-        <option value="{{ $maestro['id'] }}">{{ $maestro['nombre_completo'] }}</option>
-    @endforeach
-</select>
+
 
 <!-- Búsqueda de maestros sin materias -->
 
@@ -48,7 +49,9 @@
         <h3 class="text-lg font-semibold mb-4">Reportes de la Institución</h3>
 
         <div class="grid grid-cols-4 gap-4 mb-4">
+            @if ($modo)
             <div>
+
                 <label class="block mb-1">Grado</label>
                 <select wire:model="grado" class="w-full border rounded p-2">
                     <option value="">Todos</option>
@@ -57,6 +60,7 @@
                     <option value="3">3</option>
                 </select>
             </div>
+
             <div>
                 <label class="block mb-1">Grupo</label>
                 <select wire:model="letra" class="w-full border rounded p-2">
@@ -78,20 +82,25 @@
                     @endforeach
                 </select>
             </div>
+            @else
             <div>
                 <label class="block mb-1">Materia</label>
                 <select wire:model="materia_id" class="w-full border rounded p-2">
                     <option value="">Todos</option>
-                    {{-- Aquí iría la lista de materias --}}
+                    @foreach ($materias as $materia)
+                        <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
+                    @endforeach
                 </select>
             </div>
             <div>
                 <label class="block mb-1">Maestro</label>
-                <select wire:model="maestro_id" class="w-full border rounded p-2">
-                    <option value="">Todos</option>
-                    {{-- Aquí iría la lista de maestros --}}
+                <select wire:model="maestro_id">
+                    @foreach($maestros_basico as $maestro)
+                        <option value="{{ $maestro['id'] }}">{{ $maestro['nombre_completo'] }}</option>
+                    @endforeach
                 </select>
             </div>
+            @endif
         </div>
 
         <div class="text-right">
@@ -130,7 +139,36 @@
         </div>
 
         {{-- Tabla de alumnos corregida --}}
-        @if($resultados && $resultados->count() > 0)
+        @if($modo && $resultados && $resultados->count() > 0)
+<div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border px-4 py-2">#</th>
+                <th class="border px-4 py-2">Matrícula</th>
+                <th class="border px-4 py-2">Apellidos</th>
+                <th class="border px-4 py-2">Nombres</th>
+                <th class="border px-4 py-2">Grado/Grupo</th>
+                <th class="border px-4 py-2">Estatus</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($resultados as $index => $alumno)
+            <tr class="hover:bg-gray-50">
+                <td class="border px-4 py-2">{{ $loop->iteration }}</td>
+                <td class="border px-4 py-2">{{ $alumno->matricula }}</td>
+                <td class="border px-4 py-2">{{ $alumno->apellidos }}</td>
+                <td class="border px-4 py-2">{{ $alumno->nombres }}</td>
+                <td class="border px-4 py-2">
+                    {{ $alumno->inscritos->first()->grupo->grado ?? '' }}{{ $alumno->inscritos->first()->grupo->letra ?? '' }}
+                </td>
+                <td class="border px-4 py-2">{{ $alumno->estatus }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@elseif (!$modo && $resultados && $resultados->count() > 0)
 <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
         <thead>
@@ -161,7 +199,13 @@
 </div>
 @else
 <div class="p-8 text-center text-gray-500">
-    No se encontraron alumnos con los criterios seleccionados
+    No se encontraron
+    @if ($modo)
+     alumnos
+    @else
+        maestros
+    @endif
+    con los criterios seleccionados
 </div>
 @endif
     </div>

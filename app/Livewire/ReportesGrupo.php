@@ -29,6 +29,8 @@ class ReportesGrupo extends Component
     public $materiasSinMaestro = 0;
     public $gruposSinMaestro = 0;
     public $searchMaestro = '';
+    public $modo = true; //True reporte de alumnos, false reporte de maestros
+    public $maestros = [];
 
     public function mount()
     {
@@ -50,6 +52,11 @@ class ReportesGrupo extends Component
         $this->gruposSinMaestro = Grupo::whereDoesntHave('imparte', function($q) {
             $q->whereNotNull('maestro_id');
         })->count();
+    }
+
+    public function cambioModo()
+    {
+        $this->modo =!$this->modo;
     }
 
     public function cargarDatosIniciales()
@@ -184,6 +191,14 @@ public function obtenerMaestrosCompleto()
                  })
                  ->toArray();
 }
+
+public function obtenerMaestrosPorMateria($materia_id)
+{
+    return Materia::with(['grupos.imparte.maestro' => function($q) {
+        $q->distinct()->select('maestros.id', 'name', 'apellidos');
+    }])->findOrFail($materia_id);
+}
+
 public function obtenerMaestrosSinMaterias($search = '')
 {
     return Maestro::whereDoesntHave('materias')
