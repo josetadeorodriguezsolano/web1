@@ -63,6 +63,7 @@ class ReportesGrupo extends Component
 
     public function cambioModo()
     {
+        $this->resultados = [];
         $this->modo =!$this->modo;
     }
 
@@ -125,7 +126,7 @@ class ReportesGrupo extends Component
     {
         //dd("Estoy en el else");
         $this->resultados = $this->obtenerMaestrosPorMateria();
-        dd($this->resultados);
+        //dd($this->resultados);
     }
 
 
