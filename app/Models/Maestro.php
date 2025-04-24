@@ -82,4 +82,8 @@ class Maestro extends Authenticatable
             return $imparte->grupo->generacion == $generacion;
         });
     }
+    public function materias()
+{
+    return $this->belongsToMany(Materia::class, 'imparte', 'maestro_id', 'materia_id');
+}
 }

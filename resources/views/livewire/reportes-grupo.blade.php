@@ -12,14 +12,37 @@
         </div>
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Materias sin Maestro</h2>
-            <p class="text-2xl font-bold">{{ $materiasSinMaestroCount }}</p>
+            <p class="text-2xl font-bold">{{ $materiasSinMaestro }}</p>
         </div>
         <div class="bg-white p-4 shadow rounded text-center">
             <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
-            <p class="text-2xl font-bold">{{ $gruposSinMaestroCount }}</p>
+            <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
         </div>
     </div>
+    <div>
+        <label class="block mb-1">Materia</label>
+        <select wire:model="materia_id" class="w-full border rounded p-2">
+            <option value="">Todos</option>
+            @foreach ($materias as $materia)
+                <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
+            @endforeach
+        </select>
+    </div>
 
+<!-- Select básico -->
+<select wire:model="maestro_id">
+    @foreach($maestros_basico as $maestro)
+        <option value="{{ $maestro['id'] }}">{{ $maestro['nombre_completo'] }}</option>
+    @endforeach
+</select>
+
+<!-- Búsqueda de maestros sin materias -->
+
+<ul>
+    @foreach($maestros_sin_materias as $maestro)
+        <li>{{ $maestro['nombre_completo'] }} - {{ $maestro['curp'] }}</li>
+    @endforeach
+</ul>
     {{-- Filtros de búsqueda --}}
     <div class="bg-white p-4 shadow rounded">
         <h3 class="text-lg font-semibold mb-4">Reportes de la Institución</h3>

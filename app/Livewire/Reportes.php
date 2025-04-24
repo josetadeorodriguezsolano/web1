@@ -76,6 +76,19 @@ class Reportes extends Component
             ->with('imparte.grupo.materia')
             ->first();
     }
+//dd
+    //Método solicitado por DAVIGOD
+    public function materiasConMaestro()
+{
+    return Materia::whereHas('grupos.imparte') // Solo materias con maestros
+        ->when($this->grado, function($query) {
+            $query->where('grado', $this->grado); // Filtro opcional por grado
+        })
+        ->with(['grupos' => function($q) {
+            $q->with('imparte.maestro'); // Carga maestros asignados
+        }])
+        ->get();
+}
 
     // Método principal que muestra la vista
     public function render()
@@ -92,4 +105,5 @@ class Reportes extends Component
             ]
         ]);
     }
+
 }
