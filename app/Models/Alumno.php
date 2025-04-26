@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Falta;
 
 class Alumno extends Model
 {
@@ -15,7 +16,11 @@ class Alumno extends Model
         'estatus' => 'vigente',
     ];
 
-    public function falto($fecha){
-        return Falta::where([['alumno_id',$this->id],['fecha',$fecha]])->first();
+    public function falto($fecha)
+    {
+    return Falta::where([
+        ['alumno_id', '=', $this->id],
+        ['fecha', '=', $fecha]
+    ])->first();
     }
 }

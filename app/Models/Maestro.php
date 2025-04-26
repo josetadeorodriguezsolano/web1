@@ -31,7 +31,8 @@ class Maestro extends Authenticatable
         'apellidos',
         'direccion',
         'curp',
-        'telefono'
+        'telefono',
+        'profile_photo_path',
     ];
 
     /**
