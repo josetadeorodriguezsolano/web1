@@ -16,11 +16,12 @@ class Calificacion extends Model
 
     protected $fillable = [
         'alumno_id',
+        'materia_id',
+        'grupo_id',
         'imparte_id',
         'unidad',
         'calificacion',
     ];
-
     // Relaciones
     public function alumno()
     {

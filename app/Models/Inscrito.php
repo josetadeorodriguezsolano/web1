@@ -12,6 +12,8 @@ class Inscrito extends Model
     protected $fillable = [
         'alumno_id',
         'grupo_id',
+        'estatus',
+
     ];
 
     // Relaciones

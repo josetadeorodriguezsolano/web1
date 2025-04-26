@@ -12,6 +12,16 @@ class Alumno extends Model
     //public $table= "alumnos";
     public $timestamps=true;
 
+    protected $fillable = [
+        'matricula',
+        'nombres',
+        'apellidos',
+        'estatus',
+        'curp',
+        'contacto',
+        'tutor',
+    ];
+
     protected $attributes = [
         'estatus' => 'vigente',
     ];
@@ -22,5 +32,20 @@ class Alumno extends Model
         ['alumno_id', '=', $this->id],
         ['fecha', '=', $fecha]
     ])->first();
+    }
+
+    public function inscritos()
+    {
+        return $this->hasMany(Inscrito::class);
+    }
+
+    public function faltas()
+    {
+        return $this->hasMany(Falta::class);
+    }
+
+    public function calificaciones()
+    {
+        return $this->hasMany(Calificacion::class);
     }
 }
