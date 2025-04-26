@@ -11,6 +11,12 @@ class Imparte extends Model
     public $table = "imparte";
     public $timestamps = true;
 
+    protected $fillable = [
+        'materia_id',
+        'maestro_id',
+        'grupo_id',
+    ];
+
     public function grupo(){
         return $this->belongsTo(Grupo::class);
     }
@@ -21,5 +27,10 @@ class Imparte extends Model
 
     public function maestro(){
         return $this->belongsTo(Maestro::class);
+    }
+
+    public function calificaciones(): HasMany
+    {
+        return $this->hasMany(Calificacion::class, 'imparte_id'); // Especificar la clave foránea si no sigue la convención
     }
 }

@@ -35,4 +35,6 @@ class Falta extends Model
         self::where([['alumno_id',$alumno_id],
                      ['fecha',date('Y-m-d')]])->delete();
     }
+
+
 }
