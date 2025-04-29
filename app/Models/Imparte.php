@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Grupo;
+use App\Models\Materia;
 
 class Imparte extends Model
 {
@@ -31,6 +35,6 @@ class Imparte extends Model
 
     public function calificaciones(): HasMany
     {
-        return $this->hasMany(Calificacion::class, 'imparte_id'); // Especificar la clave foránea si no sigue la convención
+        return $this->hasMany(Calificacion::class, 'imparte_id');
     }
 }

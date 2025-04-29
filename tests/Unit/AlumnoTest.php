@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\Models\Alumno;
 use App\Models\Falta;
@@ -19,6 +19,7 @@ class AlumnoTest extends TestCase
             'matricula' => 'A123456789',
             'nombres' => 'Juan',
             'apellidos' => 'Pérez',
+            'estatus' => 'vigente',
             'curp' => 'CURP123456HDFABC01',
             'contacto' => '5551234567',
             'tutor' => 'Carlos Pérez'
@@ -27,6 +28,38 @@ class AlumnoTest extends TestCase
         $this->assertDatabaseHas('alumnos', [
             'id' => $alumno->id,
             'curp' => 'CURP123456HDFABC01'
+        ]);
+    }
+
+    public function test_se_puede_leer_un_alumno()
+    {
+        $alumno = Alumno::factory()->create(); // Usamos factory para crear rápido
+
+        $encontrado = Alumno::find($alumno->id);
+
+        $this->assertNotNull($encontrado);
+        $this->assertEquals($alumno->matricula, $encontrado->matricula);
+    }
+
+    public function test_se_puede_actualizar_un_alumno()
+    {
+        $alumno = Alumno::factory()->create();
+        $nuevoContacto = '6129876543'; // Otro número de ejemplo
+        $nuevoTutor = 'María García';
+
+        $alumno->update([
+            'contacto' => $nuevoContacto,
+            'tutor' => $nuevoTutor,
+        ]);
+
+        $alumno->refresh();
+
+        $this->assertEquals($nuevoContacto, $alumno->contacto);
+        $this->assertEquals($nuevoTutor, $alumno->tutor);
+        $this->assertDatabaseHas('alumnos', [
+            'id' => $alumno->id,
+            'contacto' => $nuevoContacto,
+            'tutor' => $nuevoTutor,
         ]);
     }
 

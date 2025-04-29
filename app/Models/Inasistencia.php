@@ -7,12 +7,30 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\InasistenciaInsertarRequest;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inasistencia extends Model
 {
     use HasFactory;
 
-    public static function insertar($grupo_id,$alumno_id){
+    protected $fillable = [
+        'grupo_id',
+        'alumno_id',
+        'fecha'
+    ];
+
+    public function grupo(): BelongsTo
+    {
+        return $this->belongsTo(Grupo::class);
+    }
+
+    public function alumno(): BelongsTo
+    {
+        return $this->belongsTo(Alumno::class);
+    }
+
+    public static function insertar($grupo_id, $alumno_id)
+    {
         $data = [
             'grupo_id' => $grupo_id,
             'alumno_id' => $alumno_id,
@@ -26,9 +44,12 @@ class Inasistencia extends Model
         return true;
     }
 
-    public static function eliminar($grupo_id,$alumno_id){
-        self::where([['grupo_id',$grupo_id],
-                    ['alumno_id',$alumno_id],
-                    ['fecha',Date::now()->format('Y-m-d')]])->delete();
+    public static function eliminar($grupo_id, $alumno_id)
+    {
+        self::where([
+            ['grupo_id', $grupo_id],
+            ['alumno_id', $alumno_id],
+            ['fecha', Date::now()->format('Y-m-d')]
+        ])->delete();
     }
 }

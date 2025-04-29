@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Validation\ValidationException;
-
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Calificacion extends Model
 {
@@ -22,27 +21,28 @@ class Calificacion extends Model
         'unidad',
         'calificacion',
     ];
-    // Relaciones
-    public function alumno()
+
+    public function alumno(): BelongsTo
     {
         return $this->belongsTo(Alumno::class);
     }
 
-    public function imparte()
+    public function imparte(): BelongsTo
     {
         return $this->belongsTo(Imparte::class);
     }
-    public function materia()
+
+    public function materia(): BelongsTo
     {
-        return $this->imparte->materia();
+        return $this->belongsTo(Materia::class);
     }
 
-    public function grupo()
+    public function grupo(): BelongsTo
     {
-        return $this->imparte->grupo();
+        return $this->belongsTo(Grupo::class);
     }
 
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 
@@ -55,6 +55,7 @@ class Calificacion extends Model
         });
     }
 }
+
 
 
 

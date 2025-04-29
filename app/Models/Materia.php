@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class Materia extends Model {
     use HasFactory;
@@ -17,11 +19,13 @@ class Materia extends Model {
         'grado',
     ];
 
-    public static function porGrado($grado){
-        return Materia::where('grado',$grado)->get();
+    // Scope para buscar por grado
+    public function scopePorGrado($query, $grado)
+    {
+        return $query->where('grado', $grado);
     }
 
-    public function imparte(): HasMany
+    public function impartes(): HasMany
     {
         return $this->hasMany(Imparte::class);
     }

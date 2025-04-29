@@ -4,13 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Falta;
 
 class Alumno extends Model
 {
     use HasFactory;
-    //public $table= "alumnos";
-    public $timestamps=true;
+
+    protected $table = 'alumnos'; // Opcional, pero recomendable
+
+    public $timestamps = true;
 
     protected $fillable = [
         'matricula',
@@ -26,26 +29,23 @@ class Alumno extends Model
         'estatus' => 'vigente',
     ];
 
-    public function falto($fecha)
-    {
-    return Falta::where([
-        ['alumno_id', '=', $this->id],
-        ['fecha', '=', $fecha]
-    ])->first();
-    }
-
-    public function inscritos()
+    public function inscritos(): HasMany
     {
         return $this->hasMany(Inscrito::class);
     }
 
-    public function faltas()
+    public function faltas(): HasMany
     {
         return $this->hasMany(Falta::class);
     }
 
-    public function calificaciones()
+    public function calificaciones(): HasMany
     {
         return $this->hasMany(Calificacion::class);
+    }
+
+    public function falto($fecha)
+    {
+        return $this->faltas()->where('fecha', $fecha)->first();
     }
 }
