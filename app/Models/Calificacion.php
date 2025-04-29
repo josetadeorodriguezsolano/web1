@@ -47,7 +47,6 @@ class Calificacion extends Model
         parent::boot();
 
         static::saving(function ($calificacion) {
-            // Validar si la calificación está dentro del rango
             if ($calificacion->calificacion < 1.0 || $calificacion->calificacion > 10.0) {
                 throw ValidationException::withMessages([
                     'calificacion' => ['La calificación debe estar entre 1.0 y 10.0'],
