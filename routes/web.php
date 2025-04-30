@@ -9,6 +9,7 @@ use App\Livewire\ReportesGrupo;
 use App\Livewire\CatalogoMaestros;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
+use App\Http\Livewire\InasistenciasPase;
 
 // Ruta principal ahora usando el componente Livewire
 Route::get('/', ReportesGrupo::class)->name('home');
@@ -23,7 +24,6 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-<<<<<<< HEAD
     Route::prefix('pase_de_lista')->controller(PaseDeListaController::class)
     ->group(function () {
         Route::get('','mostrar');
@@ -38,7 +38,6 @@ Route::middleware([
     Route::get('catalogo/maestros',CatalogoMaestros::class);
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
     Route::resource('alumnos', AlumnoController::class); //placeholder para acceder a las funciones CRUD de Alumno
-=======
 
     // Rutas de pase de lista
     Route::prefix('pase_de_lista')
@@ -59,7 +58,6 @@ Route::middleware([
 
     // Generación de PDFs
     Route::get('lista/{grupo_id}', [PdfController::class, 'lista']);
->>>>>>> mi-progreso
 });
 
 // Rutas de prueba de estilos (puedes eliminarlas en producción)
@@ -70,3 +68,13 @@ Route::get("w3css", function () {
 Route::get("bootstrap", function () {
     return view("bootstrap");
 });
+
+
+//Ruta de Inasistencias (Alumnos x Materias)
+
+Route::get('/inasistencias', function () {
+    return view('inasistencias.index');
+})->name('inasistencias.index');
+
+
+

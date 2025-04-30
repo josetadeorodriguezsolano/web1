@@ -17,11 +17,11 @@ class Imparte extends Model
         return $this->belongsTo(Grupo::class);
     }
 
-    public function materia(){
-        return $this->belongsTo(Materia::class);
+    public function materia()
+    {
+        return $this->belongsTo(\App\Models\Materia::class);
     }
-
-
+    
     public function maestro(){
         return $this->belongsTo(Maestro::class);
     }

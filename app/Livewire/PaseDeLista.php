@@ -56,7 +56,7 @@ class PaseDeLista extends Component
 
         $grupo = Grupo::with('alumnos')->find($this->selectGrupo);
         $alumnos = $grupo->alumnos->map(function($alumno) {
-            $alumno->falto = ($alumno->falto(date('Y-m-d')) == null;
+            $alumno->falto = ($alumno->falto(date('Y-m-d')) == null) ?true: false;
             return $alumno->only(['id', 'nombres', 'apellidos', 'falto']);
         });
 
