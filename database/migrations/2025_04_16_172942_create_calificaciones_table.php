@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('calificaciones', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('alumno_id')->constrained();
             $table->foreignId('materia_id')->constrained();
             $table->foreignId('grupo_id')->constrained();
-            $table->foreignId('imparte_id')->constrained('imparte'); // Ajusta si es otra tabla
-            $table->unsignedTinyInteger('unidad');
-            $table->decimal('calificacion', 5, 2);
-
+            $table->foreignId('imparte_id')->constrained('imparte');
+            $table->string('unidad');
+            $table->decimal('calificacion', 3, 1);
             $table->timestamps();
+            $table->unique(['alumno_id', 'materia_id', 'imparte_id', 'unidad']);
         });
     }
 

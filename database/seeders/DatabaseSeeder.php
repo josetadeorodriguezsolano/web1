@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             MateriasSeeder::class,
             GruposSeeder::class,
             ImparteSeeder::class,
+            CalificacionesSeeder::class,
         ]);
     }
 }

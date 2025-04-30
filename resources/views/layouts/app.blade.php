@@ -7,6 +7,8 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Agregar estilos de Livewire -->
+    @livewireStyles
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -29,7 +31,6 @@
             <i data-lucide="menu" class="w-6 h-6"></i>
         </button>
 
-        <!-- Bienvenida -->
         <div class="text-lg font-semibold">Hola, Bienvenido!</div>
 
         <!-- Fecha -->
@@ -72,6 +73,9 @@
             Español</span>
         </div>
     </footer>
+
+    <!-- Agregar scripts de Livewire antes de los otros scripts -->
+    @livewireScripts
 
     <script>
         lucide.createIcons()

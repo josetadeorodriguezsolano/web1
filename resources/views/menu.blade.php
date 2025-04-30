@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <title>Menú con Sidebar</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-gray-100">
 
 <div class="flex">
-    <!-- Sidebar -->
    <div class="relative w-64 h-screen bg-[#F3F4F6] shadow-lg">
-    <!-- Logo en posición absoluta -->
     <div class="absolute top-4 left-1/2 transform -translate-x-1/2">
         <img src="{{ asset('img/LogoSecundaria.png') }}"
              alt="Logo"

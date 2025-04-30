@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
 use App\Http\Controllers\InscripcionesController;
+use App\Livewire\Calificaciones;
+
 
 
 Route::get('/', function () {
@@ -19,7 +21,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/calificaciones', function () {
     return view('calificaciones');
-})->name('calificaciones');
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('calificaciones');
 
 Route::middleware([
     'auth:sanctum',//token autentificacion
