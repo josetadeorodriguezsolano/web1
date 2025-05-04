@@ -13,11 +13,10 @@ class GruposSeeder extends Seeder {
      * Run the database seeds.
      */
     public function run(): void {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Grupo::truncate();
-        Alumno::truncate();
-        Inscrito::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        Grupo::query()->delete();
+Alumno::query()->delete();
+Inscrito::query()->delete();
+
         $añoInicio = 2020;
         $añoFinal = date('Y')-1;
         $letras = ['A','B','C','D','E','F'];

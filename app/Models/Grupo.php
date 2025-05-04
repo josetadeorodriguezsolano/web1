@@ -18,8 +18,9 @@ class Grupo extends Model
                     ,'grupo_id','id','id','alumno_id')->orderBy('apellidos');
     }
 
-    public function materia(){
-        return $this->belongsTo(Materia::class);
+    public function materias()
+    {
+        return $this->belongsToMany(Materia::class, 'imparte', 'grupo_id', 'materia_id');
     }
 
     public function imparte() {

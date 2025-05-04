@@ -42,7 +42,9 @@ Route::middleware([
     // Generación de PDFs
     Route::get('lista/{grupo_id}', [PdfController::class, 'lista']);
 });
-
+Route::get('reportes', function (){
+    return view('reportes');
+});
 // Rutas de prueba de estilos (puedes eliminarlas en producción)
 Route::get("w3css", function () {
     return view("w3css");
