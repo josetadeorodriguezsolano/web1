@@ -16,8 +16,6 @@ class Calificacion extends Model
     protected $fillable = [
         'alumno_id',
         'materia_id',
-        'grupo_id',
-        'imparte_id',
         'unidad',
         'calificacion',
     ];
@@ -27,19 +25,9 @@ class Calificacion extends Model
         return $this->belongsTo(Alumno::class);
     }
 
-    public function imparte(): BelongsTo
-    {
-        return $this->belongsTo(Imparte::class);
-    }
-
     public function materia(): BelongsTo
     {
         return $this->belongsTo(Materia::class);
-    }
-
-    public function grupo(): BelongsTo
-    {
-        return $this->belongsTo(Grupo::class);
     }
 
     protected static function boot()
@@ -55,7 +43,3 @@ class Calificacion extends Model
         });
     }
 }
-
-
-
-

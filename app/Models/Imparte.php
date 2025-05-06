@@ -35,6 +35,11 @@ class Imparte extends Model
 
     public function calificaciones(): HasMany
     {
-        return $this->hasMany(Calificacion::class, 'imparte_id');
+        return Calificacion::query()
+            ->where('materia_id', $this->materia_id)
+            ->whereHas('alumno.inscritos', function ($query) {
+                $query->where('grupo_id', $this->grupo_id)
+                      ->where('estatus', 'vigente');
+            });
     }
 }

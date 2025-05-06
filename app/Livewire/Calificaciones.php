@@ -153,7 +153,8 @@ class Calificaciones extends Component
             $this->alumnos = $grupo->alumnos->toArray();
 
             // Obtener las calificaciones existentes para estos alumnos
-            $calificacionesExistentes = Calificacion::where('imparte_id', $this->imparteSeleccionado)
+            // Modificado para no usar imparte_id
+            $calificacionesExistentes = Calificacion::where('materia_id', $this->materiaSeleccionada)
                 ->whereIn('alumno_id', $grupo->alumnos->pluck('id'))
                 ->get()
                 ->groupBy('alumno_id')
@@ -244,11 +245,10 @@ class Calificaciones extends Component
 
         // Guardar la calificación en la base de datos
         try {
+            // Modificado para no usar grupo_id e imparte_id
             $datosCalificacion = [
                 'alumno_id' => $alumnoId,
-                'imparte_id' => $this->imparteSeleccionado,
                 'materia_id' => $this->materiaSeleccionada,
-                'grupo_id' => $this->grupoSeleccionado,
                 'unidad' => $unidad,
                 'calificacion' => $valor ?? 0
             ];

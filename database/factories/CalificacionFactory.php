@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Calificacion;
 use App\Models\Alumno;
-use App\Models\Imparte;
+use App\Models\Materia;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CalificacionFactory extends Factory
@@ -14,9 +14,9 @@ class CalificacionFactory extends Factory
     public function definition(): array
     {
         return [
-            'alumno_id'     => Alumno::factory(),
-            'imparte_id'    => Imparte::factory(),
-            'unidad' => $this->faker->word, // Unidad aleatoria
+            'alumno_id' => Alumno::factory(),
+            'materia_id' => Materia::factory(),
+            'unidad' => $this->faker->numberBetween(1, 5),  // O usa una cadena si prefieres
             'calificacion' => $this->faker->randomFloat(1, 1.0, 10.0),
         ];
     }
