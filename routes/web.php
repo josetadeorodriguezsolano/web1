@@ -41,7 +41,7 @@ Route::middleware([
     
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
 
-    Route::get('inasistencia',[PDFInasistenciasController::class,'generar']);
+    Route::get('inasistencia', [PDFInasistenciasController::class,'generar']);
 
 });
 
