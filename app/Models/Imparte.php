@@ -47,4 +47,3 @@ class Imparte extends Model
         return $this->belongsTo(Maestro::class);
     }
 }
-

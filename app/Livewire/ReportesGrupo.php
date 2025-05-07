@@ -9,10 +9,7 @@ use App\Models\Materia;
 use App\Models\Maestro;
 use App\Models\Imparte;
 use App\Models\Inscrito;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\DB;
-=======
->>>>>>> anntho
 
 class ReportesGrupo extends Component
 {
@@ -23,11 +20,7 @@ class ReportesGrupo extends Component
     public $letra = null;
     public $materia_id = null;
     public $maestro_id = null;
-<<<<<<< HEAD
    
-=======
-
->>>>>>> anntho
     // Variables de resultados
     public $resultados = [];
 
@@ -37,7 +30,6 @@ class ReportesGrupo extends Component
     public $materiasSinMaestro = 0;
     public $gruposSinMaestro = 0;
     public $searchMaestro = '';
-<<<<<<< HEAD
     public $modo = true; //True reporte de alumnos, false reporte de maestros
     public $maestros = [];
 
@@ -47,8 +39,6 @@ class ReportesGrupo extends Component
     //
     public $maestros_con_materias = [];
     public $materias_sin_maestro = [];
-=======
->>>>>>> anntho
 
     public function mount()
     {
@@ -56,7 +46,6 @@ class ReportesGrupo extends Component
         $this->cargarDatosIniciales();
     }
 
-<<<<<<< HEAD
     public function cambiarVista($tab)
     {
         $this->vista = $tab; 
@@ -213,8 +202,6 @@ class ReportesGrupo extends Component
     }
 
 
-=======
->>>>>   anntho
     public function calcularEstadisticas()
     {
         $this->totalAlumnos = Alumno::count();
@@ -231,16 +218,12 @@ class ReportesGrupo extends Component
         })->count();
     }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> anntho
     public function cargarDatosIniciales()
     {
         $this->resultados = $this->alumnosInscritos()->take(5);
     }
 
-<<<<<<< HEAD
     /*Tanto este metodo como el contolEscolarMaestros deberian ser el mismo
         pero por algun motivo el if en control escolar del modo no funciona
         como deberia, asi se creo un metodo particualar para cada caso, un if en
@@ -253,17 +236,12 @@ class ReportesGrupo extends Component
 
 
 
-=======
-    public function controlEscolar()
-    {
->>>>>>> anntho
         $this->validate([
             'grado' => 'nullable|integer|between:1,3',
             'letra' => 'nullable|string|max:1',
             'generacion' => 'nullable|integer|min:2000|max:' . (date('Y') + 1)
         ]);
 
-<<<<<<< HEAD
         if($this->modo===true)
         {
 
@@ -304,11 +282,6 @@ class ReportesGrupo extends Component
     }
 
 
-=======
-        $this->resultados = $this->filtrarResultados();
-        $this->calcularEstadisticas();
-    }
->>>>>>> anntho
   /**
      * Método solicitado para DAVIGOD
  * Filtra grupos por generación y un parámetro adicional (ID, letra o grado).
@@ -425,7 +398,6 @@ public function obtenerMaestrosCompleto()
                  })
                  ->toArray();
 }
-<<<<<<< HEAD
 
 public function obtenerMaestrosPorMateria()
 {
@@ -439,8 +411,6 @@ public function obtenerMaestrosPorMateria()
     })->get();
 }
 
-=======
->>>>>>> anntho
 public function obtenerMaestrosSinMaterias($search = '')
 {
     return Maestro::whereDoesntHave('materias')
@@ -475,15 +445,11 @@ public function obtenerMaestrosSinMaterias($search = '')
             'maestros_basico' => $this->obtenerMaestrosBasico(),
             'maestros_completo' => $this->obtenerMaestrosCompleto(),
             'maestros_sin_materias' => $this->obtenerMaestrosSinMaterias($this->searchMaestro ?? ''),
-<<<<<<< HEAD
 
-=======
->>>>>>> anntho
             'resultados' => $this->resultados,
             'totalAlumnos' => $this->totalAlumnos,
             'totalMaestros' => $this->totalMaestros,
             'materiasSinMaestro' => $this->materiasSinMaestro,
-<<<<<<< HEAD
             'gruposSinMaestro' => $this->gruposSinMaestro,
             'materia_id' => $this->materia_id
         ]);
@@ -491,9 +457,4 @@ public function obtenerMaestrosSinMaterias($search = '')
    
 
 
-=======
-            'gruposSinMaestro' => $this->gruposSinMaestro
-        ]);
     }
->>>>>>> anntho
-}
