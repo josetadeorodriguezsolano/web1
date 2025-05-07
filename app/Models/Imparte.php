@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Imparte extends Model
 {
+
     use HasFactory;
 
     protected $fillable = [
@@ -18,6 +19,7 @@ class Imparte extends Model
         'hora_fin',
     ];
 
+    protected $fillable = ['grupo_id', 'materia_id', 'maestro_id'];
     public $table = "imparte";
     public $timestamps = true;
 
@@ -34,10 +36,15 @@ class Imparte extends Model
     public function materia()
     {
         return $this->belongsTo(Materia::class);
+    public function materia()
+    {
+        return $this->belongsTo(\App\Models\Materia::class);
     }
 
     public function maestro()
     {
+    
+    public function maestro(){
         return $this->belongsTo(Maestro::class);
     }
 }

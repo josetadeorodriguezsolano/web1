@@ -257,7 +257,7 @@
     @endif
     @elseif ($vista === 'grupos_sin_maestro')
     {{-- Tab de Grupos sin Maestro --}}
-
+                
     @if (!$modo && $resultados && $resultados->count() > 0)
         <div class="overflow-x-auto mt-4">
             <table class="w-full text-left border-collapse">
