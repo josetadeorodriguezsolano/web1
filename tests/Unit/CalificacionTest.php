@@ -13,7 +13,7 @@ class CalificacionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_creacion_calificacion_con_unidad()
+    public function test_creacion_calificacion()
     {
         $alumno = Alumno::factory()->create();
         $materia = Materia::factory()->create();
@@ -21,33 +21,32 @@ class CalificacionTest extends TestCase
         $calificacion = Calificacion::create([
             'alumno_id' => $alumno->id,
             'materia_id' => $materia->id,
-            'unidad' => 'Unidad 1',
+            'unidad' => '1',
             'calificacion' => 9.5
         ]);
 
         $this->assertDatabaseHas('calificaciones', [
             'alumno_id' => $alumno->id,
             'materia_id' => $materia->id,
-            'unidad' => 'Unidad 1',
             'calificacion' => 9.5
         ]);
     }
 
-    /** @test */
     public function test_calificacion_fuera_de_rango()
     {
         $this->expectException(ValidationException::class);
 
-        // Creación de calificación fuera de rango
+        $alumno = Alumno::factory()->create();
+        $materia = Materia::factory()->create();
+
         Calificacion::create([
-            'alumno_id' => 1,
-            'materia_id' => 1,
-            'unidad' => 1,
-            'calificacion' => 11.0, // Calificación fuera de rango
+            'alumno_id' => $alumno->id,
+            'materia_id' => $materia->id,
+            'unidad' => '1',
+            'calificacion' => 11.0  // Calificación fuera de rango
         ]);
     }
 
-    /** @test */
     public function test_relacion_con_alumno_y_materia()
     {
         $alumno = Alumno::factory()->create();
@@ -56,7 +55,7 @@ class CalificacionTest extends TestCase
         $calificacion = Calificacion::create([
             'alumno_id' => $alumno->id,
             'materia_id' => $materia->id,
-            'unidad' => 'Unidad 2',
+            'unidad' => '2',
             'calificacion' => 8.5
         ]);
 

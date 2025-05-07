@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Models\Inscrito;
 use App\Models\Alumno;
@@ -32,7 +32,13 @@ class InscritoTest extends TestCase
 
     public function test_se_puede_leer_un_registro_inscrito()
     {
-        $inscrito = Inscrito::factory()->create(); // Usamos factory para crear rápido
+        $alumno = Alumno::factory()->create();
+        $grupo = Grupo::factory()->create();
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+        ]);
 
         $encontrado = Inscrito::find($inscrito->id);
 
@@ -43,7 +49,15 @@ class InscritoTest extends TestCase
 
     public function test_se_puede_actualizar_un_registro_inscrito()
     {
-        $inscrito = Inscrito::factory()->create();
+        $alumno = Alumno::factory()->create();
+        $grupo = Grupo::factory()->create();
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente',
+        ]);
+
         $nuevoEstatus = 'baja';
 
         $inscrito->update([
@@ -61,7 +75,13 @@ class InscritoTest extends TestCase
 
     public function test_se_puede_eliminar_un_registro_inscrito()
     {
-        $inscrito = Inscrito::factory()->create();
+        $alumno = Alumno::factory()->create();
+        $grupo = Grupo::factory()->create();
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+        ]);
 
         $inscrito->delete();
 
@@ -76,7 +96,6 @@ class InscritoTest extends TestCase
         $inscrito = Inscrito::create([
             'alumno_id' => $alumno->id,
             'grupo_id' => $grupo->id,
-            'estatus' => 'vigente',
         ]);
 
         $this->assertInstanceOf(Alumno::class, $inscrito->alumno);
@@ -91,7 +110,6 @@ class InscritoTest extends TestCase
         $inscrito = Inscrito::create([
             'alumno_id' => $alumno->id,
             'grupo_id' => $grupo->id,
-            'estatus' => 'vigente',
         ]);
 
         $this->assertInstanceOf(Grupo::class, $inscrito->grupo);
@@ -101,15 +119,14 @@ class InscritoTest extends TestCase
     public function test_puede_tener_grado()
     {
         $alumno = Alumno::factory()->create();
-        $grupo = Grupo::factory()->create(['grado' => 3]);
+        $grupo = Grupo::factory()->create(['grado' => '3']);
 
         $inscrito = Inscrito::create([
             'alumno_id' => $alumno->id,
             'grupo_id' => $grupo->id,
-            'estatus' => 'vigente',
         ]);
 
-        $this->assertEquals(3, $inscrito->grado);
+        $this->assertEquals('3', $inscrito->grado);
     }
 
     public function test_puede_tener_generacion()
@@ -120,10 +137,9 @@ class InscritoTest extends TestCase
         $inscrito = Inscrito::create([
             'alumno_id' => $alumno->id,
             'grupo_id' => $grupo->id,
-            'estatus' => 'vigente',
         ]);
 
-        $this->assertEquals(2022, $inscrito->generacion);
+        $this->assertEquals(2022, $inscrito->generacionGrupo);
     }
 
     public function test_puede_tener_salon()
@@ -134,7 +150,6 @@ class InscritoTest extends TestCase
         $inscrito = Inscrito::create([
             'alumno_id' => $alumno->id,
             'grupo_id' => $grupo->id,
-            'estatus' => 'vigente',
         ]);
 
         $this->assertEquals('B', $inscrito->salon);
