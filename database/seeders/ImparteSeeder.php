@@ -20,7 +20,7 @@ class ImparteSeeder extends Seeder
         $grupos = Grupo::all();
         $materias = [];
         foreach ($grupos as $grupo) {
-            $materias = Materia::porGrado($grupo->grado);
+            $materias = Materia::porGrado($grupo->grado)->get();
             foreach ($materias as $materia) {
                 Imparte::create(['materia_id'=>$materia->id,
                                  'grupo_id'=>$grupo->id,

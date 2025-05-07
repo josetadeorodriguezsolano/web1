@@ -25,6 +25,26 @@ class Calificaciones extends Component
     public $cargando = false;
     public $mensaje = '';
     public $tipoMensaje = '';
+    public $errores = [];
+
+    // Método para definir las reglas de validación
+    protected function rules()
+    {
+        return [
+            'calificaciones.*.*.valor' => ['nullable', 'numeric', 'min:0', 'max:10', 'regex:/^\d(\.\d{0,1})?$/'],
+        ];
+    }
+
+    // Método para personalizar los mensajes de error
+    protected function messages()
+    {
+        return [
+            'calificaciones.*.*.valor.numeric' => 'La calificación debe ser un número',
+            'calificaciones.*.*.valor.min' => 'La calificación mínima es 0',
+            'calificaciones.*.*.valor.max' => 'La calificación máxima es 10',
+            'calificaciones.*.*.valor.regex' => 'La calificación debe tener formato de número con máximo un decimal',
+        ];
+    }
 
     public function mount()
     {
@@ -80,6 +100,7 @@ class Calificaciones extends Component
         $this->calificaciones = [];
         $this->materiaSeleccionada = null;
         $this->imparteSeleccionado = null;
+        $this->errores = []; // Limpiar errores al cambiar de grupo
 
         if (!$valor) {
             $this->materiasImpartidas = [];
@@ -116,6 +137,8 @@ class Calificaciones extends Component
 
     public function updatedMateriaSeleccionada($valor)
     {
+        $this->errores = []; // Limpiar errores al cambiar de materia
+
         if (!$valor || !$this->grupoSeleccionado) {
             $this->alumnos = [];
             $this->calificaciones = [];
@@ -136,6 +159,7 @@ class Calificaciones extends Component
     public function cargarAlumnosConCalificaciones()
     {
         $this->cargando = true;
+        $this->errores = []; // Limpiar errores al cargar alumnos
 
         try {
             // Obtener los alumnos del grupo seleccionado
@@ -234,14 +258,58 @@ class Calificaciones extends Component
         return round($total / $cantidad, 1);
     }
 
+    // Método para validar una calificación individual
+    public function validarCalificacion($valor, $alumnoId, $unidad)
+    {
+        // Limpiar error específico
+        unset($this->errores["alumno_{$alumnoId}_unidad_{$unidad}"]);
+
+        // Si el valor es una cadena vacía, establecerlo como null
+        if ($valor === '') {
+            return null;
+        }
+
+        // Si es null, es válido (calificación no asignada)
+        if ($valor === null) {
+            return null;
+        }
+
+        // Convertir a número para asegurar el tipo correcto
+        $valor = floatval($valor);
+
+        // Validar rango
+        if ($valor < 0 || $valor > 10) {
+            $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'La calificación debe ser entre 0 y 10';
+            return false;
+        }
+
+        // Validar formato (máximo un decimal)
+        if (!preg_match('/^\d(\.\d{0,1})?$/', (string)$valor)) {
+            $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'La calificación debe tener formato X.X (máximo un decimal)';
+            return false;
+        }
+
+        return $valor;
+    }
+
     public function actualizarCalificacion($alumnoId, $unidad, $valor)
     {
-        // Validar que el valor esté entre 0 y 10
-        if ($valor !== null && ($valor < 0 || $valor > 10)) {
-            $this->mensaje = 'La calificación debe ser entre 0 y 10';
+        // Limpiar mensajes previos
+        $this->mensaje = '';
+        $this->tipoMensaje = '';
+
+        // Validar la calificación
+        $valorValidado = $this->validarCalificacion($valor, $alumnoId, $unidad);
+
+        // Si hay error de validación, detener
+        if ($valorValidado === false) {
+            $this->mensaje = 'Hay errores de validación';
             $this->tipoMensaje = 'error';
             return;
         }
+
+        // Usar el valor validado (puede ser null)
+        $valor = $valorValidado;
 
         // Guardar la calificación en la base de datos
         try {
@@ -270,6 +338,7 @@ class Calificaciones extends Component
             $this->tipoMensaje = 'success';
 
         } catch (\Exception $e) {
+            $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'Error al guardar';
             $this->mensaje = 'Error al guardar la calificación: ' . $e->getMessage();
             $this->tipoMensaje = 'error';
         }
@@ -279,14 +348,58 @@ class Calificaciones extends Component
     {
         $this->cargando = true;
         $hayErrores = false;
+        $this->errores = [];
 
+        // Validar todas las calificaciones primero
         foreach ($this->calificaciones as $alumnoId => $unidades) {
             foreach ($unidades as $unidad => $datos) {
-                if ($datos['valor'] !== null) {
-                    try {
-                        $this->actualizarCalificacion($alumnoId, $unidad, $datos['valor']);
-                    } catch (\Exception $e) {
+                if ($datos['valor'] !== null && $datos['valor'] !== '') {
+                    $valorValidado = $this->validarCalificacion($datos['valor'], $alumnoId, $unidad);
+                    if ($valorValidado === false) {
                         $hayErrores = true;
+                    } else {
+                        // Actualizar con el valor validado
+                        $this->calificaciones[$alumnoId][$unidad]['valor'] = $valorValidado;
+                    }
+                }
+            }
+        }
+
+        // Si hay errores, no continuar
+        if ($hayErrores) {
+            $this->cargando = false;
+            $this->mensaje = 'Hay calificaciones con formato incorrecto. Por favor, corríjalas antes de guardar.';
+            $this->tipoMensaje = 'error';
+            return;
+        }
+
+        // Guardar todas las calificaciones
+        $errorAlGuardar = false;
+        foreach ($this->calificaciones as $alumnoId => $unidades) {
+            foreach ($unidades as $unidad => $datos) {
+                if ($datos['valor'] !== null && $datos['valor'] !== '') {
+                    try {
+                        // Usamos el valor ya validado
+                        $datosCalificacion = [
+                            'alumno_id' => $alumnoId,
+                            'materia_id' => $this->materiaSeleccionada,
+                            'unidad' => $unidad,
+                            'calificacion' => $datos['valor'] ?? 0
+                        ];
+
+                        // Si ya existe un ID, actualizar, si no, crear
+                        if (isset($datos['id']) && $datos['id']) {
+                            $calificacion = Calificacion::find($datos['id']);
+                            if ($calificacion) {
+                                $calificacion->update($datosCalificacion);
+                            }
+                        } else {
+                            $calificacion = Calificacion::create($datosCalificacion);
+                            $this->calificaciones[$alumnoId][$unidad]['id'] = $calificacion->id;
+                        }
+                    } catch (\Exception $e) {
+                        $errorAlGuardar = true;
+                        $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'Error al guardar: ' . $e->getMessage();
                     }
                 }
             }
@@ -294,7 +407,7 @@ class Calificaciones extends Component
 
         $this->cargando = false;
 
-        if ($hayErrores) {
+        if ($errorAlGuardar) {
             $this->mensaje = 'Se guardaron algunas calificaciones, pero hubo errores';
             $this->tipoMensaje = 'warning';
         } else {

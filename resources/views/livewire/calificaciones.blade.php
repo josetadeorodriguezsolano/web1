@@ -79,8 +79,14 @@
                                             max="10"
                                             wire:model="calificaciones.{{ $alumno['id'] }}.{{ $unidad }}.valor"
                                             wire:change="actualizarCalificacion({{ $alumno['id'] }}, {{ $unidad }}, $event.target.value)"
-                                            class="w-20 text-center border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                            class="w-20 text-center border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm
+                                                  @if(isset($errores['alumno_'.$alumno['id'].'_unidad_'.$unidad])) border-red-500 @endif"
                                         >
+                                        @if(isset($errores['alumno_'.$alumno['id'].'_unidad_'.$unidad]))
+                                            <div class="text-xs text-red-600 mt-1">
+                                                {{ $errores['alumno_'.$alumno['id'].'_unidad_'.$unidad] }}
+                                            </div>
+                                        @endif
                                     </td>
                                 @endfor
 
