@@ -70,7 +70,7 @@ class Maestro extends Authenticatable
     }
 
     public function imparte(){
-        return $this->hasMany(Imparte::class)->with(['grupo','materia']);
+        return $this->hasMany(Imparte::class)->with(['grupo_id','materia_id']);
     }
 
     public function gruposImpartidos($generacion){

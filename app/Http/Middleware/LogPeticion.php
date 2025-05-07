@@ -17,7 +17,7 @@ class LogPeticion
     public function handle(Request $request, Closure $next): Response
     {
         $maestro = Auth::user();
-        if ($maestro->gruposImpartidos(2024)->count() == 0) {
+        if ($maestro->gruposImpartidos(1)->count() == 0) {
             return redirect('dashboard');
         }
         return $next($request);

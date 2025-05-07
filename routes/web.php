@@ -2,19 +2,25 @@
 
 use App\Http\Controllers\PaseDeListaController;
 use App\Http\Controllers\PdfController;
+
+use App\Http\Controllers\PDFInasistenciasController;
+
 use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
+
+use App\Livewire\Ina;
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::middleware([
-    'auth:sanctum',//token autentificacion
-    config('jetstream.auth_session'),//autentificacion
-    'verified',//verificacion de correo electronico
+  //  'auth:sanctum',//token autentificacion
+   //config('jetstream.auth_session'),//autentificacion
+    //'verified',//verificacion de correo electronico
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -31,7 +37,12 @@ Route::middleware([
     });
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
+    Route::get('ina',Ina::class);
+    
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
+
+    Route::get('inasistencia',[PDFInasistenciasController::class,'generar']);
+
 });
 
 Route::get("w3css",function(){
