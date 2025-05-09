@@ -9,10 +9,10 @@
     @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Selección de grupo -->
+        <!-- Selección de grupo - AUMENTADO TAMAÑO DE TEXTO -->
         <div>
-            <label for="grupo" class="block text-sm font-medium text-gray-700 mb-2">Selecciona un grupo:</label>
-            <select id="grupo" wire:model.live="grupoSeleccionado" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <label for="grupo" class="block text-lg font-medium text-gray-700 mb-2">Selecciona un grupo:</label>
+            <select id="grupo" wire:model.live="grupoSeleccionado" class="mt-1 block w-full pl-3 pr-10 py-2 text-xl font-medium border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md">
                 <option value="">-- Seleccionar grupo --</option>
                 @foreach ($gruposImpartidos as $grupo)
                 <option value="{{ $grupo['id'] }}">{{ $grupo['nombre'] }}</option>
@@ -20,10 +20,10 @@
             </select>
         </div>
 
-        <!-- Selección de materia -->
+        <!-- Selección de materia - AUMENTADO TAMAÑO DE TEXTO -->
         <div>
-            <label for="materia" class="block text-sm font-medium text-gray-700 mb-2">Selecciona una materia:</label>
-            <select id="materia" wire:model.live="materiaSeleccionada" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" {{ count($materiasImpartidas) ? '' : 'disabled' }}>
+            <label for="materia" class="block text-lg font-medium text-gray-700 mb-2">Selecciona una materia:</label>
+            <select id="materia" wire:model.live="materiaSeleccionada" class="mt-1 block w-full pl-3 pr-10 py-2 text-xl font-medium border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md" {{ count($materiasImpartidas) ? '' : 'disabled' }}>
                 <option value="">-- Seleccionar materia --</option>
                 @foreach ($materiasImpartidas as $materia)
                 <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
@@ -46,11 +46,9 @@
         </h3>
 
         <div class="overflow-x-auto">
-            <!-- Eliminado max-width, ajustado padding y espaciado -->
             <table class="w-full divide-y divide-gray-200 border-collapse">
                 <thead class="bg-[#1E3A8A]">
                     <tr>
-                        <!-- Agrandado texto y ajustado espaciado -->
                         <th class="py-2 text-left text-xl font-medium text-white uppercase tracking-wide" style="width: 40%; padding-left: 10px; padding-right: 0;">Alumno</th>
                         <th class="py-2 text-center text-xl font-medium text-white uppercase tracking-wide" style="width: 12%; padding: 0;">Unidad 1</th>
                         <th class="py-2 text-center text-xl font-medium text-white uppercase tracking-wide" style="width: 12%; padding: 0;">Unidad 2</th>
@@ -63,7 +61,6 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach ($alumnos as $alumno)
                     <tr>
-                        <!-- Agrandado texto y nombres, reducido margen vertical -->
                         <td class="py-2 whitespace-nowrap" style="padding-left: 10px; padding-right: 0;">
                             <div class="text-xl font-medium text-gray-900">
                                 {{ $alumno['apellidos'] }} {{ $alumno['nombres'] }}
@@ -74,26 +71,24 @@
                         </td>
 
                         @for ($unidad = 1; $unidad <= 4; $unidad++)
-                            <!-- Centrado verticalmente, eliminado padding, aumentado tamaño input -->
                             <td class="py-2 align-middle text-center" style="padding-left: 0; padding-right: 0;">
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    min="0"
-                                    max="10"
-                                    wire:model="calificaciones.{{ $alumno['id'] }}.{{ $unidad }}.valor"
-                                    wire:change="actualizarCalificacion({{ $alumno['id'] }}, {{ $unidad }}, $event.target.value)"
-                                    class="w-16 text-center text-xl font-medium border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="10"
+                                wire:model="calificaciones.{{ $alumno['id'] }}.{{ $unidad }}.valor"
+                                wire:change="actualizarCalificacion({{ $alumno['id'] }}, {{ $unidad }}, $event.target.value)"
+                                class="w-16 text-center text-xl font-medium border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm
                                                   @if(isset($errores['alumno_'.$alumno['id'].'_unidad_'.$unidad])) border-red-500 @endif">
-                                @if(isset($errores['alumno_'.$alumno['id'].'_unidad_'.$unidad]))
-                                <div class="text-xs text-red-600 mt-1">
-                                    {{ $errores['alumno_'.$alumno['id'].'_unidad_'.$unidad] }}
-                                </div>
-                                @endif
+                            @if(isset($errores['alumno_'.$alumno['id'].'_unidad_'.$unidad]))
+                            <div class="text-xs text-red-600 mt-1">
+                                {{ $errores['alumno_'.$alumno['id'].'_unidad_'.$unidad] }}
+                            </div>
+                            @endif
                             </td>
                             @endfor
 
-                            <!-- Centrado verticalmente, eliminado padding, agrandado texto -->
                             <td class="py-2 align-middle text-center" style="padding-left: 0; padding-right: 0;">
                                 @php
                                 $promedio = $this->calcularPromedioAlumno($alumno['id']);
@@ -117,7 +112,7 @@
             <button
                 wire:click="guardarTodasLasCalificaciones"
                 wire:loading.attr="disabled"
-                class="inline-flex items-center px-4 py-2 bg-[#1E3A8A] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-900 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring focus:ring-blue-300 disabled:opacity-25 transition">
+                class="inline-flex items-center px-4 py-2 bg-[#1E3A8A] border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-blue-900 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring focus:ring-blue-300 disabled:opacity-25 transition">
                 Guardar todas las calificaciones
             </button>
         </div>
