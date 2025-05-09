@@ -61,25 +61,7 @@ class Calificaciones extends Component
     {
         try {
             $maestro = Auth::user();
-            $año = date('Y');
-
-            // Obtener grupos únicos que imparte el maestro
-            $imparte = $maestro->imparte()
-                ->with(['grupo', 'materia'])
-                ->whereHas('grupo', function($query) use ($año) {
-                    $query->where('generacion', '<=', $año);
-                })
-                ->get();
-
-            // Agrupar por grupo para el dropdown
-            $gruposUnicos = $imparte->pluck('grupo')->unique('id')->values();
-
-            $this->gruposImpartidos = $gruposUnicos->map(function($grupo) {
-                return [
-                    'id' => $grupo->id,
-                    'nombre' => $grupo->grado . '°' . $grupo->letra . ' (Gen. ' . $grupo->generacion . ')'
-                ];
-            })->toArray();
+            $this->gruposImpartidos = $maestro->obtenerGruposImpartidos()->toArray();
         } catch (\Exception $e) {
             // Para desarrollo, muestra detalles de error
             $this->mensaje = 'Error al cargar grupos: ' . $e->getMessage();
@@ -109,20 +91,7 @@ class Calificaciones extends Component
 
         try {
             $maestro = Auth::user();
-
-            // Obtener las materias que imparte el maestro en este grupo
-            $imparte = $maestro->imparte()
-                ->with(['materia'])
-                ->where('grupo_id', $valor)
-                ->get();
-
-            $this->materiasImpartidas = $imparte->map(function($relacion) {
-                return [
-                    'id' => $relacion->materia_id,
-                    'imparte_id' => $relacion->id,
-                    'nombre' => $relacion->materia->nombre . ' (' . $relacion->materia->clave . ')'
-                ];
-            })->toArray();
+            $this->materiasImpartidas = $maestro->obtenerMateriasImpartidasEnGrupo($valor);
         } catch (\Exception $e) {
             $this->mensaje = 'Error al cargar materias: ' . $e->getMessage();
             $this->tipoMensaje = 'error';
@@ -162,10 +131,8 @@ class Calificaciones extends Component
         $this->errores = []; // Limpiar errores al cargar alumnos
 
         try {
-            // Obtener los alumnos del grupo seleccionado
-            $grupo = Grupo::with(['alumnos' => function($query) {
-                $query->orderBy('apellidos');
-            }])->find($this->grupoSeleccionado);
+            // Obtener los alumnos y sus calificaciones usando el método del modelo
+            $grupo = Grupo::find($this->grupoSeleccionado);
 
             if (!$grupo) {
                 $this->cargando = false;
@@ -174,44 +141,10 @@ class Calificaciones extends Component
                 return;
             }
 
-            $this->alumnos = $grupo->alumnos->toArray();
+            $resultado = $grupo->obtenerAlumnosConCalificaciones($this->materiaSeleccionada);
 
-            // Obtener las calificaciones existentes para estos alumnos
-            // Modificado para no usar imparte_id
-            $calificacionesExistentes = Calificacion::where('materia_id', $this->materiaSeleccionada)
-                ->whereIn('alumno_id', $grupo->alumnos->pluck('id'))
-                ->get()
-                ->groupBy('alumno_id')
-                ->toArray();
-
-            // Inicializar la estructura de calificaciones
-            $this->calificaciones = [];
-
-            foreach ($this->alumnos as $alumno) {
-                $alumnoId = $alumno['id'];
-
-                // Inicializar las calificaciones para las 4 unidades
-                $this->calificaciones[$alumnoId] = [
-                    1 => ['valor' => null, 'id' => null],
-                    2 => ['valor' => null, 'id' => null],
-                    3 => ['valor' => null, 'id' => null],
-                    4 => ['valor' => null, 'id' => null],
-                ];
-
-                // Si hay calificaciones existentes, cargarlas
-                if (isset($calificacionesExistentes[$alumnoId])) {
-                    foreach ($calificacionesExistentes[$alumnoId] as $calificacion) {
-                        $unidad = $calificacion['unidad'];
-                        if ($unidad >= 1 && $unidad <= 4) {
-                            $this->calificaciones[$alumnoId][$unidad] = [
-                                'valor' => floatval($calificacion['calificacion']),
-                                'id' => $calificacion['id']
-                            ];
-                        }
-                    }
-                }
-            }
-
+            $this->alumnos = $resultado['alumnos'];
+            $this->calificaciones = $resultado['calificaciones'];
         } catch (\Exception $e) {
             $this->mensaje = 'Error al cargar alumnos: ' . $e->getMessage();
             $this->tipoMensaje = 'error';
@@ -313,29 +246,28 @@ class Calificaciones extends Component
 
         // Guardar la calificación en la base de datos
         try {
-            // Modificado para no usar grupo_id e imparte_id
-            $datosCalificacion = [
-                'alumno_id' => $alumnoId,
-                'materia_id' => $this->materiaSeleccionada,
-                'unidad' => $unidad,
-                'calificacion' => $valor ?? 0
-            ];
+            // Obtener el ID de la calificación si existe
+            $calificacionId = isset($this->calificaciones[$alumnoId][$unidad]['id']) ?
+                $this->calificaciones[$alumnoId][$unidad]['id'] : null;
 
-            // Si ya existe un ID, actualizar, si no, crear
-            if (isset($this->calificaciones[$alumnoId][$unidad]['id']) &&
-                $this->calificaciones[$alumnoId][$unidad]['id']) {
-                $calificacion = Calificacion::find($this->calificaciones[$alumnoId][$unidad]['id']);
-                if ($calificacion) {
-                    $calificacion->update($datosCalificacion);
-                }
-            } else {
-                $calificacion = Calificacion::create($datosCalificacion);
+            // Usar el método del modelo para actualizar o crear la calificación
+            $calificacion = Calificacion::actualizarCalificacion(
+                $alumnoId,
+                $this->materiaSeleccionada,
+                $unidad,
+                $valor,
+                $calificacionId
+            );
+
+            // Actualizar el ID en el arreglo local si es una nueva calificación
+            if (!$calificacionId) {
                 $this->calificaciones[$alumnoId][$unidad]['id'] = $calificacion->id;
             }
 
             $this->calificaciones[$alumnoId][$unidad]['valor'] = $valor;
-            $this->mensaje = 'Calificación guardada correctamente';
-            $this->tipoMensaje = 'success';
+            // MENSAJE ELIMINADO
+            //$this->mensaje = 'Calificación guardada correctamente';
+            //$this->tipoMensaje = 'success';
 
         } catch (\Exception $e) {
             $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'Error al guardar';
@@ -379,22 +311,20 @@ class Calificaciones extends Component
             foreach ($unidades as $unidad => $datos) {
                 if ($datos['valor'] !== null && $datos['valor'] !== '') {
                     try {
-                        // Usamos el valor ya validado
-                        $datosCalificacion = [
-                            'alumno_id' => $alumnoId,
-                            'materia_id' => $this->materiaSeleccionada,
-                            'unidad' => $unidad,
-                            'calificacion' => $datos['valor'] ?? 0
-                        ];
+                        // Obtener el ID de la calificación si existe
+                        $calificacionId = isset($datos['id']) ? $datos['id'] : null;
 
-                        // Si ya existe un ID, actualizar, si no, crear
-                        if (isset($datos['id']) && $datos['id']) {
-                            $calificacion = Calificacion::find($datos['id']);
-                            if ($calificacion) {
-                                $calificacion->update($datosCalificacion);
-                            }
-                        } else {
-                            $calificacion = Calificacion::create($datosCalificacion);
+                        // Usar el método del modelo para actualizar o crear la calificación
+                        $calificacion = Calificacion::actualizarCalificacion(
+                            $alumnoId,
+                            $this->materiaSeleccionada,
+                            $unidad,
+                            $datos['valor'],
+                            $calificacionId
+                        );
+
+                        // Actualizar el ID en el arreglo local si es una nueva calificación
+                        if (!$calificacionId) {
                             $this->calificaciones[$alumnoId][$unidad]['id'] = $calificacion->id;
                         }
                     } catch (\Exception $e) {

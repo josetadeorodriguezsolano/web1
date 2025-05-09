@@ -42,4 +42,34 @@ class Calificacion extends Model
             }
         });
     }
+
+    /**
+     * Actualiza o crea una calificación para un alumno en una materia y unidad específica
+     * 
+     * @param int $alumnoId ID del alumno
+     * @param int $materiaId ID de la materia
+     * @param int $unidad Número de unidad (1-4)
+     * @param float|null $valor Valor de la calificación
+     * @param int|null $calificacionId ID de la calificación existente (opcional)
+     * @return \App\Models\Calificacion
+     */
+    public static function actualizarCalificacion($alumnoId, $materiaId, $unidad, $valor, $calificacionId = null)
+    {
+        $datosCalificacion = [
+            'alumno_id' => $alumnoId,
+            'materia_id' => $materiaId,
+            'unidad' => $unidad,
+            'calificacion' => $valor ?? 0
+        ];
+
+        if ($calificacionId) {
+            $calificacion = self::find($calificacionId);
+            if ($calificacion) {
+                $calificacion->update($datosCalificacion);
+                return $calificacion;
+            }
+        }
+
+        return self::create($datosCalificacion);
+    }
 }
