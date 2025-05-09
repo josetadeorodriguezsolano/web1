@@ -15,6 +15,33 @@ class GrupoTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_se_puede_seleccionar_un_grupo_y_listar_alumnos(): void
+    {
+    $grupo = Grupo::factory()->create([
+        'grado' => 3,
+        'letra' => 'A',
+        'generacion' => '2022-2025',
+    ]);
+
+    $alumnos = Alumno::factory(2)->create(); // Creamos 2 alumnos
+
+    foreach ($alumnos as $alumno) {
+        Inscrito::create([
+            'grupo_id' => $grupo->id,
+            'alumno_id' => $alumno->id
+        ]);
+    }
+
+    $alumnosObtenidos = $grupo->alumnos;
+
+    $this->assertCount(2, $alumnosObtenidos);
+    $this->assertEquals(
+        $alumnos->pluck('id')->sort()->values()->toArray(),
+        $alumnosObtenidos->pluck('id')->sort()->values()->toArray()
+    );
+    }
+
+
     /** @test */
     public function un_grupo_puede_ser_creado_en_la_base_de_datos()
     {
