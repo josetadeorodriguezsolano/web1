@@ -217,11 +217,10 @@ class Calificaciones extends Component
         }
 
         // Validar formato (máximo un decimal)
-        if (!preg_match('/^\d(\.\d{0,1})?$/', (string)$valor)) {
+        if (!preg_match('/^(10|[0-9])(\.\d{0,1})?$/', (string)$valor)) {
             $this->errores["alumno_{$alumnoId}_unidad_{$unidad}"] = 'La calificación debe tener formato X.X (máximo un decimal)';
             return false;
         }
-
         return $valor;
     }
 
