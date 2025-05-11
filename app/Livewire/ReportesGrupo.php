@@ -20,7 +20,7 @@ class ReportesGrupo extends Component
     public $letra = null;
     public $materia_id = null;
     public $maestro_id = null;
-   
+
     // Variables de resultados
     public $resultados = [];
 
@@ -48,19 +48,19 @@ class ReportesGrupo extends Component
 
     public function cambiarVista($tab)
     {
-        $this->vista = $tab; 
-        $this->resultados = []; 
-        $this->buscarReporte(); 
+        $this->vista = $tab;
+        $this->resultados = [];
+        $this->buscarReporte();
     }
     public function cambioModo()
     {
-        $this->resultados = []; 
-        $this->modo = !$this->modo; 
-        $this->buscarReporte(); 
+        $this->resultados = [];
+        $this->modo = !$this->modo;
+        $this->buscarReporte();
     }
     public function buscarReporte()
     {
-        $this->resultados = []; 
+        $this->resultados = [];
 
         if ($this->modo) {
             $this->controlEscolar();
@@ -80,7 +80,7 @@ class ReportesGrupo extends Component
                     $this->reporteGruposSinMaestro();
                     break;
                 default:
-                    $this->controlEscolarMaestros(); 
+                    $this->controlEscolarMaestros();
                     break;
             }
         }
@@ -172,14 +172,14 @@ class ReportesGrupo extends Component
 
     public function reporteGruposSinMaestro()
     {
-    
+
         $gruposSinMaestro = \App\Models\Grupo::leftJoin('imparte', 'grupos.id', '=', 'imparte.grupo_id')
-            ->whereNull('imparte.maestro_id') 
+            ->whereNull('imparte.maestro_id')
             ->leftJoin('materias', 'imparte.materia_id', '=', 'materias.id')
             ->select(
-                'grupos.id', 
-                DB::raw("CONCAT(grupos.grado, grupos.letra, '-', grupos.generacion) as grupo_nombre"), 
-                'materias.nombre as materia_nombre' 
+                'grupos.id',
+                DB::raw("CONCAT(grupos.grado, grupos.letra, '-', grupos.generacion) as grupo_nombre"),
+                'materias.nombre as materia_nombre'
             )
             ->get();
 
@@ -196,7 +196,7 @@ class ReportesGrupo extends Component
 
     public function actualizarMateriaId(){
         //dd("Se actualizó a: ", $value);
-        
+
         $this->materia_id = $this->materia_id !== '' ? (int) $this->materia_id : null;
         //dd("Materia se actualizo a: ", $this->materia_id);
     }
@@ -232,10 +232,7 @@ class ReportesGrupo extends Component
     */
     public function controlEscolar()
     {
-
-
-
-
+        //dd("Estoy llamando a control escolar");
         $this->validate([
             'grado' => 'nullable|integer|between:1,3',
             'letra' => 'nullable|string|max:1',
@@ -245,9 +242,10 @@ class ReportesGrupo extends Component
         if($this->modo===true)
         {
 
-            //dd("Estoy en el if");
+
             $this->resultados = $this->filtrarResultados();
-            $this->calcularEstadisticas();
+            //dd($this->resultados);
+            //$this->calcularEstadisticas();
         }
         if($this->modo===false)
         {
@@ -454,7 +452,7 @@ public function obtenerMaestrosSinMaterias($search = '')
             'materia_id' => $this->materia_id
         ]);
     }
-   
+
 
 
     }
