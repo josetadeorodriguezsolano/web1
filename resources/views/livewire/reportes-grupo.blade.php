@@ -136,6 +136,9 @@
                 <button wire:click="cambiarVista('grupos_sin_maestro')" class="{{ $vista === 'grupos_sin_maestro' ? 'font-semibold border-b-2 border-black' : '' }}">
                     Grupos sin Maestro
                 </button>
+                <button wire:click="cambiarVista('reporte_de_inasistencia')" class="{{ $vista === 'reporte_de_inasistencia' ? 'font-semibold border-b-2 border-black' : '' }}">
+                    Reporte de inasistencia
+                </button>
             </div>
 
             <div class="flex justify-between items-center mb-2">
@@ -292,7 +295,7 @@
                 </div>
             @endif
             @endif
-            @if($modo && $resultados && $resultados->count()>0)
+            @if($modo && $reporteInasistencia == false && $resultados && $resultados->count()>0)
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>

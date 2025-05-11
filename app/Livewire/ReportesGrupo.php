@@ -31,6 +31,7 @@ class ReportesGrupo extends Component
     public $gruposSinMaestro = 0;
     public $searchMaestro = '';
     public $modo = true; //True reporte de alumnos, false reporte de maestros
+    public $reporteInasistencia = false;
     public $maestros = [];
 
     //vista tab
@@ -48,15 +49,24 @@ class ReportesGrupo extends Component
 
     public function cambiarVista($tab)
     {
-        $this->vista = $tab;
-        $this->resultados = [];
-        $this->buscarReporte();
+         $this->resultados = [];
+
+        if($tab !='reporte_de_inasistencia')
+        {
+            $this->vista = $tab;
+            $this->buscarReporte();
+        }
+        else if ($this->modo)
+        {
+            $this->reporteInasistencia = true;
+        }
     }
     public function cambioModo()
     {
         $this->resultados = [];
         $this->modo = !$this->modo;
-        $this->buscarReporte();
+        if ($this->modo == false)
+            $this->buscarReporte();
     }
     public function buscarReporte()
     {
@@ -65,6 +75,7 @@ class ReportesGrupo extends Component
         if ($this->modo) {
             $this->controlEscolar();
         } else {
+            $this->reporteInasistencia = false;
             // Reportes de maestros
             switch ($this->vista) {
                 case 'maestros':
@@ -85,6 +96,14 @@ class ReportesGrupo extends Component
             }
         }
     }
+
+    //Parte del reporte de inasitencia de los alumnos
+    public function reporteInasistenciaAlumnos()
+    {
+        dd("llamada a reporteinasistencia");
+    }
+
+
     //MIO
     public function reporteMaestroPorMateria()
     {
@@ -186,12 +205,6 @@ class ReportesGrupo extends Component
         $this->resultados = $gruposSinMaestro;
         $this->modo = false;
     }
-
-
-
-
-
-
 
 
     public function actualizarMateriaId(){
