@@ -292,5 +292,39 @@
                 </div>
             @endif
             @endif
+            @if($modo && $resultados && $resultados->count()>0)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border px-4 py-2">#</th>
+                                <th class="border px-4 py-2">Matrícula</th>
+                                <th class="border px-4 py-2">Apellidos</th>
+                                <th class="border px-4 py-2">Nombres</th>
+                                <th class="border px-4 py-2">Grado/Grupo</th>
+                                <th class="border px-4 py-2">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($resultados as $index => $alumno)
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-4 py-2">{{ $loop->iteration }}</td>
+                                <td class="border px-4 py-2">{{ $alumno->matricula }}</td>
+                                <td class="border px-4 py-2">{{ $alumno->apellidos }}</td>
+                                <td class="border px-4 py-2">{{ $alumno->nombres }}</td>
+                                <td class="border px-4 py-2">
+                                    {{ $alumno->inscritos->first()->grupo->grado ?? '' }}{{ $alumno->inscritos->first()->grupo->letra ?? '' }}
+                                </td>
+                                <td class="border px-4 py-2">{{ $alumno->estatus}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="p-8 text-center text-gray-500">
+                    No se encontraron resultados.
+                </div>
+            @endif
         </div>
 </div>
