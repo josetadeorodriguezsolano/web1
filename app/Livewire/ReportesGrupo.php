@@ -303,7 +303,7 @@ class ReportesGrupo extends Component
         return Alumno::when($this->grado || $this->letra || $this->generacion, function($query) {
                 $query->whereHas('inscritos.grupo', function($q) {
                     if ($this->grado) {
-                        $q->where('grado', $this->grado);
+                        $q->where('grado', '=' ,(string) $this->grado);
                     }
                     if ($this->letra) {
                         $q->where('letra', $this->letra);

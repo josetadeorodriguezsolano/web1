@@ -313,7 +313,8 @@
                                 <td class="border px-4 py-2">{{ $alumno->apellidos }}</td>
                                 <td class="border px-4 py-2">{{ $alumno->nombres }}</td>
                                 <td class="border px-4 py-2">
-                                    {{ $alumno->inscritos->first()->grupo->grado ?? '' }}{{ $alumno->inscritos->first()->grupo->letra ?? '' }}
+                                    {{ $alumno->inscritos->where('grupo.grado', $grado)->first()->grupo->grado ?? $alumno->inscritos->first()->grupo->grado}}
+                                    {{ $alumno->inscritos->first()->grupo->letra ?? '' }}
                                 </td>
                                 <td class="border px-4 py-2">{{ $alumno->estatus}}</td>
                             </tr>
