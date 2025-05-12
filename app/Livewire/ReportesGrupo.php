@@ -17,6 +17,9 @@ class ReportesGrupo extends Component
     public $grupo_id = null;
     public $generacion = null;
     public $grado = null;
+    public $alumno_matricula = null;
+    public $alumno_clases_totales = null;
+    public $porcentaje_faltas = null;
     public $letra = null;
     public $materia_id = null;
     public $maestro_id = null;
@@ -73,7 +76,15 @@ class ReportesGrupo extends Component
         $this->resultados = [];
 
         if ($this->modo) {
-            $this->controlEscolar();
+            if(!$this->alumno_matricula)
+                $this->controlEscolar();
+            else
+            {
+                $this->reporteInasistenciaAlumnos();
+                $this->calcularPorcentajeFaltas();
+                $this->acomodarResultadosVista();
+                dd($this->resultados);
+            }
         } else {
             $this->reporteInasistencia = false;
             // Reportes de maestros
@@ -97,12 +108,92 @@ class ReportesGrupo extends Component
         }
     }
 
-    //Parte del reporte de inasitencia de los alumnos
+    public function acomodarResultadosVista()
+    {
+        // Validación básica
+        if (!isset($this->resultados['faltas'], $this->resultados['matricula'], $this->alumno_clases_totales)) {
+            $this->addError('resultado', 'Faltan datos para generar el reporte final.');
+            return;
+        }
+
+        if (!is_numeric($this->alumno_clases_totales) || (int)$this->alumno_clases_totales <= 0) {
+            $this->addError('alumno_clases_totales', 'Ingresa un número válido de clases totales.');
+            return;
+        }
+
+        $totalClases = (int)$this->alumno_clases_totales;
+        $totalFaltas = count($this->resultados['faltas']);
+        $porcentaje = round(($totalFaltas / $totalClases) * 100, 2);
+
+        // Arreglo limpio con los campos solicitados
+        $formato = [
+            'matricula' => $this->resultados['matricula'],
+            'nombre' => $this->resultados['nombre'],
+            'apellidos' => $this->resultados['apellidos'],
+            'grado' => $this->resultados['grado'],
+            'grupo' => $this->resultados['grupo'],
+            'faltas_totales' => $totalFaltas,
+            'clases_totales' => $totalClases,
+            'porcentaje_faltas' => $porcentaje,
+        ];
+
+        $this->resultados = $formato;
+    }
+        //Parte del reporte de inasitencia de los alumnos
     public function reporteInasistenciaAlumnos()
     {
-        dd("llamada a reporteinasistencia");
+        $alumno = Alumno::where('matricula', $this->alumno_matricula)->first();
+
+        if (!$alumno) {
+            $this->addError('alumno_matricula', 'Alumno no encontrado');
+            return;
+        }
+
+        $faltas = $alumno->faltas()->get();
+
+        $inscrito = $alumno->inscritos()->with('grupo')->latest()->first();
+
+        $grado = $inscrito?->grupo?->grado ?? 'Desconocido';
+        $grupo = $inscrito?->grupo?->letra ?? 'Desconocido';
+
+        $resultado = [
+            'matricula' => $alumno->matricula,
+            'nombre' => $alumno->nombres,
+            'apellidos' => $alumno->apellidos,
+            'grado' => $grado,
+            'grupo' => $grupo,
+            'faltas' => $faltas->map(function($falta) {
+                return [
+                    'fecha' => $falta->fecha,
+                    'justificada' => $falta->justificada,
+                ];
+            })->toArray()
+        ];
+
+        // Puedes guardar el resultado en una propiedad pública del componente para mostrarlo en la vista
+        $this->resultados = $resultado;
     }
 
+    public function calcularPorcentajeFaltas()
+    {
+        // Asegurarse de que hay datos y el total de clases es numérico
+        if (!is_array($this->resultados) || !isset($this->resultados['faltas'])) {
+            $this->addError('resultado', 'Primero obtén el reporte de inasistencia.');
+            return;
+        }
+
+        if (!is_numeric($this->alumno_clases_totales) || (int)$this->alumno_clases_totales <= 0) {
+            $this->addError('alumno_clases_totales', 'Ingresa un número válido de clases totales.');
+            return;
+        }
+
+        $totalClases = (int)$this->alumno_clases_totales;
+        $totalFaltas = count($this->resultados['faltas']);
+
+        $porcentaje = ($totalFaltas / $totalClases) * 100;
+
+        $this->porcentaje_faltas = round($porcentaje, 2); // Almacenar en una propiedad para mostrarlo
+    }
 
     //MIO
     public function reporteMaestroPorMateria()

@@ -107,11 +107,7 @@
 
                 <div class="text-right">
                 <button
-                @if ($modo)
-                    wire:click="controlEscolar"
-                @else
                     wire:click="buscarReporte"
-                @endif
                     class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -141,7 +137,8 @@
                 </button>
             </div>
 
-            <div class="flex justify-between items-center mb-2">
+            @if ($reporteInasistencia == false)
+                <div class="flex justify-between items-center mb-2">
                 <button wire:click="actualizar" class="flex items-center bg-gray-100 px-3 py-1 rounded">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6"/>
@@ -156,6 +153,21 @@
                     Exportar PDF
                 </button>
             </div>
+            @else
+            <div class="bg-white p-4 shadow rounded">
+                <div>
+                    <label class="block mb-1">Total de clases del alumno</label>
+                    <input
+                    type="text" wire:model.defer="alumno_clases_totales" class="w-full border rounded p-2">
+                </div>
+                <div>
+                    <label class="block mb-1">Matrícula del Alumno</label>
+                    <input
+                    type="text" wire:model.defer="alumno_matricula" class="w-full border rounded p-2">
+                </div>
+            </div>
+            @endif
+
 
             {{-- Mostrar contenido basado en la vista seleccionada --}}
 
