@@ -84,4 +84,5 @@ class Maestro extends Authenticatable
             return $imparte->grupo->generacion == $generacion;
         });
     }
+    
 }

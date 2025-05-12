@@ -13,10 +13,19 @@ class Grupo extends Model
         return $this->hasMany(Inscrito::class);//,'grupo_id','id');
     }
 
-    public function alumnos(){// es un hasMany pero utiliza una tabla pivote
-        return $this->hasManyThrough(Alumno::class,Inscrito::class
-                    ,'grupo_id','id','id','alumno_id')->orderBy('apellidos');
-    }
+    public function alumnos()
+{
+    return $this->hasManyThrough(
+        Alumno::class,
+        Inscrito::class,
+        'grupo_id',   // Foreign key on inscritos table...
+        'id',         // Local key on alumnos table...
+        'id',         // Local key on grupos table...
+        'alumno_id'   // Foreign key on inscritos table...
+    )->orderBy('apellidos');
+}
+
+    
 
     public function materias()
     {
