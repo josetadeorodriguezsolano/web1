@@ -15,7 +15,7 @@
                     <p class="text-2xl font-bold">{{ $materiasSinMaestro }}</p>
                 </div>
                 <div class="bg-white p-4 shadow rounded text-center">
-                    <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
+                    <h2 class="text-gray-600 text-sm">Grupos si Maestro</h2>
                     <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
                 </div>
             </div>
@@ -260,7 +260,7 @@
             @endif
             @elseif ($vista === 'grupos_sin_maestro')
             {{-- Tab de Grupos sin Maestro --}}
-                        
+
             @if (!$modo && $resultados && $resultados->count() > 0)
                 <div class="overflow-x-auto mt-4">
                     <table class="w-full text-left border-collapse">

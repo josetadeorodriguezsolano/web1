@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div>
-        
+
         <!-- Select básico -->
 
         {{-- Filtros de búsqueda --}}
@@ -114,13 +114,16 @@
                         </div>
 
                         <div class="flex justify-between items-center mb-2">
-                            <button wire:click="actualizar" class="flex items-center bg-gray-100 px-3 py-1 rounded">
+                            <!-- Botón Actualizar -->
+                            <button wire:click="actualizar" class="flex items-center bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6"/>
                                 </svg>
                                 Actualizar
                             </button>
-                            <button class="flex items-center bg-gray-100 px-3 py-1 rounded">
+
+                            <!-- Botón Exportar PDF -->
+                            <button wire:click="exportarPDF" class="flex items-center bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path d="M12 20l9-5-9-5-9 5 9 5z"/>
                                     <path d="M12 12V4l9 5-9 5-9-5 9-5z"/>
@@ -128,7 +131,7 @@
                                 Exportar PDF
                             </button>
                         </div>
-               
+
 
                         {{-- Mostrar contenido basado en la vista seleccionada --}}
             @if ($vista === 'maestros')
@@ -187,7 +190,7 @@
                             @foreach ($resultados as $index => $materia)
                             <tr class="{{ $materia['cruce'] ? 'bg-red-100' : 'hover:bg-gray-50' }}">
                                 <td class="border px-4 py-2">{{ $index + 1 }}</td>
-                                <td class="border px-4 py-2">{{ $materia['maestro'] }}</td> 
+                                <td class="border px-4 py-2">{{ $materia['maestro'] }}</td>
                                 <td class="border px-4 py-2">{{ $materia['materia'] }}</td>
                                 <td class="border px-4 py-2">{{ $materia['grupo'] }}</td>
                                 <td class="border px-4 py-2">{{ $materia['dia'] }}</td>
@@ -302,7 +305,7 @@
                         </tbody>
                     </table>
                 </div>
-              
+
             @else
                 <div class="p-8 text-center text-gray-500">
                     No se encontraron alumnos con los criterios seleccionados.
@@ -311,6 +314,6 @@
             @endif
         </div>
                     </div>
-          
+
 
 </div>

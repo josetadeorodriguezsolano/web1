@@ -19,8 +19,9 @@ class DatabaseSeeder extends Seeder
             GruposSeeder::class,
             HorasSeeder::class,
             ImparteSeeder::class,
-            FaltasSeeder::class,   
+            FaltasSeeder::class,
             HorariosSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

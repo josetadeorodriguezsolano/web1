@@ -12,7 +12,8 @@ use App\Models\Inscrito;
 use App\Models\Horario;
 use App\Models\Hora;
 use Illuminate\Support\Facades\DB;
-
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 class ReportesGrupo extends Component
 {
     // Variables de filtrado
@@ -22,7 +23,7 @@ class ReportesGrupo extends Component
     public $letra = null;
     public $materia_id = null;
     public $maestro_id = null;
-   
+
     // Variables de resultados
     public $resultados = [];
 
@@ -46,17 +47,77 @@ class ReportesGrupo extends Component
         $this->calcularEstadisticas();
         $this->cargarDatosIniciales();
     }
+    public function obtenerNombreMateriaPorId($id)
+{
+    return Materia::where('id', $id)
+                  ->pluck('nombre')
+                  ->first();
+}
+
+
+public function obtenerNombreMaestroPorId($id)
+{
+    return Maestro::where('id', $id)
+                  ->pluck(DB::raw("CONCAT(apellidos, ' ', name)"))
+                  ->first();
+}
+    public function exportarPDF()
+    {
+        if (empty($this->resultados)) {
+            session()->flash('error', 'No hay resultados para exportar.');
+            return;
+        }
+        Log::info('Vista actual: ' . $this->grado);
+
+        $titulo = match ($this->vista) {
+            'maestros' => 'Reporte de Maestros',
+            'maestro_por_materias' => 'Reporte de Maestros por materia',
+            'materias_sin_maestro' => 'Reporte de materias sin maestro',
+            'grupos_sin_maestro' => 'Reporte de grupos sin maestro',
+            'alumnos' => 'Reporte de alumnos',
+            default => 'Reporte general',
+        };
+
+
+
+
+
+        Log::info('Vista actual: ' . $this->grado);
+        $data = [
+            'resultados' => $this->resultados,
+            'titulo' => $titulo,
+            'vista' => $this->vista,
+            'grupo_id' => $this->grupo_id,
+            'generacion' => $this->generacion,
+            'grado' => $this->grado,
+            'letra' => $this->letra,
+            'materia' => $this->obtenerNombreMateriaPorId($this->materia_id),
+            'maestro' => $this->obtenerNombreMaestroPorId($this->maestro_id),
+        ];
+
+
+        Log::info('Vista actual:', $data);
+
+
+        $pdf = Pdf::loadView('livewire.reportesgrupo_pdf', $data)->setPaper('a4', 'landscape');
+
+        Log::info('Vista actual: ' . $this->grado);
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, $titulo . '_' . now()->format('Ymd_His') . '.pdf');
+    }
+
 
     public function cambiarVista($tab)
     {
-        $this->vista = $tab; 
-        $this->resultados = []; 
-        $this->buscarReporte(); 
+        $this->vista = $tab;
+        $this->resultados = [];
+        $this->buscarReporte();
     }
-  
+
     public function buscarReporte()
     {
-        $this->resultados = []; 
+        $this->resultados = [];
 
 
            switch($this->vista){
@@ -79,10 +140,10 @@ class ReportesGrupo extends Component
                     $this->reporteGruposSinMaestro();
                     break;
             default:
-                    $this->controlEscolarMaestros(); 
+                    $this->controlEscolarMaestros();
                     break;
             }
-        
+
     }
     //MIO
     public function reporteMaestroPorMateria()
@@ -94,7 +155,7 @@ class ReportesGrupo extends Component
         'imparte.grupo'
     ]);
 
-   
+
     $horariosQuery->whereHas('imparte', function ($query) {
         if ($this->grupo_id) {
             $query->where('grupo_id', $this->grupo_id);
@@ -216,7 +277,7 @@ public function reporteGruposSinMaestro()
 
     public function actualizarMateriaId(){
         //dd("Se actualizó a: ", $value);
-        
+
         $this->materia_id = $this->materia_id !== '' ? (int) $this->materia_id : null;
         //dd("Materia se actualizo a: ", $this->materia_id);
     }
@@ -253,7 +314,7 @@ public function reporteGruposSinMaestro()
 
         $this->resultados = $this->filtrarResultados();
         $this->calcularEstadisticas();
-        
+
     }
 
     public function controlEscolarMaestros()
@@ -414,7 +475,7 @@ public function obtenerMaestrosCompleto()
             'materia_id' => $this->materia_id
         ]);
     }
-   
+
 
 
     }
