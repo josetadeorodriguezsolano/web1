@@ -13,18 +13,12 @@ class Imparte extends Model
         'grupo_id',
         'materia_id',
         'maestro_id',
-        'dia',
-        'hora_inicio',
-        'hora_fin',
     ];
 
     public $table = "imparte";
     public $timestamps = true;
 
-    protected $casts = [
-        'hora_inicio' => 'datetime:H:i',
-        'hora_fin' => 'datetime:H:i',
-    ];
+
 
     public function grupo()
     {
@@ -40,4 +34,8 @@ class Imparte extends Model
     {
         return $this->belongsTo(Maestro::class);
     }
+    public function horarios()
+{
+    return $this->hasMany(Horario::class);
+}
 }

@@ -9,6 +9,8 @@ use App\Models\Materia;
 use App\Models\Maestro;
 use App\Models\Imparte;
 use App\Models\Inscrito;
+use App\Models\Horario;
+use App\Models\Hora;
 use Illuminate\Support\Facades\DB;
 
 class ReportesGrupo extends Component
@@ -30,7 +32,6 @@ class ReportesGrupo extends Component
     public $materiasSinMaestro = 0;
     public $gruposSinMaestro = 0;
     public $searchMaestro = '';
-    public $modo = true; //True reporte de alumnos, false reporte de maestros
     public $maestros = [];
 
     //vista tab
@@ -52,44 +53,52 @@ class ReportesGrupo extends Component
         $this->resultados = []; 
         $this->buscarReporte(); 
     }
-    public function cambioModo()
-    {
-        $this->resultados = []; 
-        $this->modo = !$this->modo; 
-        $this->buscarReporte(); 
-    }
+  
     public function buscarReporte()
     {
         $this->resultados = []; 
 
-        if ($this->modo) {
-            
-            $this->controlEscolar();
-        } else {
-            // Reportes de maestros
-            switch ($this->vista) {
-                case 'maestros':
+
+           switch($this->vista){
+            case 'alumnos':
+                $this->controlEscolar();
+                break;
+            case 'grupos':
+                $this->controlEscolarGrupos();
+                break;
+            case 'maestros':
                     $this->controlEscolarMaestros();
                     break;
-                case 'maestro_por_materias':
+            case 'maestro_por_materias':
                     $this->reporteMaestroPorMateria();
                     break;
-                case 'materias_sin_maestro':
+            case 'materias_sin_maestro':
                     $this->reporteMateriasSinMaestro();
                     break;
-                case 'grupos_sin_maestro':
+            case 'grupos_sin_maestro':
                     $this->reporteGruposSinMaestro();
                     break;
-                default:
+            default:
                     $this->controlEscolarMaestros(); 
                     break;
             }
-        }
+        
     }
     //MIO
     public function reporteMaestroPorMateria()
-    {
-        $query = \App\Models\Imparte::with(['maestro', 'materia', 'grupo']);
+{
+    $horariosQuery = Horario::with([
+        'hora',
+        'imparte.maestro',
+        'imparte.materia',
+        'imparte.grupo'
+    ]);
+
+   
+    $horariosQuery->whereHas('imparte', function ($query) {
+        if ($this->grupo_id) {
+            $query->where('grupo_id', $this->grupo_id);
+        }
 
         if ($this->materia_id) {
             $query->where('materia_id', $this->materia_id);
@@ -99,101 +108,111 @@ class ReportesGrupo extends Component
             $query->where('maestro_id', $this->maestro_id);
         }
 
-        $asignaciones = $query->orderBy('maestro_id')->get();
-
-        $maestrosAgrupados = [];
-
-        foreach ($asignaciones as $asignacion) {
-            $maestro_id = $asignacion->maestro->id;
-            $maestro_nombre = $asignacion->maestro->nombre_completo ?? "{$asignacion->maestro->name} {$asignacion->maestro->apellidos}";
-            $conflicto = false;
-
-            if (!isset($maestrosAgrupados[$maestro_id])) {
-                $maestrosAgrupados[$maestro_id] = [
-                    'maestro' => $maestro_nombre,
-                    'materias' => [],
-                ];
-            }
-
-            // Verificar cruces con otras materias del mismo maestro
-            foreach ($maestrosAgrupados[$maestro_id]['materias'] as &$materiaExistente) {
-                if (
-                    $asignacion->dia === $materiaExistente['dia'] &&
-                    (
-                        ($asignacion->hora_inicio >= $materiaExistente['hora_inicio'] && $asignacion->hora_inicio < $materiaExistente['hora_fin']) ||
-                        ($asignacion->hora_fin > $materiaExistente['hora_inicio'] && $asignacion->hora_fin <= $materiaExistente['hora_fin']) ||
-                        ($asignacion->hora_inicio <= $materiaExistente['hora_inicio'] && $asignacion->hora_fin >= $materiaExistente['hora_fin'])
-                    )
-                ) {
-                    $materiaExistente['conflicto'] = true;
-                    $conflicto = true;
+        if ($this->grado || $this->letra) {
+            $query->whereHas('grupo', function ($q) {
+                if ($this->grado) {
+                    $q->where('grado', $this->grado);
                 }
-            }
 
-            $maestrosAgrupados[$maestro_id]['materias'][] = [
-                'materia' => $asignacion->materia->nombre ?? 'Desconocida',
-                'grupo' => "{$asignacion->grupo->grado}{$asignacion->grupo->letra}",
-                'dia' => $asignacion->dia,
-                'hora_inicio' => $asignacion->hora_inicio->format('H:i'),
-                'hora_fin' => $asignacion->hora_fin->format('H:i'),
-                'conflicto' => $conflicto,
-            ];
+                if ($this->letra) {
+                    $q->where('letra', $this->letra);
+                }
+            });
         }
+    });
 
-        $this->resultados = collect($maestrosAgrupados);
+    $horarios = $horariosQuery->get();
 
-        // Lista plana para mostrar fácilmente en tabla
-        $this->maestros_con_materias = [];
-        foreach ($maestrosAgrupados as $maestro) {
-            foreach ($maestro['materias'] as $materia) {
-                $this->maestros_con_materias[] = [
-                    'maestro' => $maestro['maestro'],
-                    'materia' => $materia['materia'],
-                    'grupo' => $materia['grupo'],
-                    'dia' => $materia['dia'],
-                    'hora_inicio' => $materia['hora_inicio'],
-                    'hora_fin' => $materia['hora_fin'],
-                    'cruce' => $materia['conflicto'],
-                ];
-            }
+    $ocupados = [];
+    foreach ($horarios as $horario) {
+        $clave = $horario->imparte->maestro_id . '_' . $horario->dia . '_' . $horario->hora_id;
+        $ocupados[$clave][] = $horario;
+    }
+
+    $maestros_con_materias = $horarios->map(function ($horario) use ($ocupados) {
+        $clave = $horario->imparte->maestro_id . '_' . $horario->dia . '_' . $horario->hora_id;
+
+        $grupo = $horario->imparte->grupo
+            ? $horario->imparte->grupo->grado . $horario->imparte->grupo->letra
+            : 'Sin grupo';
+
+        $maestro = $horario->imparte->maestro;
+        $nombre_maestro = $maestro->name ?? 'Sin nombre';
+        $apellido_maestro = $maestro->apellidos ?? 'Sin apellidos';
+
+        return [
+            'maestro' => $nombre_maestro . ' ' . $apellido_maestro,
+            'materia' => $horario->imparte->materia->nombre ?? 'Sin materia',
+            'grupo' => $grupo,
+            'dia' => $horario->dia,
+            'hora' => $horario->hora->numero ?? 'Sin número',
+            'hora_inicio' => $horario->hora->inicio ?? 'Sin inicio',
+            'cruce' => count($ocupados[$clave]) > 1,
+        ];
+    })->toArray();
+
+    $this->resultados = $maestros_con_materias;
+}
+public function reporteMateriasSinMaestro()
+{
+    $query = \App\Models\Imparte::with(['materia', 'grupo'])
+        ->whereNull('maestro_id');
+
+    if ($this->materia_id) {
+        $query->where('materia_id', $this->materia_id);
+    }
+
+    if ($this->grupo_id) {
+        $query->where('grupo_id', $this->grupo_id);
+    } else {
+        if ($this->grado || $this->letra) {
+            $query->whereHas('grupo', function ($q) {
+                if ($this->grado) {
+                    $q->where('grado', $this->grado);
+                }
+                if ($this->letra) {
+                    $q->where('letra', $this->letra);
+                }
+            });
         }
-
-        $this->modo = false;
-    }
-    public function reporteMateriasSinMaestro()
-    {
-        $materiasSinMaestro = \App\Models\Materia::leftJoin('imparte', 'materias.id', '=', 'imparte.materia_id')
-            ->whereNull('imparte.maestro_id') // no hay maestro asignado
-            ->select('materias.id', 'materias.nombre')
-            ->get(); // Obtiene como una colección de objetos Eloquent
-
-        $this->resultados = $materiasSinMaestro;
-        $this->modo = false;
     }
 
-    public function reporteGruposSinMaestro()
-    {
-    
-        $gruposSinMaestro = \App\Models\Grupo::leftJoin('imparte', 'grupos.id', '=', 'imparte.grupo_id')
-            ->whereNull('imparte.maestro_id') 
-            ->leftJoin('materias', 'imparte.materia_id', '=', 'materias.id')
-            ->select(
-                'grupos.id', 
-                DB::raw("CONCAT(grupos.grado, grupos.letra, '-', grupos.generacion) as grupo_nombre"), 
-                'materias.nombre as materia_nombre' 
-            )
-            ->get();
+    $sinMaestro = $query->get()->map(function ($registro) {
+        $grupo = $registro->grupo;
+        return [
+            'materia' => $registro->materia->nombre ?? 'Sin materia',
+            'grupo' => $grupo
+                ? $grupo->grado . $grupo->letra . ' - ' . $grupo->generacion
+                : 'Sin grupo',
+        ];
+    });
 
-        $this->resultados = $gruposSinMaestro;
-        $this->modo = false;
+    $this->resultados = $sinMaestro;
+}
+
+
+public function reporteGruposSinMaestro()
+{
+    $query = DB::table('imparte')
+        ->join('grupos', 'imparte.grupo_id', '=', 'grupos.id')
+        ->join('materias', 'imparte.materia_id', '=', 'materias.id')
+        ->whereNull('imparte.maestro_id');
+
+    if (!empty($this->grado)) {
+        $query->where('grupos.grado', $this->grado);
+    }
+    if (!empty($this->letra)) {
+        $query->where('grupos.letra', $this->letra);
     }
 
+    $gruposSinMaestro = $query->select(
+        'grupos.id as grupo_id',
+        DB::raw("CONCAT(grupos.grado, grupos.letra, '-', grupos.generacion) as grupo_nombre"),
+        'materias.nombre as materia_nombre'
+    )->get();
 
-
-
-
-
-
+    $this->resultados = $gruposSinMaestro;
+}
 
     public function actualizarMateriaId(){
         //dd("Se actualizó a: ", $value);
@@ -214,9 +233,9 @@ class ReportesGrupo extends Component
         })->count();
 
         // Grupos sin maestro asignado
-        $this->gruposSinMaestro = Grupo::whereDoesntHave('imparte', function($q) {
-            $q->whereNotNull('maestro_id');
-        })->count();
+        $this->gruposSinMaestro = Grupo::whereHas('imparte', function ($q) {
+            $q->whereNull('maestro_id');
+        })->distinct()->count('grupos.id');
     }
 
 
@@ -224,62 +243,27 @@ class ReportesGrupo extends Component
     {
         $this->resultados = $this->alumnosInscritos()->take(5);
     }
-
-    /*Tanto este metodo como el contolEscolarMaestros deberian ser el mismo
-        pero por algun motivo el if en control escolar del modo no funciona
-        como deberia, asi se creo un metodo particualar para cada caso, un if en
-        la visa que cambia el metodo que debe de tomar el boton, hay que pensar
-        en como optimizar este problema en futuras iteraciones
-    */
     public function controlEscolar()
     {
-
-
-
-
         $this->validate([
             'grado' => 'nullable|integer|between:1,3',
             'letra' => 'nullable|string|max:1',
             'generacion' => 'nullable|integer|min:2000|max:' . (date('Y') + 1)
         ]);
 
-        if($this->modo===true)
-        {
-
-            //dd("Estoy en el if");
-            $this->resultados = $this->filtrarResultados();
-            $this->calcularEstadisticas();
-        }
-        if($this->modo===false)
-        {
-
-            dd("Estoy en el else");
-            //$this->resultados = $this->obtenerMaestrosPorMateria();
-            //dd($this->resultados);
-            //$this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
-            //$this->calcularEstadisticas();
-            //dd($this->resultados);
-            /*
-            $this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
-            dd($this->resultados);
-            //dd("estoy en el else y mi valor de materia es: ");
-            //dd("estoy en el else y mi valor de materia es: ", $this->materia_id);
-            $this->resultados = $this->obtenerMaestrosPorMateria($this->materia_id);
-            dd($this->resultados);
-            //$this->calcularEstadisticas();
-             dd([
-            'materia_id' => $this->materia_id,
-            'tipo' => gettype($this->materia_id)
-        ]);
-            */
-        }
+        $this->resultados = $this->filtrarResultados();
+        $this->calcularEstadisticas();
+        
     }
 
     public function controlEscolarMaestros()
     {
-        //dd("Estoy en el else");
-        $this->resultados = $this->obtenerMaestrosPorMateria();
-        //dd($this->resultados);
+        $materia_id = $this->materia_id;
+        $this->resultados = Maestro::whereHas('materias', function ($query) use ($materia_id) {
+            if ($materia_id) {
+                $query->where('materias.id', $materia_id);
+            }
+        })->get();
     }
 
 
@@ -301,25 +285,36 @@ class ReportesGrupo extends Component
  *    $this->filtrarGrupos('2024', 5, 'id');
  *
  */
-    public function filtrarResultados()
-    {
-        return Alumno::when($this->grado || $this->letra || $this->generacion, function($query) {
-                $query->whereHas('inscritos.grupo', function($q) {
-                    if ($this->grado) {
-                        $q->where('grado', $this->grado);
-                    }
-                    if ($this->letra) {
-                        $q->where('letra', $this->letra);
-                    }
-                    if ($this->generacion) {
-                        $q->where('generacion', $this->generacion);
-                    }
-                });
-            })
-            ->orderBy('apellidos')
-            ->orderBy('nombres')
-            ->get();
-    }
+public function filtrarResultados()
+{
+    return Alumno::whereHas('inscritos.grupo', function($q) {
+            if ($this->grado) {
+                $q->where('grado', $this->grado);
+            }
+            if ($this->letra) {
+                $q->where('letra', $this->letra);
+            }
+            if ($this->generacion) {
+                $q->where('generacion', $this->generacion);
+            }
+        })
+        ->with(['inscritos' => function ($q) {
+            $q->whereHas('grupo', function($q2) {
+                if ($this->grado) {
+                    $q2->where('grado', $this->grado);
+                }
+                if ($this->letra) {
+                    $q2->where('letra', $this->letra);
+                }
+                if ($this->generacion) {
+                    $q2->where('generacion', $this->generacion);
+                }
+            })->with('grupo');
+        }])
+        ->orderBy('apellidos')
+        ->orderBy('nombres')
+        ->get();
+}
 
     public function alumnosInscritos()
     {
@@ -400,42 +395,8 @@ public function obtenerMaestrosCompleto()
                  ->toArray();
 }
 
-public function obtenerMaestrosPorMateria()
-{
-    //$materia_id = $materia_id !== '' ? (int) $materia_id : null;
 
-    $materia_id = $this->materia_id;
-    return Maestro::whereHas('materias', function ($query) use ($materia_id) {
-        if ($materia_id) {
-            $query->where('materias.id', $materia_id);
-        }
-    })->get();
-}
 
-public function obtenerMaestrosSinMaterias($search = '')
-{
-    return Maestro::whereDoesntHave('materias')
-                 ->when($search, function($query) use ($search) {
-                     $query->where(function($q) use ($search) {
-                         $q->where('name', 'like', '%'.$search.'%')
-                           ->orWhere('apellidos', 'like', '%'.$search.'%')
-                           ->orWhere('curp', 'like', '%'.$search.'%');
-                     });
-                 })
-                 ->select('id', 'name', 'apellidos', 'telefono', 'curp')
-                 ->orderBy('apellidos')
-                 ->orderBy('name')
-                 ->get()
-                 ->map(function ($maestro) {
-                     return [
-                         'id' => $maestro->id,
-                         'nombre_completo' => $maestro->apellidos . ' ' . $maestro->name,
-                         'telefono' => $maestro->telefono,
-                         'curp' => $maestro->curp
-                     ];
-                 })
-                 ->toArray();
-}
     public function render()
     {
         return view('livewire.reportes-grupo', [
@@ -445,8 +406,6 @@ public function obtenerMaestrosSinMaterias($search = '')
 
             'maestros_basico' => $this->obtenerMaestrosBasico(),
             'maestros_completo' => $this->obtenerMaestrosCompleto(),
-            'maestros_sin_materias' => $this->obtenerMaestrosSinMaterias($this->searchMaestro ?? ''),
-
             'resultados' => $this->resultados,
             'totalAlumnos' => $this->totalAlumnos,
             'totalMaestros' => $this->totalMaestros,
