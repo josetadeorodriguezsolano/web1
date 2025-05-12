@@ -63,6 +63,7 @@ class ReportesGrupo extends Component
         $this->resultados = []; 
 
         if ($this->modo) {
+            
             $this->controlEscolar();
         } else {
             // Reportes de maestros
