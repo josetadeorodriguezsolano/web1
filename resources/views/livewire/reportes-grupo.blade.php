@@ -337,6 +337,33 @@
                         </tbody>
                     </table>
                 </div>
+            @elseif ($modo && $reporteInasistencia && $resultados && count($resultados) > 0)
+                <div class="overflow-x-auto mt-4">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border px-4 py-2">Matrícula</th>
+                                <th class="border px-4 py-2">Apellidos</th>
+                                <th class="border px-4 py-2">Nombres</th>
+                                <th class="border px-4 py-2">Grado/Grupo</th>
+                                <th class="border px-4 py-2">Faltas Totales</th>
+                                <th class="border px-4 py-2">Clases Totales</th>
+                                <th class="border px-4 py-2">Porcentaje faltas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-2">{{ $resultados['matricula'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['apellidos'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['nombre'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['grado'] }} {{ $resultados['grupo'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['faltas_totales'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['clases_totales'] }}</td>
+            <td class="border px-4 py-2">{{ $resultados['porcentaje_faltas'] }}%</td>
+        </tr>
+    </tbody>
+                    </table>
+                </div>
             @else
                 <div class="p-8 text-center text-gray-500">
                     No se encontraron resultados.

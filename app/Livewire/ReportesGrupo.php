@@ -83,7 +83,7 @@ class ReportesGrupo extends Component
                 $this->reporteInasistenciaAlumnos();
                 $this->calcularPorcentajeFaltas();
                 $this->acomodarResultadosVista();
-                dd($this->resultados);
+                //d($this->resultados);
             }
         } else {
             $this->reporteInasistencia = false;
