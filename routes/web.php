@@ -2,6 +2,13 @@
 
 use App\Http\Controllers\PaseDeListaController;
 use App\Http\Controllers\PdfController;
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\HorariosC;
+
+use App\Http\Controllers\PDFInasistenciasController;
+
+>>>>>>> Stashed changes
 use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
@@ -32,6 +39,17 @@ Route::middleware([
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
+<<<<<<< Updated upstream
+=======
+
+    Route::get('inasistencia', [PDFInasistenciasController::class,'generar']);
+
+
+ Route::get('/horarios', [HorariosC::class, 'index'])->name('horarios.index'); // Para mostrar todos los horarios
+Route::post('/horarios', [HorariosC::class, 'store'])->name('horarios.store'); // Para guardar un nuevo horario
+Route::delete('/horarios/{id}', [HorariosC::class, 'destroy'])->name('horarios.destroy'); // Para eliminar un horario
+Route::get('/horarios/maestro/{id_maestro}', [HorariosC::class, 'horariosPorMaestro'])->name('horarios.por_maestro'); // Para obtener los horarios por maestro
+>>>>>>> Stashed changes
 });
 
 Route::get("w3css",function(){

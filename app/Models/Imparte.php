@@ -8,18 +8,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Imparte extends Model
 {
     use HasFactory;
-    public $table = "imparte";
+
+    protected $table = 'imparte'; // Usa 'protected' en lugar de 'public' para convenciones de Eloquent
     public $timestamps = true;
 
-    public function grupo(){
-        return $this->belongsTo(Grupo::class);
+    // Relación con Maestro
+    public function maestro()
+    {
+        return $this->belongsTo(Maestro::class, 'maestro_id'); // Asegúrate de que 'maestro_id' es el nombre correcto de la columna foránea
     }
 
-    public function materia(){
-        return $this->belongsTo(Materia::class);
-    }
+    // Relación con Materia
+   public function materia()
+{
+    return $this->belongsTo(Materia::class);
+}
 
-    public function maestro(){
-        return $this->belongsTo(Maestro::class);
-    }
+public function grupo()
+{
+    return $this->belongsTo(Grupo::class);
+}
 }
