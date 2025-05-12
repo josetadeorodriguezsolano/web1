@@ -171,7 +171,7 @@
 
             {{-- Mostrar contenido basado en la vista seleccionada --}}
 
-            @if ($vista === 'maestros')
+            @if ($vista === 'maestros' && !$modo )
                 {{-- Tabla de Maestros --}}
                 @if (!$modo && $resultados && $resultados->count() > 0)
                 <div class="overflow-x-auto">
@@ -364,7 +364,7 @@
     </tbody>
                     </table>
                 </div>
-            @else
+            @elseif ($modo)
                 <div class="p-8 text-center text-gray-500">
                     No se encontraron resultados.
                 </div>
