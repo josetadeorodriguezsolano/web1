@@ -53,10 +53,10 @@ class ReportesGrupo extends Component
     public function cambiarVista($tab)
     {
          $this->resultados = [];
-
+         $this->vista = $tab;
         if($tab !='reporte_de_inasistencia')
         {
-            $this->vista = $tab;
+
             $this->buscarReporte();
         }
         else if ($this->modo)
@@ -76,7 +76,7 @@ class ReportesGrupo extends Component
         $this->resultados = [];
 
         if ($this->modo) {
-            if(!$this->alumno_matricula)
+            if(!$this->reporteInasistencia)
                 $this->controlEscolar();
             else
             {
