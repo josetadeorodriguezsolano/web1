@@ -289,9 +289,7 @@ public function reporteGruposSinMaestro()
         $this->totalMaestros = Maestro::count();
 
         // Materias sin maestro asignado
-        $this->materiasSinMaestro = Materia::whereDoesntHave('imparte', function($q) {
-            $q->whereNotNull('maestro_id');
-        })->count();
+        $this->materiasSinMaestro = \App\Models\Imparte::whereNull('maestro_id')->count();
 
         // Grupos sin maestro asignado
         $this->gruposSinMaestro = Grupo::whereHas('imparte', function ($q) {
