@@ -87,21 +87,21 @@
                             </div>
                             @endif
                             </td>
-                            @endfor
+                        @endfor
 
-                            <td class="py-2 align-middle text-center" style="padding-left: 0; padding-right: 0;">
-                                @php
-                                $promedio = $this->calcularPromedioAlumno($alumno['id']);
-                                @endphp
+                        <td class="py-2 align-middle text-center" style="padding-left: 0; padding-right: 0;">
+                            @php
+                            $promedio = $this->calcularPromedioAlumno($alumno['id']);
+                            @endphp
 
-                                @if($promedio !== null)
-                                <span class="text-xl font-medium {{ $promedio < 6 ? 'text-red-600' : 'text-gray-900' }}">
-                                    {{ $promedio }}
-                                </span>
-                                @else
-                                <span class="text-xl text-gray-400">-</span>
-                                @endif
-                            </td>
+                            @if($promedio !== null)
+                            <span class="text-xl font-medium {{ $promedio < 6 ? 'text-red-600' : 'text-gray-900' }}">
+                                {{ $promedio }}
+                            </span>
+                            @else
+                            <span class="text-xl text-gray-400">-</span>
+                            @endif
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

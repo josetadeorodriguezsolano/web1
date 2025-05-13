@@ -16,7 +16,7 @@ class CalificacionFactory extends Factory
         return [
             'alumno_id' => Alumno::factory(),
             'materia_id' => Materia::factory(),
-            'unidad' => $this->faker->numberBetween(1, 5),  // O usa una cadena si prefieres
+            'unidad' => $this->faker->numberBetween(1, 5),
             'calificacion' => $this->faker->randomFloat(1, 1.0, 10.0),
         ];
     }
