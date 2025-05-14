@@ -28,11 +28,14 @@ Route::get('/calificaciones', function () {
 Route::get('/alumno/{alumnoId}', InfoAlumno::class)
     ->name('alumno.info');
 
-Route::get('/inscribir', Inscribir::class)
-    ->name('inscribir');
-
+Route::get('/inscribir', function () {
+    return view('inscribir');
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscribir');
 Route::get('/inscritos', Inscritos::class)
     ->name('inscritos');
+
+
+
 
 Route::middleware([
     'auth:sanctum',//token autentificacion

@@ -1,0 +1,62 @@
+[33m32a3b26[m[33m ([m[1;36mHEAD -> [m[1;32mjavier[m[33m, [m[1;31morigin/equipo1-main[m[33m, [m[1;32mequipo1-main[m[33m)[m rutas sprint 2
+[33m0c71d12[m[33m ([m[1;31morigin/javier[m[33m)[m Creacion de archivos Vistas, livewires, policies y test vacíos
+[33ma88dedd[m Correcion minima Valid
+[33m44987a5[m Actualizaciones test, y polices
+[33mff25c1b[m[33m ([m[1;31morigin/brayam[m[33m, [m[1;32mbrayam[m[33m)[m Modificaciones en vista de calificaciones: Selectores más grandes
+[33mc0b5960[m Modificaciones en vista de calificaciones: Eliminacion de mensaje de calificacion guardada, creación de función para consultas en modelos y ajustado de columnas de tabla para mejor visualización
+[33ma59a1be[m Añadí los tests unitarios para los modelos Maestro, Grupo, Materia e Imparte
+[33m8ff4fac[m[33m ([m[1;31morigin/nancy[m[33m)[m Validaciones del Livewire de Calificaciones
+[33me3d7f95[m Modificaciones en los Test Alumno, Calificacion e Inscrito
+[33m9841f81[m Actualizacion modelo/migracion/livewire de calificaciones
+[33m57ee1b1[m Implementacion de livewire calificaciones
+[33m47e5f21[m Actualizacion ModelosV2
+[33md15466c[m Actualizacion Modelosv2
+[33mc3744d9[m Merge branch 'javier' into equipo1-main
+[33ma52c316[m Cambios en modelos
+[33mbec6c2f[m Actualizacion Modelos
+[33m4360442[m[33m ([m[1;31morigin/edgar[m[33m, [m[1;32medgar[m[33m)[m Se agrego calificaciones.blade.php
+[33m7fc579b[m Modificaciones al layout
+[33mbf4643b[m Agrego migraciones imparte y calificaciones, y modelo Inscrito actualizado
+[33m42f5d90[m Merge branch 'equipo1-main' of https://github.com/josetadeorodriguezsolano/web1 into equipo1-main
+[33m9ad99fa[m Test ALUMNO CALIFICACION E INSCRITO
+[33m332cfb2[m[33m ([m[1;32mnancy[m[33m)[m Test Modelo "Alumno"
+[33mf91d356[m Agregué comentario cambio esme
+[33m2665935[m Modelo Alumno Calificacion e Inscrito
+[33m60acbcb[m Modelo Inscrito
+[33mba1dc2d[m Modelo Calificacion
+[33me986aba[m Merge branch 'equipo1-main' into nancy
+[33m99fd7e5[m Layout + Menu (Cambios)
+[33mbfc1cff[m Vista Menu
+[33m0bea8e6[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Crear lista de alumnos en pdf
+[33m3599a39[m Correccion de mensjaes de error de livewire
+[33m56349fd[m Correccion de mensjaes de error de livewire
+[33m5b0c997[m Merge branch 'main' into nancy
+[33m835310d[m Merge branch 'main' into javier
+[33mf3b7d94[m[33m ([m[1;32mmain[m[33m)[m Test en Livewire
+[33m6df7e44[m Test Unit y Feature
+[33m4fc06f3[m Merge branch 'main' into javier
+[33m25950bf[m[33m ([m[1;31morigin/tadeo[m[33m)[m Middleware LogPeticion revisa si el maestro tiene grupos impartidos en 2024
+[33m0399360[m Ejemplo mode.live.deboundce
+[33mc5499d2[m Pase de lista en Livewire completado, Correcciones al seeder de grupos
+[33m0260842[m Livewire pase de lista
+[33m5d9c266[m correcciones pase_de_lista
+[33mb16ddfb[m ajax con jquery
+[33m4e97df7[m correcciones
+[33me588da9[m nancyCambio
+[33ma5394b3[m Merge remote-tracking branch 'origin/main' into javier
+[33mb394eea[m[33m ([m[1;31morigin/UrielFJ08[m[33m)[m comit 10
+[33ma4c65c9[m Merge remote-tracking branch 'origin/main' into javier
+[33m698164f[m seeder corregidos
+[33m2703256[m Ignorar composer.lock
+[33meaa544e[m Merge remote-tracking branch 'origin/David-Acosta'
+[33mf18382c[m Primer commit
+[33m4b8979d[m prueba
+[33m5c446dd[m Merge remote-tracking branch 'origin/isaac'
+[33ma200ca4[m Merge remote-tracking branch 'origin/diego'
+[33m759a9ab[m primera actualizacion
+[33mf4f42b1[m[33m ([m[1;31morigin/isaac[m[33m)[m primera actualizacion
+[33m0275b86[m primera actualizacion
+[33mbf10cf7[m primera actualizacion
+[33me0064ea[m leelo.txt
+[33m42e0c10[m Migraciones
+[33m209e098[m first commit
