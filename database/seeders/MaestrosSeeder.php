@@ -10,11 +10,15 @@ class MaestrosSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     */
+     */  
+
     public function run(): void
     {
+
         Maestro::factory()
         ->count(50)
         ->create();
+
+        
     }
 }

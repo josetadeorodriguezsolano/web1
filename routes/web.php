@@ -8,6 +8,7 @@ use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
 use App\Http\Controllers\InscripcionesController;
 use App\Livewire\Calificaciones;
+use App\Livewire\Inscritos;
 
 
 
@@ -60,3 +61,11 @@ Route::get("w3css",function(){
 Route::get("bootstrap",function(){
     return view("bootstrap");
 });
+
+// Route::get('/inscritos', function () {
+//     return view('inscritos');
+// })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
+
+Route::get('/inscritos', function () {
+    return view('inscritos'); // Esta es una vista Blade normal
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
