@@ -8,7 +8,7 @@ use App\Models\Materia;
 use App\Models\Alumno;
 use App\Models\Inasistencia;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\Log;
 class InasistenciasPase extends Component
 {
     public $grupos;
@@ -56,8 +56,8 @@ class InasistenciasPase extends Component
         }
     }
 
-    
-    
+
+
 
     public function generarTablaMensual()
     {
@@ -66,7 +66,7 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->startOfMonth();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida: ' . $this->fechaSeleccionada);
+
             return;
         }
 
@@ -113,7 +113,7 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia)->toDateString();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida en toggleInasistencia(): ' . $this->fechaSeleccionada);
+
             return;
         }
 
@@ -133,8 +133,8 @@ class InasistenciasPase extends Component
         }
 
         $this->inasistenciasPorDia = [];
-        $this->generarTablaMensual(); // Volver a leer de la base de datos 
-        $this->refrescar++; // Forzar render       
+        $this->generarTablaMensual(); // Volver a leer de la base de datos
+        $this->refrescar++; // Forzar render
     }
 
 

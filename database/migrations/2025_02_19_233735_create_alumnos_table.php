@@ -24,6 +24,7 @@ return new class extends Migration
 
             $table->index('apellidos');
             $table->unique('curp');//no permitir repetidos
+
        });
     }
 

@@ -1,0 +1,460 @@
+commit 0d506f24193ad79b1d3470d4b363ba76f68d3e90
+Author: Escuela <Escuela@MSI>
+Date:   Mon May 12 12:18:12 2025 -0700
+
+    Realización de PDF en reportes
+
+diff --git a/app/Livewire/ReportesGrupo.php b/app/Livewire/ReportesGrupo.php
+index 45d0722..14c4493 100644
+--- a/app/Livewire/ReportesGrupo.php
++++ b/app/Livewire/ReportesGrupo.php
+@@ -12,7 +12,8 @@
+ use App\Models\Horario;
+ use App\Models\Hora;
+ use Illuminate\Support\Facades\DB;
+-
++use Barryvdh\DomPDF\Facade\Pdf;
++use Illuminate\Support\Facades\Log;
+ class ReportesGrupo extends Component
+ {
+     // Variables de filtrado
+@@ -22,7 +23,7 @@ class ReportesGrupo extends Component
+     public $letra = null;
+     public $materia_id = null;
+     public $maestro_id = null;
+-   
++
+     // Variables de resultados
+     public $resultados = [];
+ 
+@@ -46,17 +47,77 @@ public function mount()
+         $this->calcularEstadisticas();
+         $this->cargarDatosIniciales();
+     }
++    public function obtenerNombreMateriaPorId($id)
++{
++    return Materia::where('id', $id)
++                  ->pluck('nombre')
++                  ->first();
++}
++
++
++public function obtenerNombreMaestroPorId($id)
++{
++    return Maestro::where('id', $id)
++                  ->pluck(DB::raw("CONCAT(apellidos, ' ', name)"))
++                  ->first();
++}
++    public function exportarPDF()
++    {
++        if (empty($this->resultados)) {
++            session()->flash('error', 'No hay resultados para exportar.');
++            return;
++        }
++        Log::info('Vista actual: ' . $this->grado);
++
++        $titulo = match ($this->vista) {
++            'maestros' => 'Reporte de Maestros',
++            'maestro_por_materias' => 'Reporte de Maestros por materia',
++            'materias_sin_maestro' => 'Reporte de materias sin maestro',
++            'grupos_sin_maestro' => 'Reporte de grupos sin maestro',
++            'alumnos' => 'Reporte de alumnos',
++            default => 'Reporte general',
++        };
++
++
++
++
++
++        Log::info('Vista actual: ' . $this->grado);
++        $data = [
++            'resultados' => $this->resultados,
++            'titulo' => $titulo,
++            'vista' => $this->vista,
++            'grupo_id' => $this->grupo_id,
++            'generacion' => $this->generacion,
++            'grado' => $this->grado,
++            'letra' => $this->letra,
++            'materia' => $this->obtenerNombreMateriaPorId($this->materia_id),
++            'maestro' => $this->obtenerNombreMaestroPorId($this->maestro_id),
++        ];
++
++
++        Log::info('Vista actual:', $data);
++
++
++        $pdf = Pdf::loadView('livewire.reportesgrupo_pdf', $data)->setPaper('a4', 'landscape');
++
++        Log::info('Vista actual: ' . $this->grado);
++        return response()->streamDownload(function () use ($pdf) {
++            echo $pdf->stream();
++        }, $titulo . '_' . now()->format('Ymd_His') . '.pdf');
++    }
++
+ 
+     public function cambiarVista($tab)
+     {
+-        $this->vista = $tab; 
+-        $this->resultados = []; 
+-        $this->buscarReporte(); 
++        $this->vista = $tab;
++        $this->resultados = [];
++        $this->buscarReporte();
+     }
+-  
++
+     public function buscarReporte()
+     {
+-        $this->resultados = []; 
++        $this->resultados = [];
+ 
+ 
+            switch($this->vista){
+@@ -79,10 +140,10 @@ public function buscarReporte()
+                     $this->reporteGruposSinMaestro();
+                     break;
+             default:
+-                    $this->controlEscolarMaestros(); 
++                    $this->controlEscolarMaestros();
+                     break;
+             }
+-        
++
+     }
+     //MIO
+     public function reporteMaestroPorMateria()
+@@ -94,7 +155,7 @@ public function reporteMaestroPorMateria()
+         'imparte.grupo'
+     ]);
+ 
+-   
++
+     $horariosQuery->whereHas('imparte', function ($query) {
+         if ($this->grupo_id) {
+             $query->where('grupo_id', $this->grupo_id);
+@@ -216,7 +277,7 @@ public function reporteGruposSinMaestro()
+ 
+     public function actualizarMateriaId(){
+         //dd("Se actualizó a: ", $value);
+-        
++
+         $this->materia_id = $this->materia_id !== '' ? (int) $this->materia_id : null;
+         //dd("Materia se actualizo a: ", $this->materia_id);
+     }
+@@ -253,7 +314,7 @@ public function controlEscolar()
+ 
+         $this->resultados = $this->filtrarResultados();
+         $this->calcularEstadisticas();
+-        
++
+     }
+ 
+     public function controlEscolarMaestros()
+@@ -414,7 +475,7 @@ public function render()
+             'materia_id' => $this->materia_id
+         ]);
+     }
+-   
++
+ 
+ 
+     }
+diff --git a/database/seeders/DatabaseSeeder.php b/database/seeders/DatabaseSeeder.php
+index 8ba0890..287ac6a 100644
+--- a/database/seeders/DatabaseSeeder.php
++++ b/database/seeders/DatabaseSeeder.php
+@@ -19,8 +19,9 @@ public function run(): void
+             GruposSeeder::class,
+             HorasSeeder::class,
+             ImparteSeeder::class,
+-            FaltasSeeder::class,   
++            FaltasSeeder::class,
+             HorariosSeeder::class,
++            UserSeeder::class,
+         ]);
+     }
+ }
+diff --git a/database/seeders/UserSeeder.php b/database/seeders/UserSeeder.php
+new file mode 100644
+index 0000000..5791064
+--- /dev/null
++++ b/database/seeders/UserSeeder.php
+@@ -0,0 +1,29 @@
++<?php
++
++namespace Database\Seeders;
++
++use Illuminate\Database\Seeder;
++use App\Models\User;
++use Illuminate\Support\Facades\Hash;
++
++class UserSeeder extends Seeder
++{
++    /**
++     * Run the database seeds.
++     */
++    public function run(): void
++    {
++        User::create([
++            'name' => 'Iker',
++            'email' => 'iker@example.com',
++            'password' => Hash::make('secret123'), // o bcrypt('secret123')
++        ]);
++
++        // Puedes agregar más usuarios si quieres:
++        User::create([
++            'name' => 'Admin',
++            'email' => 'admin@example.com',
++            'password' => Hash::make('adminpass'),
++        ]);
++    }
++}
+diff --git a/resources/views/livewire/reportes-grupo.blade.php b/resources/views/livewire/reportes-grupo.blade.php
+index 2078e2d..426323e 100644
+--- a/resources/views/livewire/reportes-grupo.blade.php
++++ b/resources/views/livewire/reportes-grupo.blade.php
+@@ -20,7 +20,7 @@
+                 </div>
+             </div>
+             <div>
+-        
++
+         <!-- Select básico -->
+ 
+         {{-- Filtros de búsqueda --}}
+@@ -114,13 +114,16 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+                         </div>
+ 
+                         <div class="flex justify-between items-center mb-2">
+-                            <button wire:click="actualizar" class="flex items-center bg-gray-100 px-3 py-1 rounded">
++                            <!-- Botón Actualizar -->
++                            <button wire:click="actualizar" class="flex items-center bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition">
+                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                     <path d="M4 4v6h6M20 20v-6h-6M4 20l6-6M20 4l-6 6"/>
+                                 </svg>
+                                 Actualizar
+                             </button>
+-                            <button class="flex items-center bg-gray-100 px-3 py-1 rounded">
++
++                            <!-- Botón Exportar PDF -->
++                            <button wire:click="exportarPDF" class="flex items-center bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 transition">
+                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                     <path d="M12 20l9-5-9-5-9 5 9 5z"/>
+                                     <path d="M12 12V4l9 5-9 5-9-5 9-5z"/>
+@@ -128,7 +131,7 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+                                 Exportar PDF
+                             </button>
+                         </div>
+-               
++
+ 
+                         {{-- Mostrar contenido basado en la vista seleccionada --}}
+             @if ($vista === 'maestros')
+@@ -187,7 +190,7 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+                             @foreach ($resultados as $index => $materia)
+                             <tr class="{{ $materia['cruce'] ? 'bg-red-100' : 'hover:bg-gray-50' }}">
+                                 <td class="border px-4 py-2">{{ $index + 1 }}</td>
+-                                <td class="border px-4 py-2">{{ $materia['maestro'] }}</td> 
++                                <td class="border px-4 py-2">{{ $materia['maestro'] }}</td>
+                                 <td class="border px-4 py-2">{{ $materia['materia'] }}</td>
+                                 <td class="border px-4 py-2">{{ $materia['grupo'] }}</td>
+                                 <td class="border px-4 py-2">{{ $materia['dia'] }}</td>
+@@ -302,7 +305,7 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+                         </tbody>
+                     </table>
+                 </div>
+-              
++
+             @else
+                 <div class="p-8 text-center text-gray-500">
+                     No se encontraron alumnos con los criterios seleccionados.
+@@ -311,6 +314,6 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+             @endif
+         </div>
+                     </div>
+-          
++
+ 
+ </div>
+diff --git a/resources/views/livewire/reportesgrupo_pdf.blade.php b/resources/views/livewire/reportesgrupo_pdf.blade.php
+new file mode 100644
+index 0000000..cd2c2a7
+--- /dev/null
++++ b/resources/views/livewire/reportesgrupo_pdf.blade.php
+@@ -0,0 +1,154 @@
++<body>
++    <div class="header">
++        <h2>{{ $titulo }}</h2>
++
++        @if ($vista === 'alumnos')
++            <p><strong>Materia:</strong> {{ $materia ?? 'Todas' }}</p>
++            <p><strong>Profesor:</strong> {{ $maestro ?? '*' }}</p>
++            <p><strong>Generación:</strong> {{ $generacion ?? 'Todas' }}</p>
++            <p><strong>Grado:</strong> {{ $grado ?? 'Todos' }}</p>
++            <p><strong>Grupo:</strong> {{ $letra ?? 'Todos' }}</p>
++        @endif
++    </div>
++
++    @if ($vista === 'maestros')
++        <table>
++            <thead>
++                <tr>
++                    <th>#</th>
++                    <th>CURP</th>
++                    <th>Apellidos</th>
++                    <th>Nombres</th>
++                    <th>Telefono</th>
++                    <th>Email</th>
++                </tr>
++            </thead>
++            <tbody>
++                @foreach($resultados as $maestro)
++                    <tr>
++                        <td>{{ $loop->iteration }}</td>
++                        <td>{{ $maestro->curp }}</td>
++                        <td>{{ $maestro->apellidos }}</td>
++                        <td>{{ $maestro->name }}</td>
++                        <td>{{ $maestro->telefono }}</td>
++                        <td>{{ $maestro->email }}</td>
++                    </tr>
++                @endforeach
++            </tbody>
++        </table>
++
++    @elseif ($vista === 'maestro_por_materias')
++        <table>
++            <thead>
++                <tr>
++                    <th>#</th>
++                    <th>Nombre Completo</th>
++                    <th>Materia</th>
++                    <th>Grupo</th>
++                    <th>Día</th>
++                    <th>Hora</th>
++                    <th>Hora Inicio</th>
++                    <th>Cruce</th>
++                </tr>
++            </thead>
++            <tbody>
++                @foreach ($resultados as $index => $materia)
++                    <tr>
++                        <td>{{ $index + 1 }}</td>
++                        <td>{{ $materia['maestro'] }}</td>
++                        <td>{{ $materia['materia'] }}</td>
++                        <td>{{ $materia['grupo'] }}</td>
++                        <td>{{ $materia['dia'] }}</td>
++                        <td>{{ $materia['hora'] }}</td>
++                        <td>{{ $materia['hora_inicio'] }}</td>
++                        <td>
++                            @if($materia['cruce'])
++                                Hay cruce
++                            @else
++                                Bien
++                            @endif
++                        </td>
++                    </tr>
++                @endforeach
++            </tbody>
++        </table>
++
++    @elseif ($vista === 'materias_sin_maestro')
++        <table>
++            <thead>
++                <tr>
++                    <th>#</th>
++                    <th>Materia</th>
++                    <th>Grupo</th>
++                </tr>
++            </thead>
++            <tbody>
++                @foreach ($resultados as $index => $materia)
++                    <tr>
++                        <td>{{ $loop->iteration }}</td>
++                        <td>{{ $materia['materia'] }}</td>
++                        <td>{{ $materia['grupo'] }}</td>
++                    </tr>
++                @endforeach
++            </tbody>
++        </table>
++
++    @elseif ($vista === 'grupos_sin_maestro')
++        <table>
++            <thead>
++                <tr>
++                    <th>#</th>
++                    <th>Grupo</th>
++                    <th>Materia sin Maestro</th>
++                </tr>
++            </thead>
++            <tbody>
++                @php $contador = 1; @endphp
++                @foreach ($resultados->groupBy('grupo_nombre') as $grupo => $materias)
++                    @foreach ($materias as $materia)
++                        <tr>
++                            <td>{{ $contador++ }}</td>
++                            <td>{{ $grupo }}</td>
++                            <td>{{ $materia->materia_nombre }}</td>
++                        </tr>
++                    @endforeach
++                @endforeach
++            </tbody>
++        </table>
++
++    @elseif ($vista === 'alumnos')
++        <table>
++            <thead>
++                <tr>
++                    <th>#</th>
++                    <th>Matrícula</th>
++                    <th>Apellidos</th>
++                    <th>Nombre</th>
++                    <th>Grado y Grupo</th>
++                    <th>Estatus</th>
++                </tr>
++            </thead>
++            <tbody>
++                @foreach ($resultados as $alumno)
++                <tr>
++                    <td>{{ $loop->iteration }}</td>
++                    <td>{{ $alumno->matricula }}</td>
++                    <td>{{ $alumno->apellidos }}</td>
++                    <td>{{ $alumno->nombres }}</td>
++                    <td>
++                        {{
++                            ($grado && trim($grado) !== '')
++                            ? $grado
++                            : (optional(optional($alumno->inscritos->first())->grupo)->grado ?? 'Sin grado')
++                        }}
++                        {{
++                            optional(optional($alumno->inscritos->first())->grupo)->letra ?? 'Sin letra'
++                        }}
++                    </td>
++                    <td>{{ $alumno->estatus }}</td>
++                </tr>
++            @endforeach
++            </tbody>
++        </table>
++    @endif
++</body>
+diff --git a/resources/views/reportes-grupo.blade.php b/resources/views/reportes-grupo.blade.php
+index 48294fd..6b14cc8 100644
+--- a/resources/views/reportes-grupo.blade.php
++++ b/resources/views/reportes-grupo.blade.php
+@@ -15,7 +15,7 @@
+                     <p class="text-2xl font-bold">{{ $materiasSinMaestro }}</p>
+                 </div>
+                 <div class="bg-white p-4 shadow rounded text-center">
+-                    <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
++                    <h2 class="text-gray-600 text-sm">Grupos si Maestro</h2>
+                     <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
+                 </div>
+             </div>
+@@ -260,7 +260,7 @@ class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+             @endif
+             @elseif ($vista === 'grupos_sin_maestro')
+             {{-- Tab de Grupos sin Maestro --}}
+-                        
++
+             @if (!$modo && $resultados && $resultados->count() > 0)
+                 <div class="overflow-x-auto mt-4">
+                     <table class="w-full text-left border-collapse">
