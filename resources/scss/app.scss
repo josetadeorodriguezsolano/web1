@@ -101,3 +101,13 @@ input{
     from {top: -300px; opacity: 0}
     to {top: 0%; opacity: 1}
   }
+
+  table{
+    tr:nth-child(odd){
+        background-color: #c2c2f2;
+    }
+    tr:nth-child(even){
+        background-color: #ffffff;
+    }
+
+  }
