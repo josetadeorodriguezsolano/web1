@@ -95,8 +95,8 @@ class InasistenciasPase extends Component
             $carbonDia = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia);
 
             if ($carbonDia->isWeekend()) {
-                $this->diasNoEscolares[$dia] = true; // Si quieres dejarla para lógica futura
-                continue; // ❌ No agregues sábados ni domingos a la tabla
+                $this->diasNoEscolares[$dia] = true; 
+                continue; // No agregues sábados ni domingos a la tabla
             }
 
             $this->diasDelMes[] = [
