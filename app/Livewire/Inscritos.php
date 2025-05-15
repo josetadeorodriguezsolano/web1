@@ -36,6 +36,13 @@ class Inscritos extends Component
         $this->mostrarModalEliminar = true;
     }
 
+    public function verAlumno($alumnoId)
+    {
+        // Redirigir a la vista del alumno
+        // Ajusta la ruta según tu configuración
+        return redirect()->route('alumnos.show', $alumnoId);
+    }
+
    public function eliminarInscrito()
 {
     // En lugar de eliminar el registro, actualizamos el estatus a 'baja'

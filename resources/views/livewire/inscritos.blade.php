@@ -66,15 +66,15 @@
                                 <td class="py-3 px-4">{{ $inscrito->grupo->grado }}°{{ $inscrito->grupo->letra }}</td>
                                 <td class="py-3 text-center">
                                     <span class="px-4 py-1 inline-flex font-semibold rounded-full
-                                        {{ $inscrito->estatus === 'activo' ? 'bg-green-100 text-green-800' :
-                                           ($inscrito->estatus === 'inactivo' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                        {{ $inscrito->estatus === 'vigente' ? 'bg-green-100 text-green-800' :
+                                           ($inscrito->estatus === 'baja' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
                                         {{ ucfirst($inscrito->estatus) }}
                                     </span>
                                 </td>
                                 <td class="py-3 text-center">
                                     <div class="flex justify-center space-x-2">
                                         <button wire:click="confirmarEliminacion({{ $inscrito->id }})" class="bg-red-100 text-red-800 hover:bg-red-200 px-3 py-1 rounded-md">Eliminar</button>
-                                        <button wire:click="" class="bg-green-100 text-green-800 hover:bg-green-200 px-3 py-1 rounded-md">Ver alumno</button>
+                                        <button wire:click="verAlumno({{ $inscrito->alumno_id }})" class="bg-green-100 text-green-800 hover:bg-green-200 px-3 py-1 rounded-md">Ver alumno</button>
                                     </div>
                                 </td>
                             </tr>
