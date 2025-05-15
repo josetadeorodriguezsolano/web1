@@ -43,8 +43,20 @@ class InasistenciasPase extends Component
     public function updatedGrupoSeleccionado()
     {
         $this->inasistenciasPorDia = [];
+
+        $grupo = Grupo::find($this->grupoSeleccionado);
+
+        if ($grupo) {
+            // Filtrar las materias según el grado del grupo seleccionado
+            $this->materias = \App\Models\Materia::where('grado', $grupo->grado)->pluck('nombre', 'id')->toArray();
+        } else {
+            $this->materias = [];
+        }
+
+        $this->materiaSeleccionada = ''; // Limpiar la selección actual
         $this->actualizarTabla();
     }
+
 
     public function updatedMateriaSeleccionada()
     {
