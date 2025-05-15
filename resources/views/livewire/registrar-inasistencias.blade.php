@@ -192,10 +192,10 @@
 <!-- Botones de acción -->
 <div style="text-align: center;">
     <button wire:click="obtenerHorariosPorMaestro" style="background-color: #28a745;">
-        Deseleccionar
+        actualizar
     </button>
 
     <button wire:click='guardar' style="background-color: #ffc107;">Guardar</button>
     <button wire:click='eliminar' style="background-color: #dc3545;">Eliminar</button>
-    <button wire:click='GPDF' style="background-color: #007bff;">Generar PDF</button>
+  
 </div>

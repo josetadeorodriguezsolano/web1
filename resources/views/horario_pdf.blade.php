@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Horario del Maestro</title>
+    <title>Horario del Grupo</title>
     <style>
         table {
             width: 100%;
@@ -20,7 +20,8 @@
     </style>
 </head>
 <body>
-    <h2>Horario de {{ $maestro }}</h2>
+    <h2>Horario del Grupo {{ $grupo ?? 'Desconocido' }}</h2>
+
     <table>
         <thead>
             <tr>
@@ -33,9 +34,19 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $inicio = \Carbon\Carbon::createFromTime(7, 0); // 7:00 AM
+            @endphp
+
             @for ($hora = 1; $hora <= 7; $hora++)
+                @php
+                    $inicioBloque = $inicio->copy();
+                    $finBloque = $inicio->copy()->addMinutes(50);
+                    $rango = $inicioBloque->format('H:i') . ' - ' . $finBloque->format('H:i');
+                    $inicio->addMinutes(50); // actualizar para la siguiente fila
+                @endphp
                 <tr>
-                    <td>{{ $hora }}</td>
+                    <td>{{ $rango }}</td>
                     @for ($dia = 1; $dia <= 5; $dia++)
                         <td>
                             {{ $horas[$hora][$dia] ?? '' }}
