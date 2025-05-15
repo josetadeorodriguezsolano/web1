@@ -43,9 +43,15 @@ class Inscritos extends Component
         session()->flash('mensaje', 'Alumno eliminado correctamente.');
     }
 
-    
+     public function verAlumno($alumnoId)
+    {
+        // Redirigir a la vista del alumno
+        // Ajusta la ruta según tu configuración
+        return redirect()->route('alumnos.show', $alumnoId);
+    }
+
     public function render()
-{
+    {
     $query = Inscrito::with(['alumno', 'grupo']);
 
     if ($this->grupoSeleccionado) {
