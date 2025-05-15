@@ -2,65 +2,99 @@
 
 namespace App\Policies;
 
+use App\Models\User;
 use App\Models\Inscrito;
-use App\Models\Maestro;
-use Illuminate\Auth\Access\Response;
+use App\Models\Alumno;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InscritoPolicy
 {
+    use HandlesAuthorization;
+
     /**
-     * Determine whether the user can view any models.
+     * Realizar acciones sin verificar (para admins)
      */
-    public function viewAny(Maestro $maestro): bool
+    public function before(User $user, $ability)
     {
-        return false;
+        // Si necesitas definir un super admin, podrías hacerlo aquí
+        // Por ejemplo, si el usuario con id 1 es el admin principal
+        if ($user->id === 1) {
+            return true;
+        }
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determinar si el usuario puede ver cualquier inscrito
      */
-    public function view(Maestro $maestro, Inscrito $inscrito): bool
+    public function viewAny(User $user)
     {
-        return false;
+        // Por ahora, todos los usuarios autenticados pueden ver la lista
+        return true;
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determinar si el usuario puede ver un inscrito específico
      */
-    public function create(Maestro $maestro): bool
+    public function view(User $user, Inscrito $inscrito)
     {
-        return false;
+        // Todos los usuarios autenticados pueden ver inscripciones
+        return true;
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determinar si el usuario puede crear inscritos
      */
-    public function update(Maestro $maestro, Inscrito $inscrito): bool
+    public function create(User $user)
     {
-        return false;
+        // Por ahora, cualquier usuario autenticado puede crear
+        // Deberías ajustar esto según tu lógica de negocio
+        return true;
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determinar si el usuario puede actualizar un inscrito
      */
-    public function delete(Maestro $maestro, Inscrito $inscrito): bool
+    public function update(User $user, Inscrito $inscrito)
     {
-        return false;
+        // Por ahora, cualquier usuario autenticado puede actualizar
+        // Deberías ajustar esto según tu lógica de negocio
+        return true;
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determinar si el usuario puede eliminar inscritos
      */
-    public function restore(Maestro $maestro, Inscrito $inscrito): bool
+    public function delete(User $user, Inscrito $inscrito)
     {
-        return false;
+        // Por ahora, cualquier usuario autenticado puede eliminar
+        // Deberías ajustar esto según tu lógica de negocio
+        return true;
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determinar si el usuario puede restaurar inscritos eliminados
      */
-    public function forceDelete(Maestro $maestro, Inscrito $inscrito): bool
+    public function restore(User $user, Inscrito $inscrito)
     {
-        return false;
+        // Si implementas soft deletes
+        return true;
+    }
+
+    /**
+     * Determinar si el usuario puede eliminar permanentemente inscritos
+     */
+    public function forceDelete(User $user, Inscrito $inscrito)
+    {
+        // Si implementas soft deletes
+        return true;
+    }
+
+    /**
+     * Verificar si el usuario puede cambiar el estatus del inscrito
+     */
+    public function cambiarEstatus(User $user, Inscrito $inscrito)
+    {
+        // Por ahora, cualquier usuario autenticado puede cambiar estatus
+        return true;
     }
 }

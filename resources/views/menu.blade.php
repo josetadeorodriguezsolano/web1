@@ -28,7 +28,7 @@
         <a href="/catalogo/maestros" class="flex items-center py-3 px-6 hover:bg-gray-300">
             <i data-lucide="users" class="w-5 h-5 mr-3"></i> Catálogo Maestros
         </a>
-        <a href="/admin/index" class="flex items-center py-3 px-6 hover:bg-gray-300">
+        <a href="/inscritos" class="flex items-center py-3 px-6 hover:bg-gray-300">
             <i data-lucide="file-text" class="w-5 h-5 mr-3"></i> Inscripciones
         </a>
         <a href="/calificaciones" class="flex items-center py-3 px-6 hover:bg-gray-300">

@@ -8,8 +8,9 @@ use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
 use App\Http\Controllers\InscripcionesController;
 use App\Livewire\Calificaciones;
+use App\Livewire\InfoAlumno;
+use App\Livewire\Inscribir;
 use App\Livewire\Inscritos;
-
 
 
 Route::get('/', function () {
@@ -23,6 +24,22 @@ Route::get('/dashboard', function () {
 Route::get('/calificaciones', function () {
     return view('calificaciones');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('calificaciones');
+
+Route::get('/alumno/{alumnoId}', InfoAlumno::class)
+    ->name('alumno.info');
+
+Route::get('/inscribir', function () {
+    return view('inscribir');
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscribir');
+
+Route::get('/inscritos', function () {
+    return view('inscritos');
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
+
+Route::get('/info-alumno/{id?}', function ($id = null) {
+    return view('livewire.info-alumno');
+})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('detalle.alumno');
+
 
 Route::middleware([
     'auth:sanctum',//token autentificacion

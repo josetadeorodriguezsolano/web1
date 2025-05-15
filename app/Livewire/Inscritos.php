@@ -36,23 +36,30 @@ class Inscritos extends Component
         $this->mostrarModalEliminar = true;
     }
 
-    public function eliminarInscrito()
-    {
-        Inscrito::find($this->idEliminar)?->delete();
-        $this->mostrarModalEliminar = false;
-        session()->flash('mensaje', 'Alumno eliminado correctamente.');
-    }
-
-     public function verAlumno($alumnoId)
+    public function verAlumno($alumnoId)
     {
         // Redirigir a la vista del alumno
         // Ajusta la ruta según tu configuración
         return redirect()->route('alumnos.show', $alumnoId);
     }
 
+   public function eliminarInscrito()
+{
+    // En lugar de eliminar el registro, actualizamos el estatus a 'baja'
+    $inscrito = Inscrito::find($this->idEliminar);
+
+    if ($inscrito) {
+        $inscrito->update(['estatus' => 'baja']);
+        $this->mostrarModalEliminar = false;
+        session()->flash('mensaje', 'Alumno marcado como baja correctamente.');
+    }
+}
+
     public function render()
-    {
-    $query = Inscrito::with(['alumno', 'grupo']);
+{
+    // Modificamos la consulta para solo mostrar alumnos con estatus 'vigente'
+    $query = Inscrito::with(['alumno', 'grupo'])
+            ->where('estatus', 'vigente');
 
     if ($this->grupoSeleccionado) {
         $query->where('grupo_id', $this->grupoSeleccionado);
@@ -66,8 +73,7 @@ class Inscritos extends Component
         'grupos' => $this->generacionSeleccionada
             ? Grupo::where('generacion', $this->generacionSeleccionada)->get()
             : Grupo::all(),
-        'inscritos' => $query->paginate(10), 
+        'inscritos' => $query->paginate(10),
     ]);
 }
-
 }
