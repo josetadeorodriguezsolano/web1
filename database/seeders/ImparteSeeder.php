@@ -14,7 +14,7 @@ class ImparteSeeder extends Seeder
     {
         $maestros = Maestro::all();
         $grupos = Grupo::all();
-
+        
         foreach ($grupos as $grupo) {
             // se asignara solo la materia del mismo grado que el grupo
             $materias = Materia::where('grado', $grupo->grado)->get();
@@ -23,7 +23,7 @@ class ImparteSeeder extends Seeder
                 Imparte::create([
                     'materia_id' => $materia->id,
                     'grupo_id' => $grupo->id,
-                    //es para que ponga maestros que no tengan materias
+                    //es para que ponga maestros que no tengan materias(se cambio la migracion para que sea nulo)
                     'maestro_id' => rand(0, 1) ? $maestros->random()->id : null
                 ]);
             }
