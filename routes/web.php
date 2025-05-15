@@ -39,8 +39,11 @@ Route::middleware([
     });
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
-    Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
+  Route::get('/maestro/{id}/horario/pdf', [PdfController::class, 'horarioMaestro']);
 
+
+
+    
   Route::get('ina',Ina::class);
 
     Route::get('inasistencia', [PDFInasistenciasController::class,'generar']);
