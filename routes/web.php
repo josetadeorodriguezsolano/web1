@@ -9,11 +9,12 @@ use App\Http\Controllers\HorariosC;
 use App\Http\Controllers\PDFInasistenciasController;
 
 
-use App\Livewire\PaseDeLista;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Livewire\CatalogoMaestros;
 use App\Livewire\Ina;
+use App\Livewire\GeneradorHorarios;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,7 +38,6 @@ Route::middleware([
         Route::get('listar/{numero_de_lista}/vino','listarVino');
         Route::get('listar/{numero_de_lista}/falto','listarFalto');
     });
-    Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
   Route::get('/maestro/{id}/horario/pdf', [PdfController::class, 'horarioGrupo']);
 
@@ -53,6 +53,8 @@ Route::middleware([
 Route::post('/horarios', [HorariosC::class, 'store'])->name('horarios.store'); // Para guardar un nuevo horario
 Route::delete('/horarios/{id}', [HorariosC::class, 'destroy'])->name('horarios.destroy'); // Para eliminar un horario
 Route::get('/horarios/maestro/{id_maestro}', [HorariosC::class, 'horariosPorMaestro'])->name('horarios.por_maestro'); // Para obtener los horarios por maestro
+
+Route::get('/genhorarios', [App\Http\Controllers\HorarioController::class, 'index'])->name('horarios.index');
 
 });
 

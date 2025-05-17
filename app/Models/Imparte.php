@@ -2,30 +2,37 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Imparte extends Model
 {
+    protected $table = 'imparte';
     use HasFactory;
 
-    protected $table = 'imparte'; // Usa 'protected' en lugar de 'public' para convenciones de Eloquent
-    public $timestamps = true;
+    protected $fillable = [
+        'materia_id',
+        'grupo_id',
+        'maestro_id'
+    ];
 
-    // Relación con Maestro
-    public function maestro()
+    public function materia()
     {
-        return $this->belongsTo(Maestro::class, 'maestro_id'); // Asegúrate de que 'maestro_id' es el nombre correcto de la columna foránea
+        return $this->belongsTo(Materia::class);
     }
 
-    // Relación con Materia
-   public function materia()
-{
-    return $this->belongsTo(Materia::class);
-}
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class);
+    }
 
-public function grupo()
-{
-    return $this->belongsTo(Grupo::class);
-}
+    public function maestro()
+    {
+        return $this->belongsTo(Maestro::class);
+    }
+
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class);
+    }
 }
