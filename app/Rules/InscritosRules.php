@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Rules;
-
 use Illuminate\Contracts\Validation\Rule;
 use App\Models\Inscrito;
 use App\Models\Grupo;
@@ -9,83 +8,75 @@ use App\Models\Grupo;
 class InscritosRules
 {
     /**
-     * Reglas de validación para crear un nuevo inscrito
+     * Obtener las reglas de validación para el componente Inscritos.
+     *
+     * @return array
      */
-    public static function create()
+    public static function getRules()
     {
         return [
-            'alumno_id' => [
-                'required',
-                'exists:alumnos,id',
-                new AlumnoNoInscritoEnGeneracionRule
+            'generacionSeleccionada' => [
+                'sometimes',
+                'nullable',
+                'numeric',
+                'exists:grupos,generacion'
             ],
-            'grupo_id' => [
-                'required',
-                'exists:grupos,id',
+            'grupoSeleccionado' => [
+                'sometimes',
+                'nullable',
+                'exists:grupos,id'
             ],
-            'estatus' => 'required|in:vigente,baja,egresado',
+            'idEliminar' => [
+                'sometimes',
+                'required',
+                'exists:inscritos,id'
+            ]
         ];
     }
 
     /**
-     * Reglas de validación para actualizar un inscrito
+     * Obtener los mensajes de validación personalizados.
+     *
+     * @return array
      */
-    public static function update($inscritoId)
+    public static function getMessages()
     {
         return [
-            'grupo_id' => [
-                'sometimes',
-                'required',
-                'exists:grupos,id',
-            ],
-            'estatus' => 'sometimes|required|in:vigente,baja,egresado',
+            'generacionSeleccionada.numeric' => 'La generación seleccionada debe ser un número.',
+            'generacionSeleccionada.exists' => 'La generación seleccionada no existe.',
+            
+            'grupoSeleccionado.exists' => 'El grupo seleccionado no existe.',
+            
+            'idEliminar.required' => 'Se requiere un ID para eliminar.',
+            'idEliminar.exists' => 'El inscrito que intenta eliminar no existe.'
         ];
     }
-}
-
-/**
- * Regla para verificar que un alumno no esté inscrito en la misma generación
- */
-class AlumnoNoInscritoEnGeneracionRule implements Rule
-{
-    protected $alumnoId;
-    protected $grupoId;
-
-    public function __construct($alumnoId = null, $grupoId = null)
+    
+    /**
+     * Obtener las reglas para la actualización de estatus de un inscrito.
+     *
+     * @return array
+     */
+    public static function getEstatusRules()
     {
-        $this->alumnoId = $alumnoId;
-        $this->grupoId = $grupoId;
+        return [
+            'estatus' => [
+                'required',
+                'in:vigente,baja,egresado'
+            ]
+        ];
     }
-
-    public function passes($attribute, $value)
+    
+    /**
+     * Obtener los mensajes para la actualización de estatus.
+     *
+     * @return array
+     */
+    public static function getEstatusMessages()
     {
-        // Si no se proporciona grupo_id, usamos el valor del request
-        $grupoId = $this->grupoId ?? request('grupo_id');
-        
-        if (!$grupoId) {
-            return true; // Si no hay grupo, no podemos validar la generación
-        }
-
-        $grupo = Grupo::find($grupoId);
-        
-        if (!$grupo) {
-            return true; // Si el grupo no existe, otra validación lo manejará
-        }
-
-        // Verificar si el alumno ya está inscrito en la misma generación
-        // Solo consideramos inscripciones vigentes (ya que ahora no eliminas, solo cambias a baja)
-        $inscripcionExistente = Inscrito::whereHas('grupo', function ($query) use ($grupo) {
-                $query->where('generacion', $grupo->generacion);
-            })
-            ->where('alumno_id', $value)
-            ->where('estatus', 'vigente')
-            ->exists();
-
-        return !$inscripcionExistente;
-    }
-
-    public function message()
-    {
-        return 'El alumno ya está inscrito en esta generación.';
+        return [
+            'estatus.required' => 'El estatus es obligatorio.',
+            'estatus.in' => 'El estatus debe ser vigente, baja o egresado.'
+        ];
     }
 }
