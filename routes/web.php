@@ -25,8 +25,9 @@ Route::get('/calificaciones', function () {
     return view('calificaciones');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('calificaciones');
 
-Route::get('/alumno/{alumnoId}', InfoAlumno::class)
-    ->name('alumno.info');
+Route::get('/info-alumno/{alumnoId}', function ($alumnoId) {
+    return view('info-alumno', compact('alumnoId'));
+})->name('alumnoId');
 
 Route::get('/inscribir', function () {
     return view('inscribir');
@@ -36,9 +37,6 @@ Route::get('/inscritos', function () {
     return view('inscritos');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
 
-Route::get('/info-alumno/{alumnoId}', function ($alumnoId) {
-    return view('info-alumno', compact('alumnoId'));
-})->name('alumnoId');
 
 
 
