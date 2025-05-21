@@ -102,5 +102,5 @@ class AlumnoPolicy
         return Imparte::where('maestro_id', $maestro->id)
                    ->whereIn('grupo_id', $gruposDelAlumno)
                    ->exists();
-    }
+    }
 }

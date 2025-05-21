@@ -40,7 +40,7 @@ class InfoAlumno extends Component
     ];
 
     // Montar el componente con el ID del alumno
-    public function mount($alumnoId = null)
+   public function mount($alumnoId = null)
     {
         try {
             $this->alumnoId = $alumnoId;
