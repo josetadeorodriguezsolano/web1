@@ -46,6 +46,11 @@ class InfoAlumno extends Component
             $this->alumnoId = $alumnoId;
 
             if ($this->alumnoId) {
+                $this->alumno = Alumno::findOrFail($this->alumnoId);
+
+                // Aplica la policy:
+                $this->authorize('view', $this->alumno);
+
                 $this->cargarAlumno();
             } else {
                 Log::info('No se proporcionó ID de alumno');
