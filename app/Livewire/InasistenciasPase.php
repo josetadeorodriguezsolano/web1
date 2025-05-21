@@ -82,7 +82,7 @@ class InasistenciasPase extends Component
         // Limpia la tabla si falta algún filtro
         $this->alumnos = collect();
         $this->diasDelMes = [];
-        $this->inasistencias = [];
+
     }
 }
 
@@ -94,7 +94,7 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->startOfMonth();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida: ' . $this->fechaSeleccionada);
+
             return;
         }
 
@@ -107,7 +107,7 @@ class InasistenciasPase extends Component
             $carbonDia = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia);
 
             if ($carbonDia->isWeekend()) {
-                $this->diasNoEscolares[$dia] = true; 
+                $this->diasNoEscolares[$dia] = true;
                 continue; // No agregues sábados ni domingos a la tabla
             }
 
@@ -145,7 +145,7 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia)->toDateString();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida en toggleInasistencia(): ' . $this->fechaSeleccionada);
+
             return;
         }
 
@@ -165,8 +165,8 @@ class InasistenciasPase extends Component
         }
 
         $this->inasistenciasPorDia = [];
-        $this->generarTablaMensual(); // Volver a leer de la base de datos 
-        $this->refrescar++; // Forzar render       
+        $this->generarTablaMensual(); // Volver a leer de la base de datos
+        $this->refrescar++; // Forzar render
     }
 
 
