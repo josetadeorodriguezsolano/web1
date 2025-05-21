@@ -41,9 +41,10 @@ Route::get('/inscritos', function () {
     return view('inscritos');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
 
-Route::get('/info-alumno/{id?}', function ($id = null) {
-    return view('livewire.info-alumno');
-})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('detalle.alumno');
+Route::get('/info-alumno/{alumnoId}', function ($alumnoId) {
+    return view('info-alumno', compact('alumnoId'));
+})->name('alumnoId');
+
 
 
 Route::middleware([
@@ -83,3 +84,5 @@ Route::get("w3css", function () {
 Route::get("bootstrap", function () {
     return view("bootstrap");
 });
+
+

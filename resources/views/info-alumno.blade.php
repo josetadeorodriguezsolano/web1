@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    @livewire('info-alummno')
+    @livewire('info-alumno', ['alumnoId' => $alumnoId ?? request()->route('alumnoId')])
 @endsection
