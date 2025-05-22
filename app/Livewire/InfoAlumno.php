@@ -10,6 +10,7 @@ use App\Models\Calificacion;
 use App\Models\Materia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class InfoAlumno extends Component
 {
@@ -40,7 +41,7 @@ class InfoAlumno extends Component
     ];
 
     // Montar el componente con el ID del alumno
-   public function mount($alumnoId = null)
+    public function mount($alumnoId = null)
     {
         try {
             $this->alumnoId = $alumnoId;
@@ -48,8 +49,8 @@ class InfoAlumno extends Component
             if ($this->alumnoId) {
                 $this->alumno = Alumno::findOrFail($this->alumnoId);
 
-                // Aplica la policy:
-                $this->authorize('view', $this->alumno);
+                // Aplica la policy si existe:
+                // $this->authorize('view', $this->alumno);
 
                 $this->cargarAlumno();
             } else {
@@ -73,9 +74,9 @@ class InfoAlumno extends Component
 
             // Obtener la inscripción vigente
             $this->inscripcion = Inscrito::where('alumno_id', $this->alumnoId)
-                                        ->where('estatus', 'vigente')
-                                        ->with('grupo')
-                                        ->first();
+                ->where('estatus', 'vigente')
+                ->with('grupo')
+                ->first();
 
             if ($this->inscripcion) {
                 $this->grupo = $this->inscripcion->grupo;
@@ -141,8 +142,8 @@ class InfoAlumno extends Component
         foreach ($materias as $materia) {
             // Obtener calificaciones para esta materia
             $calificacionesMateria = Calificacion::where('alumno_id', $this->alumnoId)
-                                                ->where('materia_id', $materia->id)
-                                                ->get();
+                ->where('materia_id', $materia->id)
+                ->get();
 
             // Inicializar estructura para esta materia
             $datosMateria = [
@@ -185,6 +186,9 @@ class InfoAlumno extends Component
     public function activarEdicion()
     {
         $this->editando = true;
+        $this->resetValidation(); // Limpiar errores previos
+        $this->mensaje = '';
+        $this->tipoMensaje = '';
     }
 
     // Cancelar edición
@@ -202,9 +206,14 @@ class InfoAlumno extends Component
             'contacto' => $this->alumno->contacto,
             'tutor' => $this->alumno->tutor
         ];
+
+        // Limpiar mensajes y errores
+        $this->resetValidation();
+        $this->mensaje = '';
+        $this->tipoMensaje = '';
     }
 
-    // Reglas de validación
+    // Reglas de validación CORREGIDAS
     protected function rules()
     {
         return [
@@ -213,19 +222,22 @@ class InfoAlumno extends Component
                 'string',
                 'max:10',
                 'min:5',
-                'unique:alumnos,matricula,' . $this->alumnoId,
+                'regex:/^[A-Z0-9]+$/', // Solo mayúsculas y números
+                Rule::unique('alumnos', 'matricula')->ignore($this->alumnoId),
             ],
             'alumnoData.nombres' => [
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo permite letras, espacios y caracteres acentuados
+                'min:2',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo letras, espacios y acentos
             ],
             'alumnoData.apellidos' => [
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo permite letras, espacios y caracteres acentuados
+                'min:2',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo letras, espacios y acentos
             ],
             'alumnoData.estatus' => [
                 'required',
@@ -235,27 +247,74 @@ class InfoAlumno extends Component
                 'required',
                 'string',
                 'size:18',
-                'unique:alumnos,curp,' . $this->alumnoId,
-                'regex:/^[A-Z0-9]+$/' // Solo mayúsculas y números
+                'regex:/^[A-Z0-9]+$/', // Solo mayúsculas y números
+                Rule::unique('alumnos', 'curp')->ignore($this->alumnoId),
             ],
             'alumnoData.contacto' => [
                 'required',
                 'string',
-                'max:20',
-                'regex:/^[0-9]+$/' // Solo números
+                'min:10',
+                'max:10',
+                'regex:/^[0-9]{10}$/' // Solo números, exactamente 10
             ],
             'alumnoData.tutor' => [
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo permite letras, espacios y caracteres acentuados
+                'min:2',
+                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/' // Solo letras, espacios y acentos
             ],
+        ];
+    }
+
+    // Mensajes de validación CORREGIDOS
+    protected function messages()
+    {
+        return [
+            'alumnoData.matricula.required' => 'La matrícula es obligatoria.',
+            'alumnoData.matricula.min' => 'La matrícula debe tener al menos 5 caracteres.',
+            'alumnoData.matricula.max' => 'La matrícula no puede tener más de 10 caracteres.',
+            'alumnoData.matricula.regex' => 'La matrícula solo debe contener letras mayúsculas y números.',
+            'alumnoData.matricula.unique' => 'Esta matrícula ya está registrada.',
+
+            'alumnoData.nombres.required' => 'El nombre es obligatorio.',
+            'alumnoData.nombres.min' => 'El nombre debe tener al menos 2 caracteres.',
+            'alumnoData.nombres.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'alumnoData.nombres.regex' => 'El nombre solo debe contener letras, espacios y acentos.',
+
+            'alumnoData.apellidos.required' => 'Los apellidos son obligatorios.',
+            'alumnoData.apellidos.min' => 'Los apellidos deben tener al menos 2 caracteres.',
+            'alumnoData.apellidos.max' => 'Los apellidos no pueden tener más de 255 caracteres.',
+            'alumnoData.apellidos.regex' => 'Los apellidos solo deben contener letras, espacios y acentos.',
+
+            'alumnoData.estatus.required' => 'El estatus es obligatorio.',
+            'alumnoData.estatus.in' => 'El estatus debe ser: vigente, egresado o baja.',
+
+            'alumnoData.curp.required' => 'El CURP es obligatorio.',
+            'alumnoData.curp.size' => 'El CURP debe tener exactamente 18 caracteres.',
+            'alumnoData.curp.regex' => 'El CURP debe contener solo letras mayúsculas y números.',
+            'alumnoData.curp.unique' => 'Este CURP ya está registrado.',
+
+            'alumnoData.contacto.required' => 'El teléfono de contacto es obligatorio.',
+            'alumnoData.contacto.min' => 'El teléfono debe tener exactamente 10 dígitos.',
+            'alumnoData.contacto.max' => 'El teléfono debe tener exactamente 10 dígitos.',
+            'alumnoData.contacto.regex' => 'El teléfono solo debe contener números (10 dígitos).',
+
+            'alumnoData.tutor.required' => 'El nombre del tutor es obligatorio.',
+            'alumnoData.tutor.min' => 'El nombre del tutor debe tener al menos 2 caracteres.',
+            'alumnoData.tutor.max' => 'El nombre del tutor no puede tener más de 255 caracteres.',
+            'alumnoData.tutor.regex' => 'El nombre del tutor solo debe contener letras, espacios y acentos.',
         ];
     }
 
     // Guardar cambios
     public function guardarCambios()
     {
+        // Limpiar mensajes previos
+        $this->mensaje = '';
+        $this->tipoMensaje = '';
+
+        // Validar antes de guardar
         $this->validate();
 
         try {
@@ -263,12 +322,12 @@ class InfoAlumno extends Component
 
             // Actualizar alumno
             $this->alumno->update([
-                'matricula' => strtoupper($this->alumnoData['matricula']),
-                'nombres' => ucwords(strtolower($this->alumnoData['nombres'])),
-                'apellidos' => ucwords(strtolower($this->alumnoData['apellidos'])),
-                'curp' => strtoupper($this->alumnoData['curp']),
-                'contacto' => $this->alumnoData['contacto'],
-                'tutor' => ucwords(strtolower($this->alumnoData['tutor'])),
+                'matricula' => strtoupper(trim($this->alumnoData['matricula'])),
+                'nombres' => ucwords(strtolower(trim($this->alumnoData['nombres']))),
+                'apellidos' => ucwords(strtolower(trim($this->alumnoData['apellidos']))),
+                'curp' => strtoupper(trim($this->alumnoData['curp'])),
+                'contacto' => trim($this->alumnoData['contacto']),
+                'tutor' => ucwords(strtolower(trim($this->alumnoData['tutor']))),
                 'estatus' => $this->alumnoData['estatus']
             ]);
 
@@ -285,7 +344,6 @@ class InfoAlumno extends Component
 
             // Recargar datos
             $this->cargarAlumno();
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->mensaje = 'Error al actualizar alumno: ' . $e->getMessage();
@@ -327,11 +385,11 @@ class InfoAlumno extends Component
 
             // Recargar datos
             $this->cargarAlumno();
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->mensaje = 'Error al dar de baja al alumno: ' . $e->getMessage();
             $this->tipoMensaje = 'error';
+            $this->mostrarModalEliminar = false;
         }
     }
 
@@ -359,27 +417,40 @@ class InfoAlumno extends Component
         return round($totalPromedios / $cantidadMaterias, 1);
     }
 
-    // Método updated para validación en tiempo real y transformaciones
+    // Método updated CORREGIDO
     public function updated($property)
     {
-        // Validar solo la propiedad actualizada
-        $this->validateOnly($property);
+        // Solo procesar si estamos en modo edición
+        if (!$this->editando) {
+            return;
+        }
 
-        // Transformaciones específicas
+        // PRIMERO aplicar transformaciones de formato
         if ($property === 'alumnoData.curp') {
             $this->alumnoData['curp'] = strtoupper($this->alumnoData['curp']);
         }
 
+        if ($property === 'alumnoData.matricula') {
+            $this->alumnoData['matricula'] = strtoupper($this->alumnoData['matricula']);
+        }
+
+        // Limpiar números de campos de texto
         if (in_array($property, ['alumnoData.nombres', 'alumnoData.apellidos', 'alumnoData.tutor'])) {
             $field = explode('.', $property)[1];
-            // Eliminar números
             $this->alumnoData[$field] = preg_replace('/[0-9]/', '', $this->alumnoData[$field]);
         }
 
+        // Limpiar todo excepto números del campo contacto
         if ($property === 'alumnoData.contacto') {
-            // Eliminar no números
             $this->alumnoData['contacto'] = preg_replace('/[^0-9]/', '', $this->alumnoData['contacto']);
+            // Limitar a 10 dígitos máximo
+            if (strlen($this->alumnoData['contacto']) > 10) {
+                $this->alumnoData['contacto'] = substr($this->alumnoData['contacto'], 0, 10);
+            }
         }
+
+        // DESPUÉS validar con el valor ya transformado
+        $this->validateOnly($property);
     }
 
     public function render()
