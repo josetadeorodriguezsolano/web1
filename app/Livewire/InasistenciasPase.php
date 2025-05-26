@@ -82,7 +82,7 @@ class InasistenciasPase extends Component
   public function updatedGeneracionSeleccionada()
 {
     $this->validateOnly('generacionSeleccionada');
-    // Obtener colección de objetos Grupo, no array
+
     $this->gruposFiltrados = Grupo::where('generacion', $this->generacionSeleccionada)->get();
     $this->grupoSeleccionado = '';
 }
@@ -133,7 +133,7 @@ class InasistenciasPase extends Component
         }
     }
 
-    /** Solo se usa internamente, se hace privada */
+
     private function generarTablaMensual()
     {
         if (empty($this->fechaSeleccionada)) return;
