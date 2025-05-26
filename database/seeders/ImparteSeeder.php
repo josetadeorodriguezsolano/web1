@@ -2,29 +2,34 @@
 
 namespace Database\Seeders;
 
-use App\Models\Grupo;
-use App\Models\Imparte;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Maestro;
+use App\Models\Imparte;
 use App\Models\Materia;
+use App\Models\Grupo;
+use App\Models\Maestro;
+use Illuminate\Support\Facades\DB;
 
 class ImparteSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $maestros = Maestro::all();
+        
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Imparte::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $grupos = Grupo::all();
-        $materias = [];
+        $maestros = Maestro::all();
+
         foreach ($grupos as $grupo) {
-            $materias = Materia::porGrado($grupo->grado);
+            $materias = Materia::where('grado', $grupo->grado)->get();
+
             foreach ($materias as $materia) {
-                Imparte::create(['materia_id'=>$materia->id,
-                                 'grupo_id'=>$grupo->id,
-                                 'maestro_id'=> $maestros->random()->id]);
+                Imparte::create([
+                    'grupo_id' => $grupo->id,
+                    'materia_id' => $materia->id,
+                    'maestro_id' => $maestros->random()->id,
+                ]);
             }
         }
     }

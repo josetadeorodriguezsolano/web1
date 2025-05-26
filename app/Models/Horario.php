@@ -15,10 +15,7 @@ class Horario extends Model
     // Campos que se pueden asignar masivamente
     protected $fillable = ['imparte_id', 'hora_numero', 'dia_semana'];
 
-    // Si no tienes las columnas 'created_at' y 'updated_at' en la tabla, descomenta:
-    // public $timestamps = false;
 
-    // Convertir automáticamente 'fecha' a instancia de Carbon
 
     // Relación con Imparte
     public function imparte()

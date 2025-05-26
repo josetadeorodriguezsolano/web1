@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('grupo_id')->constrained();
             $table->timestamps();
 
-            $table->unique(['grupo_id','materia_id']);
+            //$table->unique(['grupo_id','materia_id']);
+            $table->index(['grupo_id', 'materia_id']);
         });
     }
 
