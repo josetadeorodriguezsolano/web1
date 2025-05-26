@@ -18,98 +18,156 @@ class Inscritos extends Component
     public $generacionSeleccionada = '';
     public $grupoSeleccionado = '';
 
-    public $mostrarModalEliminar = false;
-    public $idEliminar = null;
+    // Cambio del modal de eliminación a modal de cambio de estatus
+    public $mostrarModalCambiarEstatus = false;
+    public $idCambiarEstatus = null;
     public $cargando = false;
 
     public $estatusSeleccionado = '';
 
-public function updatedEstatusSeleccionado()
-{
-    $this->cargando = true;
-    
-    // Validar estatus seleccionado
-    if (!empty($this->estatusSeleccionado)) {
-        $validator = Validator::make(
-            ['estatus' => $this->estatusSeleccionado],
-            InscritosRules::getEstatusRules(),
-            InscritosRules::getEstatusMessages()
-        );
+    public function updatedEstatusSeleccionado()
+    {
+        $this->cargando = true;
+        
+        // Validar estatus seleccionado
+        if (!empty($this->estatusSeleccionado)) {
+            $validator = Validator::make(
+                ['estatus' => $this->estatusSeleccionado],
+                InscritosRules::getEstatusRules(),
+                InscritosRules::getEstatusMessages()
+            );
 
-        if ($validator->fails()) {
-            $this->estatusSeleccionado = '';
-            session()->flash('mensaje', $validator->errors()->first('estatus'));
-            session()->flash('tipo', 'error');
+            if ($validator->fails()) {
+                $this->estatusSeleccionado = '';
+                session()->flash('mensaje', $validator->errors()->first('estatus'));
+                session()->flash('tipo', 'error');
+            }
         }
+        
+        $this->resetPage();
+        $this->cargando = false;
     }
-    
-    $this->resetPage();
-    $this->cargando = false;
-}
 
     // Resetear página si cambian filtros
     public function updatedGeneracionSeleccionada()
-{
-    $this->cargando = true;
-    
-    // Validar generación seleccionada
-    $validator = Validator::make(
-        ['generacionSeleccionada' => $this->generacionSeleccionada],
-        ['generacionSeleccionada' => InscritosRules::getRules()['generacionSeleccionada']],
-        InscritosRules::getMessages()
-    );
-
-    if ($validator->fails()) {
-        $this->generacionSeleccionada = '';
-        session()->flash('mensaje', $validator->errors()->first('generacionSeleccionada'));
-        session()->flash('tipo', 'error');
-    }
-
-    $this->grupoSeleccionado = '';
-    $this->resetPage();
-    $this->cargando = false;
-}
-
-public function updatedGrupoSeleccionado()
-{
-    $this->cargando = true;
-    
-    // Validar grupo seleccionado
-    $validator = Validator::make(
-        ['grupoSeleccionado' => $this->grupoSeleccionado],
-        ['grupoSeleccionado' => InscritosRules::getRules()['grupoSeleccionado']],
-        InscritosRules::getMessages()
-    );
-
-    if ($validator->fails()) {
-        $this->grupoSeleccionado = '';
-        session()->flash('mensaje', $validator->errors()->first('grupoSeleccionado'));
-        session()->flash('tipo', 'error');
-    }
-
-    $this->resetPage();
-    $this->cargando = false;
-}
-
-    public function confirmarEliminacion($id)
     {
-        // Validar ID antes de confirmar eliminación
+        $this->cargando = true;
+        
+        // Validar generación seleccionada
         $validator = Validator::make(
-            ['idEliminar' => $id],
-            ['idEliminar' => InscritosRules::getRules()['idEliminar']],
+            ['generacionSeleccionada' => $this->generacionSeleccionada],
+            ['generacionSeleccionada' => InscritosRules::getRules()['generacionSeleccionada']],
             InscritosRules::getMessages()
         );
 
         if ($validator->fails()) {
-            $this->dispatch('mostrar-alerta', [
-                'tipo' => 'error',
-                'mensaje' => $validator->errors()->first('idEliminar')
-            ]);
+            $this->generacionSeleccionada = '';
+            session()->flash('mensaje', $validator->errors()->first('generacionSeleccionada'));
+            session()->flash('tipo', 'error');
+        }
+
+        $this->grupoSeleccionado = '';
+        $this->resetPage();
+        $this->cargando = false;
+    }
+
+    public function updatedGrupoSeleccionado()
+    {
+        $this->cargando = true;
+        
+        // Validar grupo seleccionado
+        $validator = Validator::make(
+            ['grupoSeleccionado' => $this->grupoSeleccionado],
+            ['grupoSeleccionado' => InscritosRules::getRules()['grupoSeleccionado']],
+            InscritosRules::getMessages()
+        );
+
+        if ($validator->fails()) {
+            $this->grupoSeleccionado = '';
+            session()->flash('mensaje', $validator->errors()->first('grupoSeleccionado'));
+            session()->flash('tipo', 'error');
+        }
+
+        $this->resetPage();
+        $this->cargando = false;
+    }
+
+    // Cambiar de confirmarEliminacion a mostrarOpcionesEstatus
+    public function mostrarOpcionesEstatus($id)
+    {
+        // Validar ID antes de mostrar opciones
+        $validator = Validator::make(
+            ['idCambiarEstatus' => $id],
+            ['idCambiarEstatus' => ['required', 'exists:inscritos,id']], // Validación más específica
+            ['idCambiarEstatus.required' => 'Se requiere un ID para cambiar estatus.',
+             'idCambiarEstatus.exists' => 'El inscrito seleccionado no existe.']
+        );
+
+        if ($validator->fails()) {
+            session()->flash('mensaje', $validator->errors()->first('idCambiarEstatus'));
+            session()->flash('tipo', 'error');
             return;
         }
 
-        $this->idEliminar = $id;
-        $this->mostrarModalEliminar = true;
+        $this->idCambiarEstatus = $id;
+        $this->mostrarModalCambiarEstatus = true;
+    }
+
+    // Nuevo método para dar de baja
+    public function darDeBaja()
+    {
+        $this->cambiarEstatusInscrito('baja', 'Alumno marcado como inactivo correctamente.');
+    }
+
+    // Nuevo método para marcar como egresado
+    public function marcarComoEgresado()
+    {
+        $this->cambiarEstatusInscrito('egresado', 'Alumno marcado como egresado correctamente.');
+    }
+
+    // Método privado para cambiar estatus (reutilizable)
+    private function cambiarEstatusInscrito($nuevoEstatus, $mensajeExito)
+    {
+        // Validar que el ID exista antes de intentar cambiar estatus
+        $validator = Validator::make(
+            ['idCambiarEstatus' => $this->idCambiarEstatus],
+            ['idCambiarEstatus' => ['required', 'exists:inscritos,id']],
+            ['idCambiarEstatus.required' => 'Se requiere un ID para cambiar estatus.',
+             'idCambiarEstatus.exists' => 'El inscrito seleccionado no existe.']
+        );
+
+        if ($validator->fails()) {
+            $this->mostrarModalCambiarEstatus = false;
+            session()->flash('mensaje', $validator->errors()->first('idCambiarEstatus'));
+            session()->flash('tipo', 'error');
+            return;
+        }
+
+        try {
+            $inscrito = Inscrito::find($this->idCambiarEstatus);
+
+            if ($inscrito) {
+                // Validar el nuevo estatus
+                $validator = Validator::make(
+                    ['estatus' => $nuevoEstatus],
+                    InscritosRules::getEstatusRules(),
+                    InscritosRules::getEstatusMessages()
+                );
+
+                if ($validator->fails()) {
+                    throw new \Exception($validator->errors()->first('estatus'));
+                }
+                
+                $inscrito->update(['estatus' => $nuevoEstatus]);
+                $this->mostrarModalCambiarEstatus = false;
+                
+                session()->flash('mensaje', $mensajeExito);
+                session()->flash('tipo', 'success');
+            }
+        } catch (\Exception $e) {
+            session()->flash('mensaje', 'Error al cambiar el estatus del alumno: ' . $e->getMessage());
+            session()->flash('tipo', 'error');
+        }
     }
 
     public function verAlumno($alumnoId)
@@ -120,65 +178,13 @@ public function updatedGrupoSeleccionado()
         })->first();
 
         if (!$inscrito) {
-            $this->dispatch('mostrar-alerta', [
-                'tipo' => 'error',
-                'mensaje' => 'El alumno seleccionado no existe o ha sido eliminado.'
-            ]);
+            session()->flash('mensaje', 'El alumno seleccionado no existe o ha sido eliminado.');
+            session()->flash('tipo', 'error');
             return;
         }
         
         // Redirigir a la vista del alumno
         return redirect()->route('alumnos.show', $alumnoId);
-    }
-
-    public function eliminarInscrito()
-    {
-        // Validar que el ID exista antes de intentar eliminar
-        $validator = Validator::make(
-            ['idEliminar' => $this->idEliminar],
-            ['idEliminar' => InscritosRules::getRules()['idEliminar']],
-            InscritosRules::getMessages()
-        );
-
-        if ($validator->fails()) {
-            $this->mostrarModalEliminar = false;
-            $this->dispatch('mostrar-alerta', [
-                'tipo' => 'error',
-                'mensaje' => $validator->errors()->first('idEliminar')
-            ]);
-            return;
-        }
-
-        try {
-            // En lugar de eliminar el registro, actualizamos el estatus a 'baja'
-            $inscrito = Inscrito::find($this->idEliminar);
-
-            if ($inscrito) {
-                // Validar el estatus
-                $validator = Validator::make(
-                    ['estatus' => 'baja'],
-                    InscritosRules::getEstatusRules(),
-                    InscritosRules::getEstatusMessages()
-                );
-
-                if ($validator->fails()) {
-                    throw new \Exception($validator->errors()->first('estatus'));
-                }
-                
-                $inscrito->update(['estatus' => 'baja']);
-                $this->mostrarModalEliminar = false;
-                
-                $this->dispatch('mostrar-alerta', [
-                    'tipo' => 'success',
-                    'mensaje' => 'Alumno marcado como baja correctamente.'
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('mostrar-alerta', [
-                'tipo' => 'error',
-                'mensaje' => 'Error al dar de baja al alumno: ' . $e->getMessage()
-            ]);
-        }
     }
 
     public function aplicarFiltros()
@@ -200,10 +206,8 @@ public function updatedGrupoSeleccionado()
 
         if ($validator->fails()) {
             $this->cargando = false;
-            $this->dispatch('mostrar-alerta', [
-                'tipo' => 'error',
-                'mensaje' => 'Error en los filtros seleccionados. Por favor, verifica e intenta nuevamente.'
-            ]);
+            session()->flash('mensaje', 'Error en los filtros seleccionados. Por favor, verifica e intenta nuevamente.');
+            session()->flash('tipo', 'error');
             return;
         }
         
@@ -213,40 +217,33 @@ public function updatedGrupoSeleccionado()
 
     public function render()
     {
-    // Modificamos la consulta para mostrar todos los alumnos (sin filtro predeterminado de estatus)
-    $query = Inscrito::with(['alumno', 'grupo']);
-    
-    // Aplicamos los filtros de generación y grupo si existen
-    if ($this->grupoSeleccionado) {
-        $query->where('grupo_id', $this->grupoSeleccionado);
-    } elseif ($this->generacionSeleccionada) {
-        $grupoIds = Grupo::where('generacion', $this->generacionSeleccionada)->pluck('id');
-        $query->whereIn('grupo_id', $grupoIds);
-    }
-    
-    // Aplicamos el filtro de estatus si existe
-    if ($this->estatusSeleccionado) {
-        $query->where('inscritos.estatus', $this->estatusSeleccionado);
-    }
-    
-    // Ordenamos por estatus con el orden especificado: vigente, egresado, baja
-    $query->orderByRaw("FIELD(inscritos.estatus, 'vigente', 'egresado', 'baja')")
-          ->join('alumnos', 'inscritos.alumno_id', '=', 'alumnos.id')
-          ->orderBy('alumnos.apellidos')
-          ->orderBy('alumnos.nombres')
-          ->select('inscritos.*'); // Seleccionamos explícitamente las columnas de inscritos
+        // Modificamos la consulta para mostrar todos los alumnos (sin filtro predeterminado de estatus)
+        $query = Inscrito::with(['alumno', 'grupo']);
+        
+        // Aplicamos los filtros de generación y grupo si existen
+        if ($this->grupoSeleccionado) {
+            $query->where('grupo_id', $this->grupoSeleccionado);
+        } elseif ($this->generacionSeleccionada) {
+            $grupoIds = Grupo::where('generacion', $this->generacionSeleccionada)->pluck('id');
+            $query->whereIn('grupo_id', $grupoIds);
+        }
+        
+        // Aplicamos el filtro de estatus si existe
+        if ($this->estatusSeleccionado) {
+            $query->where('estatus', $this->estatusSeleccionado);
+        }
+        
+        // Ordenamos primero por estatus con el orden especificado: vigente, egresado, baja
+        // Y luego por ID en orden ascendente
+        $query->orderByRaw("FIELD(estatus, 'vigente', 'egresado', 'baja')")
+              ->orderBy('id', 'asc');
 
-    
-    $query->orderByRaw("FIELD(inscritos.estatus, 'vigente', 'egresado', 'baja')")
-          ->orderBy('id', 'asc');
-
-    return view('livewire.inscritos', [
-        'generaciones' => Grupo::select('generacion')->distinct()->get(),
-        'grupos' => $this->generacionSeleccionada
-            ? Grupo::where('generacion', $this->generacionSeleccionada)->get()
-            : Grupo::all(),
-        'inscritos' => $query->paginate(10),
-    ]);
+        return view('livewire.inscritos', [
+            'generaciones' => Grupo::select('generacion')->distinct()->get(),
+            'grupos' => $this->generacionSeleccionada
+                ? Grupo::where('generacion', $this->generacionSeleccionada)->get()
+                : Grupo::all(),
+            'inscritos' => $query->paginate(10),
+        ]);
     }
-
 }

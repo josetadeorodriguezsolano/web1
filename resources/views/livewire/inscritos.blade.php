@@ -30,15 +30,14 @@
         </div>
 
         <div>
-        <label class="block text-xl font-medium text-gray-700 mb-2">Estatus:</label>
+            <label class="block text-xl font-medium text-gray-700 mb-2">Estatus:</label>
             <select wire:model.live="estatusSeleccionado" class="mt-1 block w-full pl-3 pr-10 py-2 text-xl font-medium border-gray-300 rounded-md">
                 <option value="">Todos los estatus</option>
-                <option value="vigente">Vigente</option>
-                <option value="baja">Baja</option>
+                <option value="vigente">Activo</option>
+                <option value="baja">Inactivo</option>
                 <option value="egresado">Egresado</option>
             </select>
         </div>
-
     </div>
 
     <!-- Tabla con indicador de carga -->
@@ -78,17 +77,38 @@
                                 <td class="py-3 px-4">{{ $inscrito->grupo->generacion }}</td>
                                 <td class="py-3 px-4">{{ $inscrito->grupo->grado }}°{{ $inscrito->grupo->letra }}</td>
                                 <td class="py-3 text-center">
-                                    <span class="px-4 py-1 inline-flex font-semibold rounded-full
-                                        {{ $inscrito->estatus === 'vigente' ? 'bg-green-100 text-green-800' :
-                                           ($inscrito->estatus === 'baja' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                        {{ ucfirst($inscrito->estatus) }}
+                                    @php
+                                        $estatusDisplay = '';
+                                        $estatusClass = '';
+                                        switch($inscrito->estatus) {
+                                            case 'vigente':
+                                                $estatusDisplay = 'Activo';
+                                                $estatusClass = 'bg-green-100 text-green-800';
+                                                break;
+                                            case 'baja':
+                                                $estatusDisplay = 'Inactivo';
+                                                $estatusClass = 'bg-red-100 text-red-800';
+                                                break;
+                                            case 'egresado':
+                                                $estatusDisplay = 'Egresado';
+                                                $estatusClass = 'bg-yellow-100 text-yellow-800';
+                                                break;
+                                            default:
+                                                $estatusDisplay = ucfirst($inscrito->estatus);
+                                                $estatusClass = 'bg-gray-100 text-gray-800';
+                                        }
+                                    @endphp
+                                    <span class="px-4 py-1 inline-flex font-semibold rounded-full {{ $estatusClass }}">
+                                        {{ $estatusDisplay }}
                                     </span>
                                 </td>
                                 <td class="py-3 text-center">
                                     <div class="flex justify-center space-x-2">
-                                        <button wire:click="confirmarEliminacion({{ $inscrito->id }})" class="bg-red-100 text-red-800 hover:bg-red-200 px-3 py-1 rounded-md">
-                                            Eliminar
-                                        </button>
+                                        @if($inscrito->estatus === 'vigente')
+                                            <button wire:click="mostrarOpcionesEstatus({{ $inscrito->id }})" class="bg-orange-100 text-orange-800 hover:bg-orange-200 px-3 py-1 rounded-md">
+                                                Cambiar Estatus
+                                            </button>
+                                        @endif
                                         <button wire:click="verAlumno({{ $inscrito->alumno_id }})" class="bg-green-100 text-green-800 hover:bg-green-200 px-3 py-1 rounded-md">
                                             Ver alumno
                                         </button>
@@ -112,19 +132,28 @@
     </div>
     @endif
 
-    <!-- Modal de eliminación -->
-    @if($mostrarModalEliminar)
+    <!-- Modal de cambio de estatus -->
+    @if($mostrarModalCambiarEstatus)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
             <div class="bg-white rounded-lg p-6 max-w-md mx-auto">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Confirmar eliminación</h3>
-                <p class="text-gray-700 mb-4">¿Seguro que deseas eliminar este alumno inscrito? Esta acción no se puede deshacer.</p>
-                <div class="flex justify-end space-x-3">
-                    <button wire:click="$set('mostrarModalEliminar', false)" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md">
-                        Cancelar
+                <h3 class="text-xl font-medium text-gray-900 mb-4">Cambiar Estatus del Alumno</h3>
+                <p class="text-gray-700 mb-6">¿Qué acción deseas realizar con este alumno?</p>
+                
+                <div class="flex flex-col space-y-3 mb-6">
+                    <button wire:click="darDeBaja" wire:loading.attr="disabled" class="w-full bg-red-600 text-white px-4 py-3 rounded-md hover:bg-red-700 disabled:opacity-75 transition">
+                        <span wire:loading.remove wire:target="darDeBaja">Dar de Baja (Inactivo)</span>
+                        <span wire:loading wire:target="darDeBaja">Procesando...</span>
                     </button>
-                    <button wire:click="eliminarInscrito" wire:loading.attr="disabled" class="bg-red-600 text-white px-4 py-2 rounded-md disabled:opacity-75">
-                        <span wire:loading.remove wire:target="eliminarInscrito">Eliminar</span>
-                        <span wire:loading wire:target="eliminarInscrito">Eliminando...</span>
+                    
+                    <button wire:click="marcarComoEgresado" wire:loading.attr="disabled" class="w-full bg-yellow-600 text-white px-4 py-3 rounded-md hover:bg-yellow-700 disabled:opacity-75 transition">
+                        <span wire:loading.remove wire:target="marcarComoEgresado">Marcar como Egresado</span>
+                        <span wire:loading wire:target="marcarComoEgresado">Procesando...</span>
+                    </button>
+                </div>
+                
+                <div class="flex justify-center">
+                    <button wire:click="$set('mostrarModalCambiarEstatus', false)" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition">
+                        Cancelar
                     </button>
                 </div>
             </div>
