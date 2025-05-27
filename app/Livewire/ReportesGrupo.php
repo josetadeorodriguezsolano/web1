@@ -14,7 +14,7 @@ use App\Models\Hora;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
-
+use Livewire\Attributes\Locked;
 class ReportesGrupo extends Component
 {
     // Variables de filtrado
@@ -28,21 +28,30 @@ class ReportesGrupo extends Component
     // Variables de resultados
     public $resultados = [];
 
-    // Variables de estadísticas
-    public $totalAlumnos = 0;
-    public $totalMaestros = 0;
-    public $materiasSinMaestro = 0;
-    public $gruposSinMaestro = 0;
+
     public $searchMaestro = '';
     public $maestros = [];
 
     //vista tab
-    public $vista = 'maestros';  // Tab por defecto
+    public $vista = 'maestros';
     public $filtro = '';
     //
     public $maestros_con_materias = [];
     public $materias_sin_maestro = [];
 
+
+
+    #[Locked]
+public $totalAlumnos = 0;
+
+#[Locked]
+public $totalMaestros = 0;
+
+#[Locked]
+public $materiasSinMaestro = 0;
+
+#[Locked]
+public $gruposSinMaestro = 0;
     public function mount()
     {
         $this->calcularEstadisticas();

@@ -98,7 +98,7 @@ class InasistenciasPase extends Component
             return;
         }
 
-        // Calcular días hábiles del mes (lunes a viernes)
+      
         $diasEnMes = $fecha->daysInMonth;
         $this->diasDelMes = [];
         $this->diasNoEscolares = [];
@@ -117,11 +117,11 @@ class InasistenciasPase extends Component
             ];
         }
 
-        // Cargar alumnos del grupo seleccionado
+        
         $grupo = Grupo::find($this->grupoSeleccionado);
         $this->alumnos = $grupo ? $grupo->alumnos : collect();
 
-        // Cargar inasistencias del mes actual para esa materia
+        
         $inicio = $fecha->copy()->startOfMonth()->toDateString();
         $fin = $fecha->copy()->endOfMonth()->toDateString();
 
@@ -129,7 +129,7 @@ class InasistenciasPase extends Component
             ->whereBetween('fecha', [$inicio, $fin])
             ->get();
 
-        // Organizar inasistencias por alumno y día
+    
         foreach ($inasistencias as $inasistencia) {
             $dia = Carbon::parse($inasistencia->fecha)->day;
             $this->inasistenciasPorDia[$inasistencia->alumno_id][$dia] = true;
