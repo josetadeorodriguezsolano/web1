@@ -29,7 +29,7 @@ class ReportesGrupo extends Component
     // Variables de resultados
     public $resultados = [];
 
-    // Variables de estadísticas
+    // Variables de estadisticas
     public $totalAlumnos = 0;
     public $totalMaestros = 0;
     public $materiasSinMaestro = 0;
@@ -82,7 +82,7 @@ class ReportesGrupo extends Component
         try {
             $this->validate();
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Resetear propiedades inválidas
+            // Se resetean las propiedades inválidas
             foreach ($e->validator->failed() as $field => $rules) {
                 $this->$field = null;
             }
@@ -470,7 +470,7 @@ class ReportesGrupo extends Component
     }
     public function render()
     {
-        // Precargar datos protegidos
+        // Se precargan los datos protegidos
         $this->materiasDisponibles = $this->obtenerMaterias();
         $this->maestrosDisponibles = $this->obtenerMaestrosBasico();
 

@@ -98,8 +98,6 @@
             </button>
         </div>
     </div>
-
-
         {{-- Tabs de visualización --}}
                     <div class="bg-white p-4 shadow rounded">
                         <div class="flex space-x-4 border-b pb-2 mb-4">
