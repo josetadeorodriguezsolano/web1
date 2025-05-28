@@ -91,34 +91,25 @@
                             </span>
                         @endif
                     </label>
-                    <div class="flex">
-                        <select wire:model="materiaSeleccionada" 
-                                wire:change="cargarMaestros"
-                                id="materiaSeleccionada" 
-                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md
-                                       @if($materias->isEmpty()) opacity-50 cursor-not-allowed @endif"
-                                @if($materias->isEmpty()) disabled @endif>
-                            <option value="">
-                                @if($materias->isEmpty())
-                                    Selecciona un grupo primero
-                                @else
-                                    Seleccione materia
-                                @endif
+                    <select wire:model="materiaSeleccionada" 
+                            wire:change="cargarMaestros"
+                            id="materiaSeleccionada" 
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md
+                                   @if($materias->isEmpty()) opacity-50 cursor-not-allowed @endif"
+                            @if($materias->isEmpty()) disabled @endif>
+                        <option value="">
+                            @if($materias->isEmpty())
+                                Selecciona un grupo primero
+                            @else
+                                Seleccione materia
+                            @endif
+                        </option>
+                        @foreach($materias as $materia)
+                            <option value="{{ $materia->id }}">
+                                {{ $materia->nombre }}
                             </option>
-                            @foreach($materias as $materia)
-                                <option value="{{ $materia->id }}">
-                                    {{ $materia->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @if($materiaSeleccionada)
-                            <button wire:click="cargarMaestros" 
-                                    class="ml-2 inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    title="Buscar maestros para esta materia">
-                                🔍
-                            </button>
-                        @endif
-                    </div>
+                        @endforeach
+                    </select>
                     @if($materias->isEmpty() && $grupoSeleccionado)
                         <p class="text-xs text-red-600 mt-1">
                             ⚠️ No hay materias registradas para este grado
@@ -126,38 +117,145 @@
                     @endif
                 </div>
                 
-                <!-- Maestro -->
+                <!-- Maestro (Enhanced with Recommendations) -->
                 <div>
                     <label for="maestroSeleccionado" class="block text-sm font-medium text-gray-700">
                         Maestro
-                        @if($maestrosDisponibles->isNotEmpty())
-                            <span class="text-xs text-green-600">
-                                ({{ $maestrosDisponibles->count() }} disponibles)
+                        @if($maestroSeleccionado)
+                            <span class="text-xs text-blue-600">
+                                @if(isset($maestroAutoSeleccionado) && $maestroAutoSeleccionado)
+                                    (Auto-seleccionado)
+                                @else
+                                    (Seleccionado manualmente)
+                                @endif
                             </span>
                         @endif
                     </label>
+                    
+                    @php
+                        // Filtrar maestros disponibles (no ocupados en este horario)
+                        $maestrosDisponibles = collect([]);
+                        if($horaSeleccionada && $diaSeleccionado && $maestros) {
+                            $maestrosDisponibles = $maestros->filter(function($maestro) {
+                                // Verificar que el maestro no esté ocupado en este horario
+                                $ocupado = \App\Models\Horario::join('imparte', 'horarios.imparte_id', '=', 'imparte.id')
+                                    ->where('horarios.hora_numero', $this->horaSeleccionada)
+                                    ->where('horarios.dia_semana', $this->diaSeleccionado)
+                                    ->where('imparte.maestro_id', $maestro->id)
+                                    ->where('imparte.grupo_id', '!=', $this->grupoSeleccionado)
+                                    ->exists();
+                                return !$ocupado;
+                            });
+                        }
+                    @endphp
+                    
                     <select wire:model="maestroSeleccionado" 
-                            id="maestroSeleccionado" 
+                            id="maestroSelect"
                             class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md
-                                   @if($maestrosDisponibles->isEmpty()) opacity-50 cursor-not-allowed @endif"
-                            @if($maestrosDisponibles->isEmpty()) disabled @endif>
+                                   @if($maestrosDisponibles->isEmpty() || !$materiaSeleccionada || !$horaSeleccionada || !$diaSeleccionado) opacity-50 cursor-not-allowed @endif
+                                   @if($maestroSeleccionado) bg-green-50 border-green-300 @endif"
+                            @if($maestrosDisponibles->isEmpty() || !$materiaSeleccionada || !$horaSeleccionada || !$diaSeleccionado) disabled @endif>
+                        
                         <option value="">
                             @if(!$materiaSeleccionada)
                                 Selecciona una materia primero
+                            @elseif(!$horaSeleccionada || !$diaSeleccionado)
+                                Selecciona hora y día primero
                             @elseif($maestrosDisponibles->isEmpty())
-                                Busca maestros disponibles
+                                No hay maestros disponibles
                             @else
                                 Seleccione maestro
                             @endif
                         </option>
-                        @foreach ($maestrosDisponibles as $maestro)
-                            <option value="{{ $maestro->id }}">{{ $maestro->name }} {{ $maestro->apellidos }}</option>
-                        @endforeach
+                        
+                        @if($maestrosDisponibles->isNotEmpty() && $materiaSeleccionada && $horaSeleccionada && $diaSeleccionado)
+                            @php
+                                // Separar maestros con experiencia en esta materia
+                                $maestrosConExperiencia = $maestrosDisponibles->filter(function($maestro) {
+                                    return \App\Models\Imparte::where('maestro_id', $maestro->id)
+                                        ->where('materia_id', $this->materiaSeleccionada)
+                                        ->exists();
+                                });
+                                
+                                $maestrosSinExperiencia = $maestrosDisponibles->diff($maestrosConExperiencia);
+                            @endphp
+                            
+                            @if($maestrosConExperiencia->isNotEmpty())
+                                <optgroup label="✅ Con experiencia en esta materia">
+                                    @foreach($maestrosConExperiencia->sortBy('name') as $maestro)
+                                        <option value="{{ $maestro->id }}" 
+                                                @if($maestroSeleccionado == $maestro->id) selected @endif>
+                                            {{ $maestro->name }} {{ $maestro->apellidos }}
+                                            @php
+                                                $horasAsignadas = \App\Models\Imparte::where('maestro_id', $maestro->id)->count();
+                                            @endphp
+                                            ({{ $horasAsignadas }} materias asignadas)
+                                            @if(isset($maestroAutoSeleccionado) && $maestroAutoSeleccionado && isset($maestroOptimo) && $maestroOptimo && $maestroOptimo->id == $maestro->id)
+                                                - ⭐ Recomendado automáticamente
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
+                            
+                            @if($maestrosSinExperiencia->isNotEmpty())
+                                <optgroup label="📚 Otros maestros disponibles">
+                                    @foreach($maestrosSinExperiencia->sortBy('name') as $maestro)
+                                        <option value="{{ $maestro->id }}" 
+                                                @if($maestroSeleccionado == $maestro->id) selected @endif>
+                                            {{ $maestro->name }} {{ $maestro->apellidos }}
+                                            @php
+                                                $horasAsignadas = \App\Models\Imparte::where('maestro_id', $maestro->id)->count();
+                                            @endphp
+                                            ({{ $horasAsignadas }} materias asignadas)
+                                            @if(isset($maestroAutoSeleccionado) && $maestroAutoSeleccionado && isset($maestroOptimo) && $maestroOptimo && $maestroOptimo->id == $maestro->id)
+                                                - ⭐ Recomendado automáticamente
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
+                        @endif
                     </select>
-                    @if($maestrosDisponibles->isEmpty() && $materiaSeleccionada)
-                        <p class="text-xs text-yellow-600 mt-1">
-                            💡 Haz clic en el botón 🔍 para buscar maestros disponibles
-                        </p>
+                    
+                    <!-- Información adicional -->
+                    <div class="mt-1 text-xs">
+                        @if($materiaSeleccionada && ($horaSeleccionada && $diaSeleccionado) && $maestrosDisponibles->isEmpty())
+                            <p class="text-red-600">
+                                ⚠️ No hay maestros disponibles para este horario
+                            </p>
+                        @elseif($maestroSeleccionado && $maestrosDisponibles->isNotEmpty())
+                            @php
+                                $maestroSeleccionadoObj = $maestrosDisponibles->firstWhere('id', $maestroSeleccionado);
+                                if($maestroSeleccionadoObj) {
+                                    $tieneExperiencia = \App\Models\Imparte::where('maestro_id', $maestroSeleccionado)
+                                        ->where('materia_id', $this->materiaSeleccionada)
+                                        ->exists();
+                                    $horasAsignadas = \App\Models\Imparte::where('maestro_id', $maestroSeleccionado)->count();
+                                }
+                            @endphp
+                            @if(isset($tieneExperiencia))
+                                <p class="text-green-600">
+                                    ✅ {{ $tieneExperiencia ? 'Tiene experiencia' : 'Nuevo en esta materia' }} - {{ $horasAsignadas }} materias asignadas
+                                    @if(isset($maestroAutoSeleccionado) && $maestroAutoSeleccionado && isset($maestroOptimo) && $maestroOptimo && $maestroOptimo->id == $maestroSeleccionado)
+                                        <span class="font-semibold text-indigo-600">- ⭐ Selección automática óptima</span>
+                                    @endif
+                                </p>
+                            @endif
+                        @elseif($maestrosDisponibles->isNotEmpty() && $materiaSeleccionada && $horaSeleccionada && $diaSeleccionado)
+                            <p class="text-blue-600">
+                                💡 {{ $maestrosDisponibles->count() }} maestros disponibles para este horario
+                            </p>
+                        @endif
+                    </div>
+                    
+                    <!-- Botón de auto-selección -->
+                    @if($materiaSeleccionada && $horaSeleccionada && $diaSeleccionado && $maestrosDisponibles->isNotEmpty())
+                        <button type="button"
+                                wire:click="cargarMaestros" 
+                                class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none transition-colors duration-200">
+                            🎯 Auto-seleccionar maestro óptimo
+                        </button>
                     @endif
                 </div>
             </div>
@@ -166,8 +264,8 @@
             <div class="mt-4 flex gap-2">
                 <button wire:click="asignarClase" 
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                               @if($materias->isEmpty()) opacity-50 cursor-not-allowed @endif"
-                        @if($materias->isEmpty()) disabled @endif>
+                               @if(!$materiaSeleccionada || !$maestroSeleccionado || !$horaSeleccionada || !$diaSeleccionado) opacity-50 cursor-not-allowed @endif"
+                        @if(!$materiaSeleccionada || !$maestroSeleccionado || !$horaSeleccionada || !$diaSeleccionado) disabled @endif>
                     ✅ Asignar Clase
                 </button>
                 <button wire:click="limpiarSeleccion" 
@@ -294,6 +392,10 @@
                     <div class="w-4 h-4 bg-gray-50 border border-gray-200 rounded mr-2"></div>
                     <span>Disponible para asignar</span>
                 </div>
+                <div class="flex items-center">
+                    <span class="text-indigo-600 mr-2">⭐</span>
+                    <span>Recomendación automática</span>
+                </div>
             </div>
         </div>
         
@@ -309,11 +411,15 @@
         @php
             $totalClases = 0;
             $clasesAsignadas = 0;
-            foreach($horario as $horas) {
-                foreach($horas as $celda) {
-                    $totalClases++;
-                    if($celda !== null) {
-                        $clasesAsignadas++;
+            if(is_array($horario) || is_object($horario)) {
+                foreach($horario as $horas) {
+                    if(is_array($horas) || is_object($horas)) {
+                        foreach($horas as $celda) {
+                            $totalClases++;
+                            if($celda !== null) {
+                                $clasesAsignadas++;
+                            }
+                        }
                     }
                 }
             }
