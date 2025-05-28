@@ -15,7 +15,6 @@ use App\Models\Hora;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Locked;
 class ReportesGrupo extends Component
 {
     // Variables de filtrado con validación
