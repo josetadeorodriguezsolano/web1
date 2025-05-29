@@ -10,6 +10,7 @@ use App\Livewire\CatalogoMaestros;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LogPeticion;
 use App\Http\Livewire\InasistenciasPase;
+use App\Livewire\AuditoriaInasistencias;
 
 // Ruta principal ahora usando el componente Livewire
 Route::get('/', ReportesGrupo::class)->name('home');
@@ -33,7 +34,9 @@ Route::middleware([
         Route::get('listar/{numero_de_lista}','listar');
         Route::get('listar/{numero_de_lista}/vino','listarVino');
         Route::get('listar/{numero_de_lista}/falto','listarFalto');
+        
     });
+    
     Route::get('pase_lista',PaseDeLista::class)->middleware(LogPeticion::class);
     Route::get('catalogo/maestros',CatalogoMaestros::class);
     Route::get('lista/{grupo_id}',[PdfController::class, 'lista']);
@@ -50,6 +53,7 @@ Route::middleware([
             Route::get('listar/{numero_de_lista}', 'listar');
             Route::get('listar/{numero_de_lista}/vino', 'listarVino');
             Route::get('listar/{numero_de_lista}/falto', 'listarFalto');
+            
         });
 
     // Componentes Livewire
@@ -72,11 +76,13 @@ Route::get('reportes', function (){
     return view('reportes');
 });
 
-//Ruta de Inasistencias (Alumnos x Materias)
+
 
 Route::get('/inasistencias', function () {
     return view('inasistencias.index');
 })->name('inasistencias.index');
 
 
-
+Route::get('auditoria-inasistencias', function () {
+    return view('auditoria-inasistencias');
+});
