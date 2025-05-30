@@ -20,7 +20,6 @@
             </select>
         </div>
 
-
         <div>
             <label>Materia</label>
             <select wire:model.defer="materiaSeleccionada" wire:change="actualizarTabla">
@@ -36,7 +35,7 @@
             <input type="month" wire:model.defer="fechaSeleccionada" wire:change="actualizarTabla">
         </div>
     </div>
-    
+
 
     @if($alumnos && count($diasDelMes))
         <table class="min-w-full bg-white border">
