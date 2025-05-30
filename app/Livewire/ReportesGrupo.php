@@ -30,6 +30,7 @@ class ReportesGrupo extends Component
 
     // Variables de resultados
     public $resultados = [];
+    public $modo = false;
 
     // Variables de estadisticas
     public $totalAlumnos = 0;

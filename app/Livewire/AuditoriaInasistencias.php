@@ -7,6 +7,8 @@ use Livewire\WithPagination;
 use OwenIt\Auditing\Models\Audit;
 use App\Models\Alumno;
 use App\Models\Materia;
+use App\Models\Maestro;
+use PHPUnit\Framework\Attributes\Medium;
 
 class AuditoriaInasistencias extends Component
 {
@@ -15,6 +17,8 @@ class AuditoriaInasistencias extends Component
     public $matricula = '';
     public $materiaId = '';
     public $eventos = ['created', 'updated', 'deleted'];
+    public $eventoSeleccionado = '';
+    public $maestroId = '';
 
     public $mesSeleccionado = 'alltime';
 
@@ -34,7 +38,10 @@ class AuditoriaInasistencias extends Component
     {
         $audits = Audit::with('user')
             ->where('auditable_type', 'App\Models\Inasistencia')
-            ->whereIn('event', $this->eventos)
+            ->when($this->eventoSeleccionado, function ($query) {
+                $query->where('event', $this->eventoSeleccionado);
+            })
+
             ->when($this->matricula, function ($query) {
                 $alumno = Alumno::where('matricula', $this->matricula)->first();
                 if ($alumno) {
@@ -55,12 +62,16 @@ class AuditoriaInasistencias extends Component
             ->when($this->mesSeleccionado !== 'alltime', function ($query) {
                 $query->whereMonth('created_at', $this->mesSeleccionado);
             })
+            ->when($this->maestroId, function ($query) {
+                $query->where('user_id', $this->maestroId);
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('livewire.auditoria-inasistencias', [
             'audits' => $audits,
             'materias' => Materia::all(),
+            'maestros' => Maestro::all(),
             'meses' => [
                 'alltime' => 'Todos',
                 '1' => 'Enero',

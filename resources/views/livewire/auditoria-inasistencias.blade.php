@@ -7,6 +7,27 @@
             <input wire:model.defer="matricula" type="text" class="w-full border rounded px-2 py-1">
         </div>
 
+         <div>
+            <label>Maestros</label>
+            <select wire:model.defer="maestroId" class="w-full border rounded px-2 py-1">
+                <option value="">Todos los maestros</option>
+                <option value="Sistema">Sistema</option>
+                @foreach ($maestros as $maestro)
+                    <option value="{{ $maestro->id }}">{{ $maestro->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label>Acciones</label>
+            <select wire:model.defer="eventoSeleccionado" class="w-full border rounded px-2 py-1">
+                <option value="">Todas las acciones</option>
+                <option value="Created">Creado</option>
+                <option value="Updated">Actualizado</option>
+                <option value="Deleted">Eliminado</option>
+            </select>
+        </div>
+
         <div>
             <label>Materia</label>
             <select wire:model.defer="materiaId" class="w-full border rounded px-2 py-1">
