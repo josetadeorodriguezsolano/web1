@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('imparte', function (Blueprint $table) {
             $table->id();
             $table->foreignId('materia_id')->constrained();
-            $table->foreignId('maestro_id')->constrained();
+            $table->foreignId('maestro_id')->nullable()->constrained('maestros')->nullOnDelete();
             $table->foreignId('grupo_id')->constrained();
             $table->timestamps();
 

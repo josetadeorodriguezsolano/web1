@@ -1,97 +1,103 @@
 <div class="p-6 space-y-6">
+    @if (session()->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
 
-            {{-- Estadísticas superiores --}}
-            <div class="grid grid-cols-4 gap-4">
-                <div class="bg-white p-4 shadow rounded text-center">
-                    <h2 class="text-gray-600 text-sm">Total Alumnos</h2>
-                    <p class="text-2xl font-bold">{{ $totalAlumnos }}</p>
-                </div>
-                <div class="bg-white p-4 shadow rounded text-center">
-                    <h2 class="text-gray-600 text-sm">Total Maestros</h2>
-                    <p class="text-2xl font-bold">{{ $totalMaestros }}</p>
-                </div>
-                <div class="bg-white p-4 shadow rounded text-center">
-                    <h2 class="text-gray-600 text-sm">Materias sin Maestro</h2>
-                    <p class="text-2xl font-bold">{{ $materiasSinMaestro }}</p>
-                </div>
-                <div class="bg-white p-4 shadow rounded text-center">
-                    <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
-                    <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
-                </div>
-            </div>
+    {{-- Estadísticas superiores --}}
+    <div class="grid grid-cols-4 gap-4">
+        <div class="bg-white p-4 shadow rounded text-center">
+            <h2 class="text-gray-600 text-sm">Total Alumnos</h2>
+            <p class="text-2xl font-bold">{{ $totalAlumnos }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded text-center">
+            <h2 class="text-gray-600 text-sm">Total Maestros</h2>
+            <p class="text-2xl font-bold">{{ $totalMaestros }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded text-center">
+            <h2 class="text-gray-600 text-sm">Materias sin Maestro</h2>
+            <p class="text-2xl font-bold">{{ $materiasSinMaestro }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded text-center">
+            <h2 class="text-gray-600 text-sm">Grupos sin Maestro</h2>
+            <p class="text-2xl font-bold">{{ $gruposSinMaestro }}</p>
+        </div>
+    </div>
+    
+    {{-- Filtros de búsqueda --}}
+    <div class="bg-white p-4 shadow rounded">
+        <h3 class="text-lg font-semibold mb-4">Reportes de la Institución</h3>
+        <div class="grid grid-cols-4 gap-4 mb-4">
             <div>
-
-        <!-- Select básico -->
-
-        {{-- Filtros de búsqueda --}}
-            <div class="bg-white p-4 shadow rounded">
-                <h3 class="text-lg font-semibold mb-4">Reportes de la Institución</h3>
-                <div class="grid grid-cols-4 gap-4 mb-4">
-                    <div>
-
-                        <label class="block mb-1">Grado</label>
-                        <select wire:model="grado" class="w-full border rounded p-2">
-                            <option value="">Todos</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block mb-1">Grupo</label>
-                        <select wire:model="letra" class="w-full border rounded p-2">
-                            <option value="">Todos</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="E">E</option>
-                            <option value="F">F</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block mb-1">Generación</label>
-                        <select wire:model="generacion" class="w-full border rounded p-2">
-                            <option value="">Todos</option>
-                            @foreach ($generaciones as $gen)
-                                <option value="{{ $gen }}">{{ $gen }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block mb-1">Materia</label>
-                        <select wire:model.defer="materia_id" wire:change="actualizarMateriaId" class="w-full border rounded p-2">
-                            <option value="">Todos</option>
-                            @foreach ($materias as $materia)
-                                <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block mb-1">Maestro</label>
-                        <select wire:model="maestro_id">
-                        <option value="">Todos</option>
-                            @foreach($maestros_basico as $maestro)
-                                <option value="{{ $maestro['id'] }}">{{ $maestro['nombre_completo'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="text-right">
-                <button
-                    wire:click="buscarReporte"
-                    class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                    Buscar Reporte
-                    </button>
-                </div>
+                <label class="block mb-1">Grado</label>
+                <select wire:model="grado" class="w-full border rounded p-2 @error('grado') border-red-500 @enderror">
+                    <option value="">Todos</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+                @error('grado') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 
+            <div>
+                <label class="block mb-1">Grupo</label>
+                <select wire:model="letra" class="w-full border rounded p-2 @error('letra') border-red-500 @enderror">
+                    <option value="">Todos</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                </select>
+                @error('letra') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            
+            <div>
+                <label class="block mb-1">Generación</label>
+                <select wire:model="generacion" class="w-full border rounded p-2 @error('generacion') border-red-500 @enderror">
+                    <option value="">Todos</option>
+                    @foreach ($generaciones as $gen)
+                        <option value="{{ $gen }}">{{ $gen }}</option>
+                    @endforeach
+                </select>
+                @error('generacion') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            
+            <div>
+                <label class="block mb-1">Materia</label>
+                <select wire:model.defer="materia_id" wire:change="actualizarMateriaId" 
+                    class="w-full border rounded p-2 @error('materia_id') border-red-500 @enderror">
+                    <option value="">Todos</option>
+                    @foreach ($materias as $materia)
+                        <option value="{{ $materia['id'] }}">{{ $materia['nombre'] }}</option>
+                    @endforeach
+                </select>
+                @error('materia_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            
+            <div>
+                <label class="block mb-1">Maestro</label>
+                <select wire:model="maestro_id" class="w-full border rounded p-2 @error('maestro_id') border-red-500 @enderror">
+                    <option value="">Todos</option>
+                    @foreach($maestros_basico as $maestro)
+                        <option value="{{ $maestro['id'] }}">{{ $maestro['nombre_completo'] }}</option>
+                    @endforeach
+                </select>
+                @error('maestro_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+        </div>
 
+        <div class="text-right">
+            <button wire:click="buscarReporte" class="bg-black text-white px-4 py-2 rounded inline-flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Buscar Reporte
+            </button>
+        </div>
+    </div>
         {{-- Tabs de visualización --}}
                     <div class="bg-white p-4 shadow rounded">
                         <div class="flex space-x-4 border-b pb-2 mb-4">

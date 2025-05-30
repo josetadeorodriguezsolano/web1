@@ -4,8 +4,9 @@ namespace Tests\Feature\Livewire;
 
 use App\Livewire\PaseDeLista;
 use App\Models\Falta;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
 use Livewire\Livewire;
 use Tests\TestCase;
 use App\Models\Grupo;
@@ -14,6 +15,8 @@ use App\Models\Maestro;
 
 class PaseDeListaTest extends TestCase
 {
+        use DatabaseTransactions;
+
     /** @test */
     public function renders_successfully()
     {

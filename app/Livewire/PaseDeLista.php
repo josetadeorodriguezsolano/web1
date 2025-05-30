@@ -17,12 +17,12 @@ class PaseDeLista extends Component
     #[Locked]
     public $gruposImpartidos;
 
-    public $grupo; // id = 1
+    public $grupo; 
     public $selectGrupo;
     public $buscar;
     public $palabras = [];
 
-    // Nuevas propiedades para manejar materias ()
+  
 
     public $materias;
     public $materiaSeleccionada;
