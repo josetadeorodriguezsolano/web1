@@ -117,24 +117,9 @@
         $fin = $inicio->copy()->addMinutes(50);
         return $inicio->format('H:i') . ' - ' . $fin->format('H:i');
     }
-
-    function obtenerNombreDia($numero) {
-        $dias = [
-            1 => 'Lunes',
-            2 => 'Martes',
-            3 => 'Miércoles',
-            4 => 'Jueves',
-            5 => 'Viernes',
-        ];
-
-        return $dias[$numero] ?? 'Error: número de día inválido';
-    }
-
- 
 @endphp
 
-
-<h1>CATÁLOGO DE w</h1>
+<h1>CATÁLOGO DE HORARIOS</h1>
 
 <div class="formulario" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
     <div>
@@ -148,23 +133,19 @@
     </div>
 
     <div>
-    <label>Fecha</label><br>
-    <input type="date" id="fechaInput" wire:model='inasistencia.fecha'>
-    
-</div>
-
+        <label>Fecha</label><br>
+        <input type="date" id="fechaInput" wire:model="inasistencia.fecha">
+    </div>
 
     <div>
         <label>Justificación</label><br>
-        <input type="text" wire:model='inasistencia.justificacion'>
-        
+        <input type="text" wire:model="inasistencia.justificacion">
     </div>
 </div>
 
 @include('livewire.errores')
 
-<!-- Tabla de horarios del maestro -->
-@if($horarios && $horarios->isNotEmpty()) <!-- Mostrar solo si hay horarios -->
+@if($horarios && $horarios->isNotEmpty())
 <table>
     <thead>
         <tr>
@@ -173,14 +154,13 @@
         </tr>
     </thead>
     <tbody>
-      @foreach ($horarios as $key => $horario)
-    <tr wire:click="seleccionar({{ $key }})"
-        class="{{ $seleccionado == $key ? 'seleccionado' : '' }} {{ $horario->ocupado ? 'bg-red-300' : '' }}">
-        <td>{{ obtenerNombreDia($horario->dia_semana) }}</td>
-        <td>{{ obtenerRangoHorario($horario->hora_numero) }}</td>
-    </tr>
-@endforeach
-
+        @foreach ($horarios as $key => $horario)
+        <tr wire:click="seleccionar({{ $key }})"
+            class="{{ $seleccionado == $key ? 'seleccionado' : '' }} {{ $horario->ocupado ? 'bg-red-300' : '' }}">
+            <td>{{ $horario->dia_semana }}</td>
+            <td>{{ obtenerRangoHorario($horario->hora_numero) }}</td>
+        </tr>
+        @endforeach
     </tbody>
 </table>
 @else
@@ -189,13 +169,16 @@
 
 <hr>
 
-<!-- Botones de acción -->
 <div style="text-align: center;">
     <button wire:click="obtenerHorariosPorMaestro" style="background-color: #28a745;">
-        actualizar
+        Actualizar
     </button>
 
-    <button wire:click='guardar' style="background-color: #ffc107;">Guardar</button>
-    <button wire:click='eliminar' style="background-color: #dc3545;">Eliminar</button>
-  
+    <button wire:click="guardar" style="background-color: #ffc107;">
+        Guardar
+    </button>
+
+    <button wire:click="eliminar" style="background-color: #dc3545;">
+        Eliminar
+    </button>
 </div>

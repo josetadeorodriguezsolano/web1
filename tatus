@@ -1,0 +1,189 @@
+[33mcommit 289672a1b5dd544904f742fda7a2be772fa11c56[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mequipo3[m[33m)[m
+Author: kokoreweewvsfeqwe <y0s0yelk0k0l0k0@gmail.com>
+Date:   Thu May 15 09:25:47 2025 -0700
+
+    asd
+    
+    asdasd
+
+[33mcommit 6d600c0429a1042df27a373d0f9c4af0adb806ad[m
+Author: kokoreweewvsfeqwe <y0s0yelk0k0l0k0@gmail.com>
+Date:   Wed May 14 18:00:16 2025 -0700
+
+    paaasd
+    
+    adsasd
+
+[33mcommit 5177e782c24a8ddea849b060b664e40306c69155[m[33m ([m[1;32misaac[m[33m)[m
+Author: kokoreweewvsfeqwe <y0s0yelk0k0l0k0@gmail.com>
+Date:   Wed May 14 13:20:51 2025 -0700
+
+    aa
+    
+    asdasd
+
+[33mcommit 09a43f26910e6d247999691e4b01802886f83546[m
+Author: kokoreweewvsfeqwe <y0s0yelk0k0l0k0@gmail.com>
+Date:   Mon May 12 09:35:42 2025 -0700
+
+    asasd
+
+[33mcommit 0bea8e694d0fa3c42db179922c497886a02bc566[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Apr 9 15:54:46 2025 -0700
+
+    Crear lista de alumnos en pdf
+
+[33mcommit 3599a391638e5f7ade14c0841820443b4e761947[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Apr 9 12:56:04 2025 -0700
+
+    Correccion de mensjaes de error de livewire
+
+[33mcommit 56349fde7d52c716e1f579879711fdef5746adbe[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Apr 9 12:55:30 2025 -0700
+
+    Correccion de mensjaes de error de livewire
+
+[33mcommit f3b7d94f88b8f0f0bce64f28997d2b54f9b8a014[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 27 18:28:50 2025 -0700
+
+    Test en Livewire
+
+[33mcommit 6df7e4489f5150469fd62abd8af692d30d8b402d[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 26 16:55:35 2025 -0700
+
+    Test Unit y Feature
+
+[33mcommit 25950bfbd80d1459fd81cdba704f16f22472a256[m[33m ([m[1;31morigin/tadeo[m[33m)[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 19 16:40:53 2025 -0700
+
+    Middleware LogPeticion revisa si el maestro tiene grupos impartidos en 2024
+
+[33mcommit 0399360896f0aa0015f03c7312b13da54d23c462[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 19 15:40:39 2025 -0700
+
+    Ejemplo mode.live.deboundce
+
+[33mcommit c5499d2e4e961b244cd642b46ec9f4b5b9468663[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 19 15:11:49 2025 -0700
+
+    Pase de lista en Livewire completado, Correcciones al seeder de grupos
+
+[33mcommit 026084221e68fed93c6ed337ac766c121c16dec6[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 13 18:54:49 2025 -0700
+
+    Livewire pase de lista
+
+[33mcommit 5d9c26615d4f482dd6200d99c8bc5771a3a52bfe[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 13 17:05:46 2025 -0700
+
+    correcciones pase_de_lista
+
+[33mcommit b16ddfb98037818302a09a261e774dbb81cbb8e5[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 12 16:41:21 2025 -0700
+
+    ajax con jquery
+
+[33mcommit 4e97df7d661b24b6a5078873dfaf6cdd801d8a99[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 12 14:26:31 2025 -0700
+
+    correcciones
+
+[33mcommit b394eea3527fef5da1b87ad4144fc0e4f92e0ddf[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 6 17:27:30 2025 -0700
+
+    comit 10
+
+[33mcommit 698164f05a647bd1bcfd165b7abbf6a935345cb7[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 6 17:16:59 2025 -0700
+
+    seeder corregidos
+
+[33mcommit 2703256424af6e3fdb2143e4f3b6e68d6837a232[m
+Merge: bf10cf7 eaa544e
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 6 09:43:25 2025 -0700
+
+    Ignorar composer.lock
+
+[33mcommit eaa544eb41515193765046491039b49091f2e3bc[m
+Merge: 5c446dd 4b8979d
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Mar 6 09:36:33 2025 -0700
+
+    Merge remote-tracking branch 'origin/David-Acosta'
+
+[33mcommit 4b8979dbcd268ae13fb9bb05f667482ff05d84f9[m
+Author: David-Isaac-A-M <153351913+David-Isaac-A-M@users.noreply.github.com>
+Date:   Wed Mar 5 16:49:08 2025 -0700
+
+    prueba
+
+[33mcommit 5c446dd56bfd397d243b216bfb36a3e8ad6f85d6[m
+Merge: a200ca4 f4f42b1
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 5 16:47:39 2025 -0700
+
+    Merge remote-tracking branch 'origin/isaac'
+
+[33mcommit a200ca4cc9435203b31a2987c7db16ea373627c7[m
+Merge: 0275b86 759a9ab
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 5 16:40:30 2025 -0700
+
+    Merge remote-tracking branch 'origin/diego'
+
+[33mcommit 759a9abf4f5a956ff083f3e33b8033a7b4d7af85[m
+Author: Ked <kiogare23@hotmail.com>
+Date:   Wed Mar 5 16:35:17 2025 -0700
+
+    primera actualizacion
+
+[33mcommit f4f42b1aef098846d282d495b21b93cb23105fc3[m[33m ([m[1;31morigin/isaac[m[33m)[m
+Author: invasiveisaac16 <149755666+invasiveisaac16@users.noreply.github.com>
+Date:   Wed Mar 5 16:35:01 2025 -0700
+
+    primera actualizacion
+
+[33mcommit 0275b861d9f19713d807ca4992d96d71309aaca4[m
+Author: MRIkerDev <iker.meza.devDev@gmail.com>
+Date:   Wed Mar 5 16:34:54 2025 -0700
+
+    primera actualizacion
+
+[33mcommit bf10cf77bbe06ec3837ad784fe57a0e3e707a4fe[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 5 16:34:53 2025 -0700
+
+    primera actualizacion
+
+[33mcommit e0064ea70aaa4145b4869c739eb082baddcee5e6[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 5 16:16:59 2025 -0700
+
+    leelo.txt
+
+[33mcommit 42e0c10c1b083d7358ff9206695fe48d29073e58[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Wed Mar 5 16:01:15 2025 -0700
+
+    Migraciones
+
+[33mcommit 209e0982d314d537becaebd207fcc3afd5aa801f[m
+Author: tadeo.rodriguez <tadeo.rs@lapaz.tecnm.mx>
+Date:   Thu Feb 6 18:02:17 2025 -0700
+
+    first commit

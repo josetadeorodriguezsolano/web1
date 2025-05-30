@@ -34,34 +34,39 @@ public $diaNumero;
 
 public $inasistencia = ['fecha' => 1];
 
-
 public function obtenerDiaSemanaAjustado()
 {
-    $fechaStr = $this->inasistencia['fecha'] ?? 1;
+    $fechaStr = $this->inasistencia['fecha'] ?? null;
 
     if (!$fechaStr) {
-        $this->diaNumero = 1;
+        $this->diaNumero = 'Lunes'; // Valor por defecto
         return;
     }
 
     $fecha = \DateTime::createFromFormat('Y-m-d', $fechaStr);
 
     if (!$fecha) {
-        $this->diaNumero = 1;
+        $this->diaNumero = 'Lunes'; // Valor por defecto si la fecha es inválida
         return;
     }
 
-    $diaNumero = (int)$fecha->format('w'); // 0 = domingo, 6 = sábado
+    $dias = [
+        'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+    ];
 
-    // Ajuste
-    if ($diaNumero === 6) {
-        $this->diaNumero = 5; // Sábado ajustado a viernes
-    } elseif ($diaNumero === 0) {
-        $this->diaNumero = 1; // Domingo ajustado a lunes
+    $diaIndex = (int)$fecha->format('w'); // 0 (domingo) a 6 (sábado)
+
+    // Ajustar sábado a viernes y domingo a lunes, como tú pediste
+    if ($diaIndex === 6) {
+        $this->diaNumero = 'Viernes'; // Sábado → Viernes
+    } elseif ($diaIndex === 0) {
+        $this->diaNumero = 'Lunes'; // Domingo → Lunes
     } else {
-        $this->diaNumero = $diaNumero;
+        $this->diaNumero = $dias[$diaIndex];
     }
 }
+
+
 
 protected function rules()
 {
@@ -146,6 +151,7 @@ public function obtenerHorariosPorMaestro()
 
     $this->horarios = $horarios;
 }
+
 
 
 
