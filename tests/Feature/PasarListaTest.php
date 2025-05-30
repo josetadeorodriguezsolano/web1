@@ -7,10 +7,14 @@ use App\Models\Imparte;
 use App\Models\Maestro;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
 use Tests\TestCase;
 
 class PasarListaTest extends TestCase
 {
+     use DatabaseTransactions;
+
     /**
      * A basic feature test example.
      */

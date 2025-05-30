@@ -17,8 +17,11 @@ class DatabaseSeeder extends Seeder
             MaestrosSeeder::class,
             MateriasSeeder_2::class,
             GruposSeeder::class,
+            HorasSeeder::class,
             ImparteSeeder::class,
-            FaltasSeeder::class,   
+            FaltasSeeder::class,
+            HorariosSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

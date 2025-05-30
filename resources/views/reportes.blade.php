@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Reportes por Grupo</title>
-    
+
     {{-- Carga de estilos de Vite --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 
     {{-- Estilos Livewire --}}
     @livewireStyles

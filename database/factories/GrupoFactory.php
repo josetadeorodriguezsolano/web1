@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GrupoFactory extends Factory
 {
-    protected $model = Falta::class;
+
+    protected $model = \App\Models\Grupo::class;
 
     public function definition(): array
     {

@@ -21,43 +21,71 @@ class InasistenciasPase extends Component
     public $inasistenciasPorDia = [];
     public $refrescar = 0;
     public $diasNoEscolares = [];
+    public $generaciones = [];
+    public $generacionSeleccionada = '';
+    public $gruposFiltrados = [];
+
 
 
 
     public function mount()
     {
-        $this->grupos = Grupo::all();
+        $this->generaciones = Grupo::select('generacion')->distinct()->pluck('generacion')->toArray();
         $this->materias = Materia::all()->pluck('nombre', 'id')->toArray();
+    }
+
+    public function updatedGeneracionSeleccionada()
+    {
+        $this->gruposFiltrados = Grupo::where('generacion', $this->generacionSeleccionada)->get();
+        $this->grupoSeleccionado = ''; // Limpiar grupo cuando cambia la generación
     }
 
     public function updatedGrupoSeleccionado()
     {
+        $this->inasistenciasPorDia = [];
+
+        $grupo = Grupo::find($this->grupoSeleccionado);
+
+        if ($grupo) {
+            // Filtrar las materias según el grado del grupo seleccionado
+            $this->materias = \App\Models\Materia::where('grado', $grupo->grado)->pluck('nombre', 'id')->toArray();
+        } else {
+            $this->materias = [];
+        }
+
+        $this->materiaSeleccionada = ''; // Limpiar la selección actual
         $this->actualizarTabla();
     }
 
+
     public function updatedMateriaSeleccionada()
     {
+        $this->inasistenciasPorDia = [];
         $this->actualizarTabla();
     }
 
     public function updatedFechaSeleccionada()
     {
+        $this->inasistenciasPorDia = [];
         $this->actualizarTabla();
     }
 
     public function actualizarTabla()
-    {
-        if (
-            filled($this->grupoSeleccionado) &&
-            filled($this->materiaSeleccionada) &&
-            filled($this->fechaSeleccionada)
-        ) {
-            $this->generarTablaMensual();
-        }
-    }
+{
+    if (
+        filled($this->grupoSeleccionado) &&
+        filled($this->materiaSeleccionada) &&
+        filled($this->fechaSeleccionada)
+    ) {
+        $this->generarTablaMensual();
+    } else {
+        // Limpia la tabla si falta algún filtro
+        $this->alumnos = collect();
+        $this->diasDelMes = [];
 
-    
-    
+    }
+}
+
 
     public function generarTablaMensual()
     {
@@ -66,31 +94,34 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->startOfMonth();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida: ' . $this->fechaSeleccionada);
+
             return;
         }
 
-        // Calcular días del mes
+      
         $diasEnMes = $fecha->daysInMonth;
-        $this->diasDelMes = range(1, $diasEnMes);
+        $this->diasDelMes = [];
+        $this->diasNoEscolares = [];
 
-        // Cargar alumnos del grupo seleccionado
+        for ($dia = 1; $dia <= $diasEnMes; $dia++) {
+            $carbonDia = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia);
+
+            if ($carbonDia->isWeekend()) {
+                $this->diasNoEscolares[$dia] = true;
+                continue; // No agregues sábados ni domingos a la tabla
+            }
+
+            $this->diasDelMes[] = [
+                'numero' => $dia,
+                'nombre' => $carbonDia->isoFormat('dd') // Ej: Lu, Ma, Mi, Ju, Vi
+            ];
+        }
+
+        
         $grupo = Grupo::find($this->grupoSeleccionado);
         $this->alumnos = $grupo ? $grupo->alumnos : collect();
 
-        // Reset arrays
-        $this->inasistenciasPorDia = [];
-        $this->diasNoEscolares = [];
-
-        // Detectar sábados y domingos
-        foreach ($this->diasDelMes as $dia) {
-            $carbonDia = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia);
-            if ($carbonDia->isWeekend()) {
-                $this->diasNoEscolares[$dia] = true;
-            }
-        }
-
-        // Cargar inasistencias del mes actual para esa materia
+        
         $inicio = $fecha->copy()->startOfMonth()->toDateString();
         $fin = $fecha->copy()->endOfMonth()->toDateString();
 
@@ -98,12 +129,13 @@ class InasistenciasPase extends Component
             ->whereBetween('fecha', [$inicio, $fin])
             ->get();
 
-        // Organizar inasistencias por alumno y día
+    
         foreach ($inasistencias as $inasistencia) {
             $dia = Carbon::parse($inasistencia->fecha)->day;
             $this->inasistenciasPorDia[$inasistencia->alumno_id][$dia] = true;
         }
     }
+
 
 
     public function toggleInasistencia($alumnoId, $dia)
@@ -113,7 +145,7 @@ class InasistenciasPase extends Component
         try {
             $fecha = Carbon::createFromFormat('Y-m', $this->fechaSeleccionada)->day($dia)->toDateString();
         } catch (\Exception $e) {
-            \Log::error('Fecha inválida en toggleInasistencia(): ' . $this->fechaSeleccionada);
+
             return;
         }
 
@@ -133,8 +165,8 @@ class InasistenciasPase extends Component
         }
 
         $this->inasistenciasPorDia = [];
-        $this->generarTablaMensual(); // Volver a leer de la base de datos 
-        $this->refrescar++; // Forzar render       
+        $this->generarTablaMensual(); // Volver a leer de la base de datos
+        $this->refrescar++; // Forzar render
     }
 
 

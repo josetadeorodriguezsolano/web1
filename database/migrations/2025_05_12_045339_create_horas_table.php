@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('imparte', function (Blueprint $table) {
+        Schema::create('horas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('materia_id')->constrained();
-            $table->foreignId('maestro_id')->nullable()->constrained('maestros')->nullOnDelete();
-            $table->foreignId('grupo_id')->constrained();
+            $table->unsignedTinyInteger('numero')->unique(); // 1-6
+            $table->time('inicio');
             $table->timestamps();
-
-            $table->unique(['grupo_id','materia_id']);
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('imparte');
+        Schema::dropIfExists('horas');
     }
 };

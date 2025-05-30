@@ -23,9 +23,9 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => 'password'
         ]);
-
+        error_log($response[0]);
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
