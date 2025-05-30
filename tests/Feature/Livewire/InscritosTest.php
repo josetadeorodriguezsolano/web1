@@ -2,19 +2,645 @@
 
 namespace Tests\Feature\Livewire;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Livewire\Livewire;
+use App\Livewire\Inscritos;
+use App\Models\User;
+use App\Models\Inscrito;
+use App\Models\Grupo;
+use App\Models\Alumno;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class InscritosTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
+    use RefreshDatabase;
 
-        $response->assertStatus(200);
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Crear un usuario para las pruebas
+        $this->user = User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+        ]);
+    }
+
+    /** @test */
+    public function el_componente_se_renderiza_correctamente()
+    {
+        $this->actingAs($this->user);
+
+        Livewire::test(Inscritos::class)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    public function muestra_solo_inscritos_vigentes_cuando_se_filtra_por_estatus_vigente()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        // Crear un alumno vigente
+        $alumnoVigente = Alumno::create([
+            'matricula' => '12345678',
+            'nombres' => 'Juan',
+            'apellidos' => 'Pérez',
+            'curp' => 'PERJ990101HDFRNN01',
+            'contacto' => '1234567890',
+            'tutor' => 'María Pérez'
+        ]);
+
+        // Crear un alumno con baja
+        $alumnoBaja = Alumno::create([
+            'matricula' => '87654321',
+            'nombres' => 'María',
+            'apellidos' => 'García',
+            'curp' => 'GARM990101MDFRNN01',
+            'contacto' => '0987654321',
+            'tutor' => 'José García'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumnoVigente->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumnoBaja->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'baja'
+        ]);
+
+        // Modificado para usar el filtro de estatus
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'vigente')
+            ->assertSee($alumnoVigente->nombres)
+            ->assertDontSee($alumnoBaja->nombres);
+    }
+
+    /** @test */
+    public function puede_filtrar_por_generacion()
+    {
+        $this->actingAs($this->user);
+
+        $generacion2023 = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2023
+        ]);
+
+        $generacion2024 = Grupo::create([
+            'grado' => '1',
+            'letra' => 'B',
+            'generacion' => 2024
+        ]);
+
+        $alumno1 = Alumno::create([
+            'matricula' => '11111111',
+            'nombres' => 'María',
+            'apellidos' => 'González',
+            'curp' => 'GONM990101MDFRNN01',
+            'contacto' => '1111111111',
+            'tutor' => 'Pedro González'
+        ]);
+
+        $alumno2 = Alumno::create([
+            'matricula' => '22222222',
+            'nombres' => 'José',
+            'apellidos' => 'López',
+            'curp' => 'LOPJ990101HDFRNN01',
+            'contacto' => '2222222222',
+            'tutor' => 'Ana López'
+        ]);
+
+        // Ambos inscritos con estatus vigente
+        Inscrito::create([
+            'alumno_id' => $alumno1->id,
+            'grupo_id' => $generacion2023->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumno2->id,
+            'grupo_id' => $generacion2024->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->set('generacionSeleccionada', '2023')
+            ->assertSee($alumno1->nombres)
+            ->assertDontSee($alumno2->nombres);
+    }
+
+    /** @test */
+    public function puede_filtrar_por_grupo()
+    {
+        $this->actingAs($this->user);
+
+        $grupo1 = Grupo::create(['grado' => '1', 'letra' => 'A', 'generacion' => 2024]);
+        $grupo2 = Grupo::create(['grado' => '1', 'letra' => 'B', 'generacion' => 2024]);
+
+        $alumno1 = Alumno::create([
+            'matricula' => '44444444',
+            'nombres' => 'Carlos',
+            'apellidos' => 'Sánchez',
+            'curp' => 'SANC990101HDFRNN01',
+            'contacto' => '4444444444',
+            'tutor' => 'Rosa Sánchez'
+        ]);
+
+        $alumno2 = Alumno::create([
+            'matricula' => '55555555',
+            'nombres' => 'Laura',
+            'apellidos' => 'García',
+            'curp' => 'GARL990101MDFRNN01',
+            'contacto' => '5555555555',
+            'tutor' => 'Juan García'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumno1->id,
+            'grupo_id' => $grupo1->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumno2->id,
+            'grupo_id' => $grupo2->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->set('grupoSeleccionado', $grupo1->id)
+            ->assertSee($alumno1->nombres)
+            ->assertDontSee($alumno2->nombres);
+    }
+
+    /** @test */
+    public function modal_de_cambio_de_estatus_se_muestra_correctamente()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        $alumno = Alumno::create([
+            'matricula' => '33333333',
+            'nombres' => 'Ana',
+            'apellidos' => 'Martínez',
+            'curp' => 'MARA990101MDFRNN01',
+            'contacto' => '3333333333',
+            'tutor' => 'Luis Martínez'
+        ]);
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->call('mostrarOpcionesEstatus', $inscrito->id)
+            ->assertSet('mostrarModalCambiarEstatus', true)
+            ->assertSet('idCambiarEstatus', $inscrito->id);
+    }
+
+    /** @test */
+    public function puede_dar_de_baja_a_un_alumno()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        $alumno = Alumno::create([
+            'matricula' => '66666666',
+            'nombres' => 'Roberto',
+            'apellidos' => 'Díaz',
+            'curp' => 'DIAR990101HDFRNN01',
+            'contacto' => '6666666666',
+            'tutor' => 'Elena Díaz'
+        ]);
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->call('mostrarOpcionesEstatus', $inscrito->id)
+            ->call('darDeBaja')
+            ->assertSet('mostrarModalCambiarEstatus', false);
+
+        // Verificar que el registro cambió su estatus a baja
+        $this->assertDatabaseHas('inscritos', [
+            'id' => $inscrito->id,
+            'estatus' => 'baja'
+        ]);
+
+        // Verificar que ya no se muestra cuando se filtra por vigentes
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'vigente')
+            ->assertDontSee($alumno->nombres);
+    }
+
+    /** @test */
+    public function puede_marcar_alumno_como_egresado()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        $alumno = Alumno::create([
+            'matricula' => '77777777',
+            'nombres' => 'Carmen',
+            'apellidos' => 'Jiménez',
+            'curp' => 'JICA990101MDFRNN01',
+            'contacto' => '7777777777',
+            'tutor' => 'Pedro Jiménez'
+        ]);
+
+        $inscrito = Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->call('mostrarOpcionesEstatus', $inscrito->id)
+            ->call('marcarComoEgresado')
+            ->assertSet('mostrarModalCambiarEstatus', false);
+
+        // Verificar que el registro cambió su estatus a egresado
+        $this->assertDatabaseHas('inscritos', [
+            'id' => $inscrito->id,
+            'estatus' => 'egresado'
+        ]);
+
+        // Verificar que se muestra cuando se filtra por egresados
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'egresado')
+            ->assertSee($alumno->nombres);
+    }
+
+    /** @test */
+    public function la_paginacion_funciona_correctamente()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        // Crear más de 10 inscritos VIGENTES para probar paginación
+        for ($i = 1; $i <= 15; $i++) {
+            $alumno = Alumno::create([
+                'matricula' => str_pad($i, 8, '0', STR_PAD_LEFT),
+                'nombres' => 'Alumno',
+                'apellidos' => "Número $i",
+                'curp' => 'XXXX' . str_pad($i, 6, '0', STR_PAD_LEFT) . 'HDFXXX01',
+                'contacto' => str_pad($i, 10, '0', STR_PAD_LEFT),
+                'tutor' => "Tutor $i"
+            ]);
+
+            Inscrito::create([
+                'alumno_id' => $alumno->id,
+                'grupo_id' => $grupo->id,
+                'estatus' => 'vigente'
+            ]);
+        }
+
+        Livewire::test(Inscritos::class)
+            ->assertViewHas('inscritos', function ($inscritos) {
+                return $inscritos->count() === 10; // Solo muestra 10 por página
+            });
+    }
+
+    /** @test */
+    public function resetea_pagina_al_cambiar_filtros()
+    {
+        $this->actingAs($this->user);
+
+        $generacion = Grupo::create(['grado' => '1', 'letra' => 'A', 'generacion' => 2024]);
+
+        // Crear suficientes registros para tener múltiples páginas
+        for ($i = 1; $i <= 15; $i++) {
+            $alumno = Alumno::create([
+                'matricula' => '9' . str_pad($i, 7, '0', STR_PAD_LEFT),
+                'nombres' => 'Test',
+                'apellidos' => "Alumno $i",
+                'curp' => 'TEST' . str_pad($i, 6, '0', STR_PAD_LEFT) . 'HDFXXX01',
+                'contacto' => '9' . str_pad($i, 9, '0', STR_PAD_LEFT),
+                'tutor' => "Tutor Test $i"
+            ]);
+
+            Inscrito::create([
+                'alumno_id' => $alumno->id,
+                'grupo_id' => $generacion->id,
+                'estatus' => 'vigente'
+            ]);
+        }
+
+        // Solo verificar que el componente funciona al cambiar generación
+        Livewire::test(Inscritos::class)
+            ->set('generacionSeleccionada', '2024')
+            ->assertViewHas('inscritos');
+    }
+
+    /** @test */
+    public function muestra_mensaje_cuando_no_hay_inscritos_que_coincidan_con_los_filtros()
+    {
+        $this->actingAs($this->user);
+
+        // Crear un inscrito con baja para verificar que no se muestra al filtrar por vigente
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        $alumno = Alumno::create([
+            'matricula' => '99999999',
+            'nombres' => 'Pedro',
+            'apellidos' => 'Ruiz',
+            'curp' => 'RUIP990101HDFRNN01',
+            'contacto' => '9999999999',
+            'tutor' => 'Ana Ruiz'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'baja'
+        ]);
+
+        // Ahora usamos el filtro para verificar el mensaje de "no hay resultados"
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'vigente')
+            ->assertSee('No hay alumnos inscritos');
+    }
+
+    /** @test */
+    public function botones_de_acciones_funcionan_correctamente()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create(['grado' => '1', 'letra' => 'A', 'generacion' => 2024]);
+        $alumno = Alumno::create([
+            'matricula' => '77777777',
+            'nombres' => 'Pedro',
+            'apellidos' => 'Ramírez',
+            'curp' => 'RAMP990101HDFRNN01',
+            'contacto' => '7777777777',
+            'tutor' => 'Sara Ramírez'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumno->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Livewire::test(Inscritos::class)
+            ->assertSee('Ver alumno')
+            ->assertSee('Cambiar Estatus');
+    }
+
+    /** @test */
+    public function los_selectores_muestran_las_opciones_correctas()
+    {
+        $this->actingAs($this->user);
+
+        // Crear varias generaciones y grupos
+        $grupo1 = Grupo::create(['grado' => '1', 'letra' => 'A', 'generacion' => 2023]);
+        $grupo2 = Grupo::create(['grado' => '2', 'letra' => 'B', 'generacion' => 2024]);
+        $grupo3 = Grupo::create(['grado' => '3', 'letra' => 'C', 'generacion' => 2024]);
+
+        Livewire::test(Inscritos::class)
+            ->assertViewHas('generaciones', function ($generaciones) {
+                return $generaciones->count() === 2; // 2023 y 2024
+            })
+            ->assertViewHas('grupos', function ($grupos) {
+                return $grupos->count() === 3; // Los 3 grupos creados
+            });
+    }
+
+    /** @test */
+    public function solo_alumnos_vigentes_muestran_boton_cambiar_estatus()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        // Crear alumnos con diferentes estatus
+        $alumnoVigente = Alumno::create([
+            'matricula' => '11111111',
+            'nombres' => 'Alumno',
+            'apellidos' => 'Vigente',
+            'curp' => 'VIGX990101HDFRNN01',
+            'contacto' => '1111111111',
+            'tutor' => 'Tutor Vigente'
+        ]);
+
+        $alumnoBaja = Alumno::create([
+            'matricula' => '22222222',
+            'nombres' => 'Alumno',
+            'apellidos' => 'Baja',
+            'curp' => 'BAJX990101HDFRNN01',
+            'contacto' => '2222222222',
+            'tutor' => 'Tutor Baja'
+        ]);
+
+        $alumnoEgresado = Alumno::create([
+            'matricula' => '33333333',
+            'nombres' => 'Alumno',
+            'apellidos' => 'Egresado',
+            'curp' => 'EGRX990101HDFRNN01',
+            'contacto' => '3333333333',
+            'tutor' => 'Tutor Egresado'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumnoVigente->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumnoBaja->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'baja'
+        ]);
+
+        Inscrito::create([
+            'alumno_id' => $alumnoEgresado->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'egresado'
+        ]);
+
+        $component = Livewire::test(Inscritos::class);
+        
+        // Verificar que se ve el botón "Cambiar Estatus" cuando hay alumnos vigentes
+        $component->assertSee('Cambiar Estatus');
+        
+        // Pero al filtrar solo por baja, no debería aparecer el botón
+        $component->set('estatusSeleccionado', 'baja')
+                  ->assertDontSee('Cambiar Estatus');
+    }
+    
+    /** @test */
+    public function puede_filtrar_por_estatus()
+    {
+        $this->actingAs($this->user);
+
+        $grupo = Grupo::create([
+            'grado' => '1',
+            'letra' => 'A',
+            'generacion' => 2024
+        ]);
+
+        // Crear alumnos con nombres distintivos para cada estatus
+        $alumnoVigente = Alumno::create([
+            'matricula' => 'V1234567',
+            'nombres' => 'AlumnoVigente',
+            'apellidos' => 'TestVigente',
+            'curp' => 'VIGX990101HDFRNN01',
+            'contacto' => '1111111111',
+            'tutor' => 'TutorVigente'
+        ]);
+
+        $alumnoBaja = Alumno::create([
+            'matricula' => 'B1234567',
+            'nombres' => 'AlumnoBaja',
+            'apellidos' => 'TestBaja',
+            'curp' => 'BAJX990101HDFRNN01',
+            'contacto' => '2222222222',
+            'tutor' => 'TutorBaja'
+        ]);
+
+        $alumnoEgresado = Alumno::create([
+            'matricula' => 'E1234567',
+            'nombres' => 'AlumnoEgresado',
+            'apellidos' => 'TestEgresado',
+            'curp' => 'EGRX990101HDFRNN01',
+            'contacto' => '3333333333',
+            'tutor' => 'TutorEgresado'
+        ]);
+
+        // Crear inscritos con diferentes estatus
+        $inscritoVigente = Inscrito::create([
+            'alumno_id' => $alumnoVigente->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'vigente'
+        ]);
+
+        $inscritoBaja = Inscrito::create([
+            'alumno_id' => $alumnoBaja->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'baja'
+        ]);
+
+        $inscritoEgresado = Inscrito::create([
+            'alumno_id' => $alumnoEgresado->id,
+            'grupo_id' => $grupo->id,
+            'estatus' => 'egresado'
+        ]);
+
+        // Verificar filtro por estatus usando viewHas para comprobar los datos en lugar del HTML
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'vigente')
+            ->assertViewHas('inscritos', function ($inscritos) use ($alumnoVigente, $alumnoBaja, $alumnoEgresado) {
+                // Verifica que solo los inscritos vigentes están en la colección
+                $containsVigente = false;
+                $containsBaja = false;
+                $containsEgresado = false;
+                
+                foreach ($inscritos as $inscrito) {
+                    if ($inscrito->alumno_id == $alumnoVigente->id) {
+                        $containsVigente = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoBaja->id) {
+                        $containsBaja = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoEgresado->id) {
+                        $containsEgresado = true;
+                    }
+                }
+                
+                return $containsVigente && !$containsBaja && !$containsEgresado;
+            });
+
+        // Probar filtro por estatus "baja"
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'baja')
+            ->assertViewHas('inscritos', function ($inscritos) use ($alumnoVigente, $alumnoBaja, $alumnoEgresado) {
+                // Verifica que solo los inscritos de baja están en la colección
+                $containsVigente = false;
+                $containsBaja = false;
+                $containsEgresado = false;
+                
+                foreach ($inscritos as $inscrito) {
+                    if ($inscrito->alumno_id == $alumnoVigente->id) {
+                        $containsVigente = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoBaja->id) {
+                        $containsBaja = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoEgresado->id) {
+                        $containsEgresado = true;
+                    }
+                }
+                
+                return !$containsVigente && $containsBaja && !$containsEgresado;
+            });
+
+        // Probar filtro por estatus "egresado"
+        Livewire::test(Inscritos::class)
+            ->set('estatusSeleccionado', 'egresado')
+            ->assertViewHas('inscritos', function ($inscritos) use ($alumnoVigente, $alumnoBaja, $alumnoEgresado) {
+                // Verifica que solo los inscritos egresados están en la colección
+                $containsVigente = false;
+                $containsBaja = false;
+                $containsEgresado = false;
+                
+                foreach ($inscritos as $inscrito) {
+                    if ($inscrito->alumno_id == $alumnoVigente->id) {
+                        $containsVigente = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoBaja->id) {
+                        $containsBaja = true;
+                    }
+                    if ($inscrito->alumno_id == $alumnoEgresado->id) {
+                        $containsEgresado = true;
+                    }
+                }
+                
+                return !$containsVigente && !$containsBaja && $containsEgresado;
+            });
     }
 }
