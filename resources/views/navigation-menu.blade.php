@@ -15,6 +15,18 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    
+                    <x-nav-link href="{{ route('horarios.index') }}" :active="request()->routeIs('horarios.index')">
+                        {{ __('Horarios') }}
+                    </x-nav-link>
+                    
+                    <x-nav-link href="{{ url('ina') }}" :active="request()->is('ina')">
+                        {{ __('Inasistencias') }}
+                    </x-nav-link>
+                    
+                    <x-nav-link href="{{ url('A') }}" :active="request()->is('A')">
+                        {{ __('Auditoría') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -142,6 +154,18 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            
+            <x-responsive-nav-link href="{{ route('horarios.index') }}" :active="request()->routeIs('horarios.index')">
+                {{ __('Horarios') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link href="{{ url('ina') }}" :active="request()->is('ina')">
+                {{ __('Inasistencias') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link href="{{ url('A') }}" :active="request()->is('A')">
+                {{ __('Auditoría') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
@@ -214,4 +238,3 @@
         </div>
     </div>
 </nav>
-
