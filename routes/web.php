@@ -15,6 +15,7 @@ use App\Livewire\CatalogoMaestros;
 use App\Livewire\Ina;
 use App\Livewire\GeneradorHorarios;
 
+use App\Livewire\AUDITORIA;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +46,7 @@ Route::middleware([
 
     
   Route::get('ina',Ina::class);
+    Route::get('A',AUDITORIA::class);
 
     Route::get('inasistencia', [PDFInasistenciasController::class,'generar']);
 

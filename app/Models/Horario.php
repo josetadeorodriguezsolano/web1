@@ -5,9 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Horario extends Model
+
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+
+class Horario extends Model implements AuditableContract
 {
- use HasFactory;
+ 
+        use Auditable;
+    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     // Nombre de la tabla en la base de datos
     protected $table = 'horarios';

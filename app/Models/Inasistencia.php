@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\InasistenciaInsertarRequest;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Inasistencia extends Model
+
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
+
+
+class Inasistencia extends Model implements AuditableContract
 {
+
+
+        use Auditable;
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'inasistencias';
 
