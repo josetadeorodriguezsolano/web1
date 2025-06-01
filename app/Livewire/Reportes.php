@@ -9,19 +9,18 @@ use App\Models\Maestro;
 
 class Reportes extends Component
 {
-    // Variables
-    public $anio = null;       // Año para filtrar grupos
-    public $grado = null;      // (1, 2, 3)
-    public $horas_limite = 30; // Horas de sobrecarga
-    public $busqueda = '';     // Busquedas
+    public $anio = null;
+    public $grado = null;
+    public $horas_limite = 30;
+    public $busqueda = '';
 
-    // Inicio
+
     public function mount()
     {
-        $this->anio = date('Y'); // Año en el que se estará buscando
+        $this->anio = date('Y');
     }
 
-    // Obtiene los maestros asignados a una materia específica
+
     public function maestrosPorMateria($materia_id)
     {
         return Materia::with(['grupos.imparte.maestro' => function($q) {
@@ -29,8 +28,7 @@ class Reportes extends Component
         }])->findOrFail($materia_id);
     }
 
-    // Lista de materias sin maestros asignados
-    // Puede filtrarse por grado si está especificado
+
     public function materiasSinMaestro()
     {
         return Materia::whereDoesntHave('grupos.imparte')
@@ -40,8 +38,7 @@ class Reportes extends Component
             ->get();
     }
 
-    // Grupos que no tienen maestro asignado
-    // Lo puedes filtrar por año/generación
+
     public function gruposSinMaestro()
     {
         return Grupo::whereDoesntHave('imparte')
@@ -51,8 +48,7 @@ class Reportes extends Component
             ->get();
     }
 
-    // Maestros sobrecargados
-    // $horas_limite para filtrar como lo había hecho el profe
+
     public function maestrosSobrecargados()
     {
         return Maestro::withSum('imparte as total_horas', 'horas')
@@ -60,7 +56,7 @@ class Reportes extends Component
             ->get();
     }
 
-    //Maestros disponibles o con pocas horas
+
     public function maestrosDisponibles()
     {
         return Maestro::whereDoesntHave('imparte')
@@ -68,7 +64,7 @@ class Reportes extends Component
             ->get();
     }
 
-    // Busca un maestro por CURP o email
+
     public function buscarMaestro()
     {
         return Maestro::where('curp', 'like', "%{$this->busqueda}%")
@@ -76,31 +72,30 @@ class Reportes extends Component
             ->with('imparte.grupo.materia')
             ->first();
     }
-//dd
-    //Método solicitado por DAVIGOD
+
     public function materiasConMaestro()
 {
-    return Materia::whereHas('grupos.imparte') // Solo materias con maestros
+    return Materia::whereHas('grupos.imparte')
         ->when($this->grado, function($query) {
-            $query->where('grado', $this->grado); // Filtro opcional por grado
+            $query->where('grado', $this->grado);
         })
         ->with(['grupos' => function($q) {
-            $q->with('imparte.maestro'); // Carga maestros asignados
+            $q->with('imparte.maestro');
         }])
         ->get();
 }
 
-    // Método principal que muestra la vista
+
     public function render()
     {
         return view('livewire.reportes', [
             'datos' => [
-                // Cantidad de registros para mostrar resumen
+
                 'materias_sin_maestro' => $this->materiasSinMaestro()->count(),
                 'grupos_sin_maestro' => $this->gruposSinMaestro()->count(),
                 'maestros_sobrecargados' => $this->maestrosSobrecargados()->count(),
 
-                // Año actual, si quieres manejar años anteriores me dices
+
                 'anio_actual' => $this->anio
             ]
         ]);

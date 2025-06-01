@@ -22,18 +22,17 @@ class PaseDeLista extends Component
     public $buscar;
     public $palabras = [];
 
-    // Nuevas propiedades para manejar materias ()
+
 
     public $materias;
     public $materiaSeleccionada;
 
     public function mount()
     {
-        // Obtener todas las materias del maestro
+
         $this->materias = Materia::materiasPorMaestro(Auth::id(), $this->año);
         $this->materiaSeleccionada = $this->materias->first()->id ?? null;
 
-        // Obtener grupos impartidos
         $impartidos = Auth::user()->gruposImpartidos($this->año);
         $this->gruposImpartidos = $impartidos->map(function($imparte) {
             $imparte->grupo = $imparte->grupo->only(['id', 'letra']);
