@@ -61,11 +61,12 @@
 
     </form>
     <div style="background-color: #bebebe;" class="w3-padding rounded-lg">
-        @if (count($audits) > 0)
-            <div class="flex items-end w3-margin">
-                <button class="bg-blue-500 text-white px-4 py-2 rounded w-full">Descargar PDF</button>
-            </div>
-        @endif
+       @if (count($audits) > 0)
+    <div class="flex items-end w3-margin">
+        <button wire:click="exportarPDF" type="button" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Descargar PDF</button>
+    </div>
+@endif
+
         <table class="w-full border-collapse border">
             <thead class="bg-gray-100">
                 <tr>

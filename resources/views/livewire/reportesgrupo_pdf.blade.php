@@ -1,3 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ $titulo }}</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        p {
+            margin: 2px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        table th, table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
 <body>
     <div class="header">
         <h2>{{ $titulo }}</h2>
@@ -19,7 +61,7 @@
                     <th>CURP</th>
                     <th>Apellidos</th>
                     <th>Nombres</th>
-                    <th>Telefono</th>
+                    <th>Teléfono</th>
                     <th>Email</th>
                 </tr>
             </thead>
@@ -62,11 +104,7 @@
                         <td>{{ $materia['hora'] }}</td>
                         <td>{{ $materia['hora_inicio'] }}</td>
                         <td>
-                            @if($materia['cruce'])
-                                Hay cruce
-                            @else
-                                Bien
-                            @endif
+                            {{ $materia['cruce'] ? 'Hay cruce' : 'Bien' }}
                         </td>
                     </tr>
                 @endforeach
@@ -130,25 +168,26 @@
             </thead>
             <tbody>
                 @foreach ($resultados as $alumno)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $alumno->matricula }}</td>
-                    <td>{{ $alumno->apellidos }}</td>
-                    <td>{{ $alumno->nombres }}</td>
-                    <td>
-                        {{
-                            ($grado && trim($grado) !== '')
-                            ? $grado
-                            : (optional(optional($alumno->inscritos->first())->grupo)->grado ?? 'Sin grado')
-                        }}
-                        {{
-                            optional(optional($alumno->inscritos->first())->grupo)->letra ?? 'Sin letra'
-                        }}
-                    </td>
-                    <td>{{ $alumno->estatus }}</td>
-                </tr>
-            @endforeach
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $alumno->matricula }}</td>
+                        <td>{{ $alumno->apellidos }}</td>
+                        <td>{{ $alumno->nombres }}</td>
+                        <td>
+                            {{
+                                ($grado && trim($grado) !== '')
+                                ? $grado
+                                : (optional(optional($alumno->inscritos->first())->grupo)->grado ?? 'Sin grado')
+                            }}
+                            {{
+                                optional(optional($alumno->inscritos->first())->grupo)->letra ?? 'Sin letra'
+                            }}
+                        </td>
+                        <td>{{ $alumno->estatus }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     @endif
 </body>
+</html>
