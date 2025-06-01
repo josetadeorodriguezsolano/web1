@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Calificacion extends Model
+class Calificacion extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'calificaciones';
 
@@ -19,6 +21,16 @@ class Calificacion extends Model
         'unidad',
         'calificacion',
     ];
+
+    // Configuración de auditoría
+    protected $auditEvents = [
+        'created',
+        'updated',
+        'deleted',
+    ];
+
+    protected $auditStrictMode = true;
+    protected $auditTimestamps = true;
 
     public function alumno(): BelongsTo
     {
@@ -45,13 +57,6 @@ class Calificacion extends Model
 
     /**
      * Actualiza o crea una calificación para un alumno en una materia y unidad específica
-     * 
-     * @param int $alumnoId ID del alumno
-     * @param int $materiaId ID de la materia
-     * @param int $unidad Número de unidad (1-4)
-     * @param float|null $valor Valor de la calificación
-     * @param int|null $calificacionId ID de la calificación existente (opcional)
-     * @return \App\Models\Calificacion
      */
     public static function actualizarCalificacion($alumnoId, $materiaId, $unidad, $valor, $calificacionId = null)
     {

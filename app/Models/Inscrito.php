@@ -4,17 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Inscrito extends Model
+class Inscrito extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
         'alumno_id',
         'grupo_id',
         'estatus',
-
     ];
+
+    // Configuración de auditoría
+    protected $auditEvents = [
+        'created',
+        'updated',
+        'deleted',
+    ];
+
+    protected $auditStrictMode = true;
+    protected $auditTimestamps = true;
 
     // Relaciones
     public function alumno()
