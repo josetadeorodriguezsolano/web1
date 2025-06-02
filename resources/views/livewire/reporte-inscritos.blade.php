@@ -17,8 +17,8 @@
                 <label class="block text-lg font-medium text-gray-700 mb-2">Generación:</label>
                 <select wire:model.live="generacionSeleccionada" class="w-full pl-3 pr-10 py-2 text-lg border-gray-300 rounded-md">
                     <option value="">Todas las generaciones</option>
-                    @foreach($generaciones as $gen)
-                        <option value="{{ $gen['generacion'] }}">{{ $gen['generacion'] }}</option>
+                    @foreach($generaciones as $generacion)
+                        <option value="{{ $generacion }}">{{ $generacion }}</option>
                     @endforeach
                 </select>
             </div>
@@ -116,34 +116,53 @@
                                 <tr>
                                     <td class="py-3 px-4">
                                         <div class="text-sm">
-                                            {{ \Carbon\Carbon::parse($historial->created_at)->format('d/m/Y') }}
+                                            {{ \Carbon\Carbon::parse($historial->created_at)->utc()->format('d/m/Y') }}
                                         </div>
                                         <div class="text-xs text-gray-500">
-                                            {{ \Carbon\Carbon::parse($historial->created_at)->format('H:i:s') }}
+                                            {{ \Carbon\Carbon::parse($historial->created_at)->utc()->format('H:i:s') }} UTC
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <div class="font-medium">{{ $historial->alumno_apellidos }} {{ $historial->alumno_nombres }}</div>
+                                        <div class="font-medium">
+                                            @if(isset($historial->alumno_info))
+                                                {{ $historial->alumno_info['apellidos'] ?? '' }} {{ $historial->alumno_info['nombres'] ?? '' }}
+                                            @else
+                                                <span class="text-gray-400">Sin datos</span>
+                                            @endif
+                                        </div>
                                     </td>
-                                    <td class="py-3 px-4">{{ $historial->alumno_matricula }}</td>
                                     <td class="py-3 px-4">
-                                        {{ $historial->grupo_grado }}°{{ $historial->grupo_letra }} (Gen. {{ $historial->grupo_generacion }})
+                                        @if(isset($historial->alumno_info))
+                                            {{ $historial->alumno_info['matricula'] ?? 'N/A' }}
+                                        @else
+                                            <span class="text-gray-400">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        @if(isset($historial->grupo_info))
+                                            {{ $historial->grupo_info['grado'] ?? '' }}°{{ $historial->grupo_info['letra'] ?? '' }} (Gen. {{ $historial->grupo_info['generacion'] ?? '' }})
+                                        @else
+                                            <span class="text-gray-400">Sin datos</span>
+                                        @endif
                                     </td>
                                     <td class="py-3 px-4">
                                         <span class="px-2 py-1 text-sm rounded-full 
-                                            {{ $historial->accion === 'created' ? 'bg-green-100 text-green-800' : 
-                                               ($historial->accion === 'updated' ? 'bg-blue-100 text-blue-800' : 
+                                            {{ $historial->event === 'created' ? 'bg-green-100 text-green-800' : 
+                                               ($historial->event === 'updated' ? 'bg-blue-100 text-blue-800' : 
                                                 'bg-red-100 text-red-800') }}">
-                                            {{ $historial->accion === 'created' ? 'Inscripción' : 
-                                               ($historial->accion === 'updated' ? 'Cambio de Estatus' : 'Eliminación') }}
+                                            {{ $historial->event === 'created' ? 'Inscripción' : 
+                                               ($historial->event === 'updated' ? 'Cambio de Estatus' : 'Eliminación') }}
                                         </span>
                                     </td>
                                     <td class="py-3 px-4">
-                                        @if($historial->estatus_anterior)
+                                        @php
+                                            $estatusAnterior = $historial->old_values['estatus'] ?? null;
+                                        @endphp
+                                        @if($estatusAnterior)
                                             @php
                                                 $estatusAnteriorDisplay = '';
                                                 $estatusAnteriorClass = '';
-                                                switch($historial->estatus_anterior) {
+                                                switch($estatusAnterior) {
                                                     case 'vigente':
                                                         $estatusAnteriorDisplay = 'Activo';
                                                         $estatusAnteriorClass = 'bg-green-100 text-green-800';
@@ -157,7 +176,7 @@
                                                         $estatusAnteriorClass = 'bg-yellow-100 text-yellow-800';
                                                         break;
                                                     default:
-                                                        $estatusAnteriorDisplay = ucfirst($historial->estatus_anterior);
+                                                        $estatusAnteriorDisplay = ucfirst($estatusAnterior);
                                                         $estatusAnteriorClass = 'bg-gray-100 text-gray-800';
                                                 }
                                             @endphp
@@ -169,11 +188,14 @@
                                         @endif
                                     </td>
                                     <td class="py-3 px-4">
-                                        @if($historial->estatus_nuevo)
+                                        @php
+                                            $estatusNuevo = $historial->new_values['estatus'] ?? null;
+                                        @endphp
+                                        @if($estatusNuevo)
                                             @php
                                                 $estatusNuevoDisplay = '';
                                                 $estatusNuevoClass = '';
-                                                switch($historial->estatus_nuevo) {
+                                                switch($estatusNuevo) {
                                                     case 'vigente':
                                                         $estatusNuevoDisplay = 'Activo';
                                                         $estatusNuevoClass = 'bg-green-100 text-green-800';
@@ -187,7 +209,7 @@
                                                         $estatusNuevoClass = 'bg-yellow-100 text-yellow-800';
                                                         break;
                                                     default:
-                                                        $estatusNuevoDisplay = ucfirst($historial->estatus_nuevo);
+                                                        $estatusNuevoDisplay = ucfirst($estatusNuevo);
                                                         $estatusNuevoClass = 'bg-gray-100 text-gray-800';
                                                 }
                                             @endphp
@@ -198,7 +220,9 @@
                                             <span class="text-gray-400">N/A</span>
                                         @endif
                                     </td>
-                                    <td class="py-3 px-4">{{ $historial->usuario_nombre }}</td>
+                                    <td class="py-3 px-4">
+                                        {{ $historial->user->name ?? 'Sistema' }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

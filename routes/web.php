@@ -37,6 +37,14 @@ Route::get('/inscritos', function () {
     return view('inscritos');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
 
+Route::get( '/reporte-calificaciones',  function () {
+    return view('reporte-calificaciones');
+})->middleware( ['auth:sanctum', config( 'jetstream.auth_session'), 'verified'])->name( 'reporte-calificaciones');
+
+Route::get( '/reporte-inscritos', function () {
+    return view('reporte-inscritos');
+})->middleware( ['auth:sanctum', config( 'jetstream.auth_session'), 'verified'])->name( 'reporte-inscritos');
+
 
 
 

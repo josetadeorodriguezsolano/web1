@@ -22,6 +22,13 @@ class Calificacion extends Model implements Auditable
         'calificacion',
     ];
 
+    protected $casts = [
+        'alumno_id' => 'integer',
+        'materia_id' => 'integer',
+        'unidad' => 'integer',
+        'calificacion' => 'decimal:2',
+    ];
+
     // Configuración de auditoría
     protected $auditEvents = [
         'created',
@@ -31,6 +38,14 @@ class Calificacion extends Model implements Auditable
 
     protected $auditStrictMode = true;
     protected $auditTimestamps = true;
+
+    // Incluir datos relacionados en la auditoría
+    protected $auditInclude = [
+        'alumno_id',
+        'materia_id',
+        'unidad',
+        'calificacion',
+    ];
 
     public function alumno(): BelongsTo
     {
@@ -76,5 +91,23 @@ class Calificacion extends Model implements Auditable
         }
 
         return self::create($datosCalificacion);
+    }
+
+    /**
+     * Transformar datos para auditoría
+     */
+    public function transformAudit(array $data): array
+    {
+        if (isset($data['new_values']['alumno_id'])) {
+            $alumno = Alumno::find($data['new_values']['alumno_id']);
+            $data['new_values']['alumno_info'] = $alumno ? $alumno->matricula . ' - ' . $alumno->nombres . ' ' . $alumno->apellidos : null;
+        }
+
+        if (isset($data['new_values']['materia_id'])) {
+            $materia = Materia::find($data['new_values']['materia_id']);
+            $data['new_values']['materia_info'] = $materia ? $materia->nombre : null;
+        }
+
+        return $data;
     }
 }
