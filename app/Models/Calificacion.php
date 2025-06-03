@@ -7,11 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
+
 
 class Calificacion extends Model implements Auditable
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
+    use AuditableTrait;
+
 
     protected $table = 'calificaciones';
 
