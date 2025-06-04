@@ -14,6 +14,8 @@ use Tests\TestCase;
 class AuditoriaInscritosTest extends TestCase
 {
     use RefreshDatabase;
+    protected $user;
+
 
     protected function setUp(): void
     {
