@@ -6,14 +6,41 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Calificacion extends Model
+class Calificacion extends Model implements Auditable
 {
     use HasFactory;
+    use \OwenIt\Auditing\Auditable;
 
     protected $table = 'calificaciones';
 
     protected $fillable = [
+        'alumno_id',
+        'materia_id',
+        'unidad',
+        'calificacion',
+    ];
+
+    protected $casts = [
+        'alumno_id' => 'integer',
+        'materia_id' => 'integer',
+        'unidad' => 'integer',
+        'calificacion' => 'decimal:2',
+    ];
+
+    // Configuración de auditoría
+    protected $auditEvents = [
+        'created',
+        'updated',
+        'deleted',
+    ];
+
+    protected $auditStrictMode = true;
+    protected $auditTimestamps = true;
+
+    // Incluir datos relacionados en la auditoría
+    protected $auditInclude = [
         'alumno_id',
         'materia_id',
         'unidad',
@@ -45,13 +72,6 @@ class Calificacion extends Model
 
     /**
      * Actualiza o crea una calificación para un alumno en una materia y unidad específica
-     * 
-     * @param int $alumnoId ID del alumno
-     * @param int $materiaId ID de la materia
-     * @param int $unidad Número de unidad (1-4)
-     * @param float|null $valor Valor de la calificación
-     * @param int|null $calificacionId ID de la calificación existente (opcional)
-     * @return \App\Models\Calificacion
      */
     public static function actualizarCalificacion($alumnoId, $materiaId, $unidad, $valor, $calificacionId = null)
     {
@@ -71,5 +91,23 @@ class Calificacion extends Model
         }
 
         return self::create($datosCalificacion);
+    }
+
+    /**
+     * Transformar datos para auditoría
+     */
+    public function transformAudit(array $data): array
+    {
+        if (isset($data['new_values']['alumno_id'])) {
+            $alumno = Alumno::find($data['new_values']['alumno_id']);
+            $data['new_values']['alumno_info'] = $alumno ? $alumno->matricula . ' - ' . $alumno->nombres . ' ' . $alumno->apellidos : null;
+        }
+
+        if (isset($data['new_values']['materia_id'])) {
+            $materia = Materia::find($data['new_values']['materia_id']);
+            $data['new_values']['materia_info'] = $materia ? $materia->nombre : null;
+        }
+
+        return $data;
     }
 }

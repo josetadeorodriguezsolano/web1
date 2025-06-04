@@ -29,11 +29,6 @@ Route::get('/info-alumno/{alumnoId}', function ($alumnoId) {
     return view('info-alumno', compact('alumnoId'));
 })->name('alumnoId');
 
-// Nueva ruta para la vista estática de detalle de alumno, apuntando al archivo en livewire
-Route::get('/info-alumno/{id?}', function ($id = null) {
-    return view('livewire.info-alumno');
-})->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('detalle.alumno');
-
 Route::get('/inscribir', function () {
     return view('inscribir');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscribir');
@@ -41,6 +36,14 @@ Route::get('/inscribir', function () {
 Route::get('/inscritos', function () {
     return view('inscritos');
 })->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->name('inscritos');
+
+Route::get( '/reporte-calificaciones',  function () {
+    return view('reporte-calificaciones');
+})->middleware( ['auth:sanctum', config( 'jetstream.auth_session'), 'verified'])->name( 'reporte-calificaciones');
+
+Route::get( '/reporte-inscritos', function () {
+    return view('reporte-inscritos');
+})->middleware( ['auth:sanctum', config( 'jetstream.auth_session'), 'verified'])->name( 'reporte-inscritos');
 
 
 
