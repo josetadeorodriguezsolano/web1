@@ -6,7 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Grupo;
 use App\Models\Inscrito;
+use App\Rules\AuditoriaInscripcionesRules;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use OwenIt\Auditing\Models\Audit;
 
 class ReporteInscritos extends Component
@@ -34,7 +36,7 @@ class ReporteInscritos extends Component
     public function mount()
     {
         $this->cargarGeneraciones();
-        // Establecer fechas por defecto (último mes) - CORREGIDO
+        // Establecer fechas por defecto (último mes)S
         $this->fechaFin = now()->format('Y-m-d');
         $this->fechaInicio = now()->subMonth()->format('Y-m-d');
     }
@@ -55,6 +57,20 @@ class ReporteInscritos extends Component
 
     public function updatedGeneracionSeleccionada()
     {
+        // Validar generación seleccionada
+        $validator = Validator::make(
+            ['generacionSeleccionada' => $this->generacionSeleccionada],
+            ['generacionSeleccionada' => AuditoriaInscripcionesRules::generationRules()],
+            AuditoriaInscripcionesRules::generationMessages()
+        );
+
+        if ($validator->fails()) {
+            $this->generacionSeleccionada = '';
+            $this->mensaje = $validator->errors()->first('generacionSeleccionada');
+            $this->tipoMensaje = 'error';
+            return;
+        }
+
         $this->grupoSeleccionado = '';
         $this->cargarGrupos();
         $this->resetPage();
@@ -64,11 +80,11 @@ class ReporteInscritos extends Component
     {
         try {
             $query = Grupo::query();
-            
+
             if ($this->generacionSeleccionada) {
                 $query->where('generacion', $this->generacionSeleccionada);
             }
-            
+
             $this->grupos = $query->orderBy('generacion', 'desc')
                 ->orderBy('grado')
                 ->orderBy('letra')
@@ -82,12 +98,70 @@ class ReporteInscritos extends Component
 
     public function updatedGrupoSeleccionado()
     {
+        // Validar grupo seleccionado
+        $validator = Validator::make(
+            ['grupoSeleccionado' => $this->grupoSeleccionado],
+            ['grupoSeleccionado' => AuditoriaInscripcionesRules::groupRules()],
+            AuditoriaInscripcionesRules::groupMessages()
+        );
+
+        if ($validator->fails()) {
+            $this->grupoSeleccionado = '';
+            $this->mensaje = $validator->errors()->first('grupoSeleccionado');
+            $this->tipoMensaje = 'error';
+            return;
+        }
+
+        // Validar que el grupo pertenezca a la generación seleccionada
+        if ($this->grupoSeleccionado && $this->generacionSeleccionada) {
+            if (!AuditoriaInscripcionesRules::validateGroupBelongsToGeneration(
+                $this->grupoSeleccionado,
+                $this->generacionSeleccionada
+            )) {
+                $this->grupoSeleccionado = '';
+                $this->mensaje = 'El grupo seleccionado no pertenece a la generación especificada.';
+                $this->tipoMensaje = 'error';
+                return;
+            }
+        }
+
         $this->resetPage();
     }
 
     public function aplicarFiltros()
     {
         $this->cargando = true;
+
+        // Validar filtros antes de aplicar
+        $validator = Validator::make(
+            [
+                'generacionSeleccionada' => $this->generacionSeleccionada,
+                'grupoSeleccionado' => $this->grupoSeleccionado
+            ],
+            AuditoriaInscripcionesRules::getFilterRules(),
+            AuditoriaInscripcionesRules::getFilterMessages()
+        );
+
+        if ($validator->fails()) {
+            $this->cargando = false;
+            $this->mensaje = 'Error en los filtros: ' . $validator->errors()->first();
+            $this->tipoMensaje = 'error';
+            return;
+        }
+
+        // Validar relación grupo-generación
+        if ($this->grupoSeleccionado && $this->generacionSeleccionada) {
+            if (!AuditoriaInscripcionesRules::validateGroupBelongsToGeneration(
+                $this->grupoSeleccionado,
+                $this->generacionSeleccionada
+            )) {
+                $this->cargando = false;
+                $this->mensaje = 'El grupo seleccionado no pertenece a la generación especificada.';
+                $this->tipoMensaje = 'error';
+                return;
+            }
+        }
+
         $this->resetPage();
         $this->cargando = false;
     }
@@ -97,7 +171,6 @@ class ReporteInscritos extends Component
         $this->generacionSeleccionada = '';
         $this->grupoSeleccionado = '';
         $this->accionFiltro = '';
-        // CORREGIR fechas por defecto
         $this->fechaFin = now()->format('Y-m-d');
         $this->fechaInicio = now()->subMonth()->format('Y-m-d');
         $this->cargarGrupos();
@@ -107,7 +180,7 @@ class ReporteInscritos extends Component
     public function cargarHistorialInscripciones()
     {
         try {
-            // Consulta base de auditorías
+            // Consulta base de auditoríasS
             $query = Audit::where('auditable_type', 'App\\Models\\Inscrito');
 
             // Aplicar filtros de fecha
@@ -127,11 +200,10 @@ class ReporteInscritos extends Component
                 ->orderBy('created_at', 'desc')
                 ->paginate(15);
 
-            // Enriquecer cada auditoría con datos relacionados
             $auditorias->getCollection()->transform(function ($auditoria) {
                 // Buscar el inscrito para obtener datos relacionados
                 $inscrito = Inscrito::find($auditoria->auditable_id);
-                
+
                 if ($inscrito) {
                     // Datos del alumno
                     if ($inscrito->alumno) {
@@ -141,7 +213,7 @@ class ReporteInscritos extends Component
                             'apellidos' => $inscrito->alumno->apellidos,
                         ];
                     }
-                    
+
                     // Datos del grupo
                     if ($inscrito->grupo) {
                         $auditoria->grupo_info = [
@@ -151,7 +223,7 @@ class ReporteInscritos extends Component
                         ];
                     }
                 }
-                
+
                 return $auditoria;
             });
 
@@ -159,24 +231,23 @@ class ReporteInscritos extends Component
             if ($this->generacionSeleccionada || $this->grupoSeleccionado) {
                 $filteredCollection = $auditorias->getCollection()->filter(function ($auditoria) {
                     $cumpleFiltros = true;
-                    
+
                     if ($this->generacionSeleccionada && isset($auditoria->grupo_info)) {
                         $cumpleFiltros = $cumpleFiltros && ($auditoria->grupo_info['generacion'] == $this->generacionSeleccionada);
                     }
-                    
+
                     if ($this->grupoSeleccionado) {
                         $inscrito = Inscrito::find($auditoria->auditable_id);
                         $cumpleFiltros = $cumpleFiltros && ($inscrito && $inscrito->grupo_id == $this->grupoSeleccionado);
                     }
-                    
+
                     return $cumpleFiltros;
                 });
-                
+
                 $auditorias->setCollection($filteredCollection);
             }
 
             return $auditorias;
-
         } catch (\Exception $e) {
             $this->mensaje = 'Error al cargar historial: ' . $e->getMessage();
             $this->tipoMensaje = 'error';

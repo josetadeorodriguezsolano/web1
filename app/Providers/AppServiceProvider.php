@@ -7,8 +7,12 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Carbon\Carbon;
 
-use App\Models\CustomAudit;             // ❶ tu modelo personalizado
-use App\Observers\AuditObserver;        // ❷ tu observer (no el de OwenIt)
+use App\Models\CustomAudit;
+use App\Observers\AuditObserver;
+
+// Auditoría automática Inscritos
+use App\Models\Inscrito;
+use App\Observers\InscripcionStatusObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Carbon::setLocale('es');
         CustomAudit::observe(AuditObserver::class);
-        //
+
+        // Registrar el observer específico para auditoría de cambios de estatus en inscripciones
+        Inscrito::observe(InscripcionStatusObserver::class);
     }
 }
